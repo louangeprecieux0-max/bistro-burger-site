@@ -558,9 +558,7 @@
       return wrap;
     }
     track.appendChild(group(false));
-    const dup = group(true);
-    dup.style.width = "50%";
-    track.appendChild(dup);
+    track.appendChild(group(true));
   })();
 
   /* ---------------------------------------------------------------- */
