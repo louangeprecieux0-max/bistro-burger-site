@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blog — Bistro Burger, Gardanne</title>
+<meta name="description" content="La vie du restaurant : nouveautés de la carte, coulisses de la cuisine et rendez-vous à ne pas manquer au Bistro Burger, Gardanne.">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body data-home="../index.html" data-blog-base="" data-asset-base="../">
+<div style="width:100%; overflow-x:hidden; color:var(--text-body); font-family:var(--font-body);">
+
+  <div id="header-spacer" style="height:69px;"></div>
+
+  <header style="position:fixed; top:0; left:0; right:0; z-index:80; background:rgba(14,70,61,.82); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-bottom:1px solid var(--border-on-dark);">
+    <div style="max-width:1240px; margin:0 auto; padding:14px 24px; display:flex; align-items:center; gap:32px;">
+      <a href="../index.html#accueil" style="order:0; display:flex; align-items:center; flex:none;">
+        <img src="../assets/logo-cream-sm.png" alt="Bistro Burger — Brasserie &amp; Burgers" style="height:46px; width:auto; display:block;">
+      </a>
+      <button type="button" id="nav-toggle" data-nav-toggle aria-label="Menu" aria-expanded="false" style="order:1; width:42px; height:42px; border:none; background:transparent; color:var(--color-secondary); cursor:pointer; align-items:center; justify-content:center; flex-direction:column; gap:4px; padding:0;">
+        <span style="display:block; width:22px; height:2.5px; background:currentColor; border-radius:2px;"></span>
+        <span style="display:block; width:22px; height:2.5px; background:currentColor; border-radius:2px;"></span>
+        <span style="display:block; width:22px; height:2.5px; background:currentColor; border-radius:2px;"></span>
+      </button>
+      <nav id="nav-main" data-nav-main data-open="false" style="order:2; display:flex; gap:26px; margin-left:auto; align-items:center; flex-wrap:wrap;">
+        <a href="../index.html#accueil" class="nav-link" style="color:var(--color-secondary); font-size:14.5px; opacity:.85;">Accueil</a>
+        <a href="../index.html#plat-du-jour" class="nav-link" style="color:var(--color-secondary); font-size:14.5px; opacity:.85;">Plat du jour</a>
+        <div data-nav-drop id="nav-drop" style="position:relative; z-index:90;">
+          <span style="display:inline-flex; align-items:center; gap:4px;">
+            <a href="../index.html#carte" class="nav-link" style="color:var(--color-secondary); font-size:14.5px; opacity:.85;">Notre carte</a>
+            <button type="button" id="cart-toggle" data-cart-toggle aria-label="Afficher les rubriques de la carte" style="background:transparent; border:none; cursor:pointer; color:var(--color-secondary); font-size:10px; opacity:.8; padding:6px;">▾</button>
+          </span>
+          <div data-nav-panel id="nav-panel" data-open="false" style="position:absolute; z-index:90; top:100%; left:-14px; padding-top:14px; min-width:210px;">
+            <div style="background:rgba(14,70,61,.96); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border:1px solid var(--border-on-dark); border-radius:var(--radius-card); box-shadow:0 20px 44px rgba(14,70,61,.45); padding:8px; display:flex; flex-direction:column; gap:2px;">
+              <a href="../index.html#burgers" data-nav-item class="nav-item" style="color:var(--color-secondary); font-size:14px; padding:10px 14px; border-radius:8px; opacity:.9;">Nos burgers</a>
+              <button type="button" data-nav-item data-go-carte="Sur place" class="nav-item" style="text-align:left; font-family:var(--font-body); font-size:14px; color:var(--color-secondary); background:transparent; border:none; cursor:pointer; padding:10px 14px; border-radius:8px; opacity:.9;">Carte sur place</button>
+              <button type="button" data-nav-item data-go-carte="À emporter" class="nav-item" style="text-align:left; font-family:var(--font-body); font-size:14px; color:var(--color-secondary); background:transparent; border:none; cursor:pointer; padding:10px 14px; border-radius:8px; opacity:.9;">Carte à emporter</button>
+            </div>
+          </div>
+        </div>
+        <a href="../index.html#a-propos" class="nav-link" style="color:var(--color-secondary); font-size:14.5px; opacity:.85;">À propos</a>
+        <a href="index.html" class="nav-link" style="color:var(--color-secondary); font-size:14.5px; opacity:1;">Blog</a>
+        <a href="../index.html#avis" class="nav-link" style="color:var(--color-secondary); font-size:14.5px; opacity:.85;">Avis</a>
+        <a href="../index.html#contact" class="nav-link" style="color:var(--color-secondary); font-size:14.5px; opacity:.85;">Contact</a>
+      </nav>
+      <div id="nav-actions" data-nav-actions data-open="false" style="order:3; display:flex; gap:10px; align-items:center;">
+        <div style="display:flex; gap:10px; align-items:center;">
+          <a href="https://www.facebook.com/" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook" class="social-btn" style="width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--color-primary); background:linear-gradient(115deg,#FFFBF6 0%,var(--color-secondary) 38%,var(--cream-500) 66%,#D9C7B3 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,.6), 0 6px 16px rgba(14,70,61,.35); border:1px solid rgba(237,224,211,.5);"><svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true"><path d="M14 8.5V6.8c0-.7.2-1.1 1.2-1.1H16.5V3.1C16.2 3.06 15.4 3 14.5 3 12.4 3 11 4.3 11 6.5v2H8.7V11H11v8h3v-8h2.2l.4-2.5H14z"></path></svg></a>
+          <a href="https://www.instagram.com/bistroburger_gardanne/" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram" class="social-btn" style="width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--color-primary); background:linear-gradient(115deg,#FFFBF6 0%,var(--color-secondary) 38%,var(--cream-500) 66%,#D9C7B3 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,.6), 0 6px 16px rgba(14,70,61,.35); border:1px solid rgba(237,224,211,.5);"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"></circle></svg></a>
+          <a href="https://www.tiktok.com/" target="_blank" rel="noopener" aria-label="TikTok" title="TikTok" class="social-btn" style="width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--color-primary); background:linear-gradient(115deg,#FFFBF6 0%,var(--color-secondary) 38%,var(--cream-500) 66%,#D9C7B3 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,.6), 0 6px 16px rgba(14,70,61,.35); border:1px solid rgba(237,224,211,.5);"><svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true"><path d="M16.3 3h-2.6v12.1a2.4 2.4 0 1 1-2-2.37V10.1a5 5 0 1 0 4.6 4.98V8.86a6.3 6.3 0 0 0 3.6 1.13V7.4a3.7 3.7 0 0 1-3.6-3.7V3z"></path></svg></a>
+        </div>
+        <button type="button" class="btn btn-outline-on-green btn-sm" data-shine data-call>04 65 84 89 18</button>
+      </div>
+    </div>
+  </header>
+
+  <section style="background:linear-gradient(180deg,var(--surface-alt),var(--cream-400)); padding:72px 24px 100px;">
+    <div style="max-width:1240px; margin:0 auto;">
+      <div style="text-align:center;" data-reveal>
+        <div class="eyebrow">Blog</div>
+        <h1 style="font-family:var(--font-heading); font-weight:700; font-size:42px; margin:16px 0 0; color:var(--color-primary);">La vie du restaurant</h1>
+        <p style="font-size:16px; line-height:1.65; color:var(--text-muted); max-width:620px; margin:14px auto 0;">Nouveautés de la carte, coulisses de la cuisine et rendez-vous à ne pas manquer.</p>
+      </div>
+      <div data-three-grid id="blog-grid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-top:44px;"></div>
+    </div>
+  </section>
+
+  <footer style="background:linear-gradient(180deg,var(--green-900),var(--color-primary)); color:var(--color-secondary); padding:72px 24px 32px;">
+    <div style="max-width:1240px; margin:0 auto; display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr; gap:48px;">
+      <div>
+        <img src="../assets/logo-cream-sm.png" alt="Bistro Burger — Brasserie &amp; Burgers" style="height:62px; width:auto; display:block;">
+        <p style="font-size:14.5px; line-height:1.7; color:rgba(237,224,211,.7); margin:18px 0 0; max-width:300px;">Burgers faits maison et plats du jour, à Gardanne, entre Aix-en-Provence et Marseille.</p>
+      </div>
+      <div>
+        <div class="footer-heading">Le site</div>
+        <div style="display:flex; flex-direction:column; gap:10px; font-size:14.5px;">
+          <a href="../index.html#accueil" class="footer-link">Accueil</a>
+          <a href="../index.html#plat-du-jour" class="footer-link">Plat du jour</a>
+          <a href="../index.html#carte" class="footer-link">Notre carte</a>
+          <a href="index.html" class="footer-link">Blog</a>
+          <a href="../index.html#reservation" class="footer-link">Réserver</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-heading">Contact</div>
+        <div style="display:flex; flex-direction:column; gap:10px; font-size:14.5px; color:rgba(237,224,211,.75);">
+          <span>ZAC Avon, Bretelle de la Plaine</span>
+          <span>13120 Gardanne</span>
+          <a href="tel:+33465848918" class="footer-link">+33 4 65 84 89 18</a>
+          <a href="mailto:brasserie.zone.avon@gmail.com" class="footer-link" style="word-break:break-all;">brasserie.zone.avon@gmail.com</a>
+          <div style="display:flex; gap:10px; align-items:center; margin-top:6px;">
+            <a href="https://www.facebook.com/" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook" class="social-btn-dark" style="width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--color-secondary); background:linear-gradient(115deg,#2E8F7C 0%,var(--green-700) 30%,var(--color-primary) 62%,var(--green-900) 100%); box-shadow:inset 0 1px 0 rgba(237,224,211,.3), 0 6px 16px rgba(14,70,61,.35); border:1px solid rgba(237,224,211,.22);"><svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true"><path d="M14 8.5V6.8c0-.7.2-1.1 1.2-1.1H16.5V3.1C16.2 3.06 15.4 3 14.5 3 12.4 3 11 4.3 11 6.5v2H8.7V11H11v8h3v-8h2.2l.4-2.5H14z"></path></svg></a>
+            <a href="https://www.instagram.com/bistroburger_gardanne/" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram" class="social-btn-dark" style="width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--color-secondary); background:linear-gradient(115deg,#2E8F7C 0%,var(--green-700) 30%,var(--color-primary) 62%,var(--green-900) 100%); box-shadow:inset 0 1px 0 rgba(237,224,211,.3), 0 6px 16px rgba(14,70,61,.35); border:1px solid rgba(237,224,211,.22);"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"></circle></svg></a>
+            <a href="https://www.tiktok.com/" target="_blank" rel="noopener" aria-label="TikTok" title="TikTok" class="social-btn-dark" style="width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--color-secondary); background:linear-gradient(115deg,#2E8F7C 0%,var(--green-700) 30%,var(--color-primary) 62%,var(--green-900) 100%); box-shadow:inset 0 1px 0 rgba(237,224,211,.3), 0 6px 16px rgba(14,70,61,.35); border:1px solid rgba(237,224,211,.22);"><svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true"><path d="M16.3 3h-2.6v12.1a2.4 2.4 0 1 1-2-2.37V10.1a5 5 0 1 0 4.6 4.98V8.86a6.3 6.3 0 0 0 3.6 1.13V7.4a3.7 3.7 0 0 1-3.6-3.7V3z"></path></svg></a>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="footer-heading">Horaires</div>
+        <div style="display:flex; flex-direction:column; gap:10px; font-size:14.5px; color:rgba(237,224,211,.75);">
+          <span>Lun–Ven · midi et soir</span>
+          <span>Sam · soir uniquement</span>
+          <span>Fermé sam. midi et dim.</span>
+        </div>
+      </div>
+    </div>
+    <div style="max-width:1240px; margin:44px auto 0; padding-top:22px; border-top:1px solid var(--border-on-dark); display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap; font-size:13px; color:rgba(237,224,211,.6);">
+      <span>© 2026 Bistro Burger — Gardanne. Tous droits réservés.</span>
+      <span style="display:flex; gap:20px;"><a href="../index.html#contact" class="footer-link" style="color:rgba(237,224,211,.6);">Mentions légales</a><a href="../index.html#contact" class="footer-link" style="color:rgba(237,224,211,.6);">Confidentialité</a></span>
+    </div>
+  </footer>
+
+</div>
+<script src="../script.js"></script>
+</body>
+</html>

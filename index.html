@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bistro Burger — Brasserie &amp; Burgers à Gardanne</title>
+<meta name="description" content="Burgers faits maison, plat du jour quotidien et brasserie familiale à Gardanne, entre Aix-en-Provence et Marseille. Réservez votre table ou commandez à emporter.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div style="width:100%; overflow-x:hidden; color:var(--text-body); font-family:var(--font-body);">
+
+  <!-- 01 · SPACER (compensates the fixed header) -->
+  <div id="header-spacer" style="height:69px;"></div>
+
+  <!-- 02 · EN-TÊTE FIXE -->
+  <header style="position:fixed; top:0; left:0; right:0; z-index:80; background:rgba(14,70,61,.82); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-bottom:1px solid var(--border-on-dark);">
+    <div style="max-width:1240px; margin:0 auto; padding:14px 24px; display:flex; align-items:center; gap:32px;">
+      <a href="#accueil" style="order:0; display:flex; align-items:center; flex:none;">
+        <img src="assets/logo-cream-sm.png" alt="Bistro Burger — Brasserie &amp; Burgers" style="height:46px; width:auto; display:block;">
+      </a>
+      <button type="button" id="nav-toggle" data-nav-toggle aria-label="Menu" aria-expanded="false" style="order:1; width:42px; height:42px; border:none; background:transparent; color:var(--color-secondary); cursor:pointer; align-items:center; justify-content:center; flex-direction:column; gap:4px; padding:0;">
+        <span style="display:block; width:22px; height:2.5px; background:currentColor; border-radius:2px;"></span>
+        <span style="display:block; width:22px; height:2.5px; background:currentColor; border-radius:2px;"></span>
+        <span style="display:block; width:22px; height:2.5px; background:currentColor; border-radius:2px;"></span>
+      </button>
+      <nav id="nav-main" data-nav-main data-open="false" style="order:2; display:flex; gap:26px; margin-left:auto; align-items:center; flex-wrap:wrap;">
+        <a href="#accueil" class="nav-link" style="color:var(--color-secondary); font-size:14.5px; opacity:.85;">Accueil</a>
+        <a href="#plat-du-jour" class="nav-link" style="color:var(--color-secondary); font-size:14.5px; opacity:.85;">Plat du jour</a>
+        <div data-nav-drop id="nav-drop" style="position:relative; z-index:90;">
+          <span style="display:inline-flex; align-items:center; gap:4px;">
+            <a href="#carte" class="nav-link" style="color:var(--color-secondary); font-size:14.5px; opacity:.85;">Notre carte</a>
+            <button type="button" id="cart-toggle" data-cart-toggle aria-label="Afficher les rubriques de la carte" style="background:transparent; border:none; cursor:pointer; color:var(--color-secondary); font-size:10px; opacity:.8; padding:6px;">▾</button>
+          </span>
+          <div data-nav-panel id="nav-panel" data-open="false" style="position:absolute; z-index:90; top:100%; left:-14px; padding-top:14px; min-width:210px;">
+            <div style="background:rgba(14,70,61,.96); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border:1px solid var(--border-on-dark); border-radius:var(--radius-card); box-shadow:0 20px 44px rgba(14,70,61,.45); padding:8px; display:flex; flex-direction:column; gap:2px;">
+              <a href="#burgers" data-nav-item class="nav-item" style="color:var(--color-secondary); font-size:14px; padding:10px 14px; border-radius:8px; opacity:.9;">Nos burgers</a>
+              <button type="button" data-nav-item data-go-carte="Sur place" class="nav-item" style="text-align:left; font-family:var(--font-body); font-size:14px; color:var(--color-secondary); background:transparent; border:none; cursor:pointer; padding:10px 14px; border-radius:8px; opacity:.9;">Carte sur place</button>
+              <button type="button" data-nav-item data-go-carte="À emporter" class="nav-item" style="text-align:left; font-family:var(--font-body); font-size:14px; color:var(--color-secondary); background:transparent; border:none; cursor:pointer; padding:10px 14px; border-radius:8px; opacity:.9;">Carte à emporter</button>
+            </div>
+          </div>
+        </div>
+        <a href="#a-propos" class="nav-link" style="color:var(--color-secondary); font-size:14.5px; opacity:.85;">À propos</a>
+        <a href="blog/index.html" class="nav-link" style="color:var(--color-secondary); font-size:14.5px; opacity:.85;">Blog</a>
+        <a href="#avis" class="nav-link" style="color:var(--color-secondary); font-size:14.5px; opacity:.85;">Avis</a>
+        <a href="#contact" class="nav-link" style="color:var(--color-secondary); font-size:14.5px; opacity:.85;">Contact</a>
+      </nav>
+      <div id="nav-actions" data-nav-actions data-open="false" style="order:3; display:flex; gap:10px; align-items:center;">
+        <div style="display:flex; gap:10px; align-items:center;">
+          <a href="https://www.facebook.com/" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook" class="social-btn" style="width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--color-primary); background:linear-gradient(115deg,#FFFBF6 0%,var(--color-secondary) 38%,var(--cream-500) 66%,#D9C7B3 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,.6), 0 6px 16px rgba(14,70,61,.35); border:1px solid rgba(237,224,211,.5);"><svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true"><path d="M14 8.5V6.8c0-.7.2-1.1 1.2-1.1H16.5V3.1C16.2 3.06 15.4 3 14.5 3 12.4 3 11 4.3 11 6.5v2H8.7V11H11v8h3v-8h2.2l.4-2.5H14z"></path></svg></a>
+          <a href="https://www.instagram.com/bistroburger_gardanne/" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram" class="social-btn" style="width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--color-primary); background:linear-gradient(115deg,#FFFBF6 0%,var(--color-secondary) 38%,var(--cream-500) 66%,#D9C7B3 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,.6), 0 6px 16px rgba(14,70,61,.35); border:1px solid rgba(237,224,211,.5);"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"></circle></svg></a>
+          <a href="https://www.tiktok.com/" target="_blank" rel="noopener" aria-label="TikTok" title="TikTok" class="social-btn" style="width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--color-primary); background:linear-gradient(115deg,#FFFBF6 0%,var(--color-secondary) 38%,var(--cream-500) 66%,#D9C7B3 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,.6), 0 6px 16px rgba(14,70,61,.35); border:1px solid rgba(237,224,211,.5);"><svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true"><path d="M16.3 3h-2.6v12.1a2.4 2.4 0 1 1-2-2.37V10.1a5 5 0 1 0 4.6 4.98V8.86a6.3 6.3 0 0 0 3.6 1.13V7.4a3.7 3.7 0 0 1-3.6-3.7V3z"></path></svg></a>
+        </div>
+        <button type="button" class="btn btn-outline-on-green btn-sm" data-shine data-call>04 65 84 89 18</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 03 · HÉRO -->
+  <section id="accueil" style="position:relative; color:var(--color-secondary); overflow:hidden;">
+    <img src="assets/hero-burger.webp" alt="Burger signature Bistro Burger servi avec des frites maison, enseigne néon Bistro Burger en fond" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:60% 45%; display:block;">
+    <div style="position:absolute; inset:0; background:linear-gradient(100deg,var(--green-900) 0%,rgba(14,70,61,.92) 22%,rgba(18,87,76,.7) 42%,rgba(27,109,95,.25) 62%,transparent 80%);"></div>
+    <div style="position:relative; max-width:1240px; margin:0 auto; padding:132px 24px 140px; min-height:520px; display:flex; flex-direction:column; justify-content:center; align-items:flex-start;">
+      <div style="max-width:640px;" data-reveal>
+        <div style="font-family:var(--font-heading); font-weight:700; font-size:12px; letter-spacing:.2em; text-transform:uppercase; color:rgba(237,224,211,.75);">Brasserie &amp; Burgers · Gardanne</div>
+        <h1 style="font-family:var(--font-heading); font-weight:800; font-size:60px; line-height:1.05; letter-spacing:.01em; text-transform:uppercase; margin:20px 0 0;"><span style="white-space:nowrap;">Burgers maison <span style="color:var(--cream-500); font-style:italic; text-transform:none;">&amp;</span></span><br>produits frais</h1>
+        <p style="font-size:16.5px; line-height:1.7; color:rgba(237,224,211,.82); margin:22px 0 0; max-width:480px;">Bienvenue au Bistro Burger, votre brasserie à Gardanne. Nos burgers sont uniques et faits maison, nos plats cuisinés sur place par nos chefs avec des produits frais.</p>
+        <div style="display:flex; gap:14px; margin-top:34px; flex-wrap:wrap;">
+          <button type="button" class="btn btn-on-green btn-hero-pill" data-shine data-go="reservation">Réserver</button>
+          <button type="button" class="btn btn-outline-on-green btn-hero-pill-outline" data-shine data-go="commander">Commander</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div style="background:linear-gradient(90deg,var(--green-900),var(--green-700) 55%,var(--green-900)); color:var(--color-secondary); border-top:1px solid var(--border-on-dark); border-bottom:1px solid var(--border-on-dark); overflow:hidden; padding:11px 0;">
+    <div data-marquee style="display:flex; align-items:center; gap:26px; width:max-content;" id="marquee-track"></div>
+  </div>
+
+  <!-- 04 · À PROPOS -->
+  <section id="a-propos" style="background: linear-gradient(180deg,var(--surface-alt),var(--cream-400)); padding: 80px 24px 96px; position: relative">
+    <div style="max-width:1240px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center;">
+      <div data-reveal style="position: relative">
+        <div class="eyebrow">À propos</div>
+        <h2 style="font-family:var(--font-heading); font-weight:700; font-size:42px; line-height:1.15; margin:16px 0 0; color:var(--color-primary);">Une brasserie moderne au cœur de la ZAC Avon</h2>
+        <p style="font-size:16.5px; line-height:1.7; color:var(--text-muted); margin:20px 0 0;">Bistro Burger est né d'une idée simple : proposer à Gardanne des burgers qu'on aurait plaisir à manger tous les jours. Nos plats sont cuisinés sur place, à la commande, avec des produits frais sélectionnés auprès de nos fournisseurs.</p>
+        <div style="font-size:16.5px; line-height:1.7; color:var(--text-muted); margin:14px 0 0;"><p>Chaque midi, nous proposons un plat du jour, en plus de notre carte disponible à tout moment et de nos desserts maison. Le midi, les actifs de la ZAC Avon viennent pour la formule et le plat du jour ; le soir et le week-end, la salle se remplit de familles et de tablées d'amis. Le service reste le même : rapide, avec le sourire.</p></div>
+        <div style="margin-top:30px;">
+          <button type="button" class="btn btn-primary btn-gradient" data-shine data-go="carte">Découvrir la carte</button>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;" data-reveal>
+        <div style="grid-column:1 / -1; aspect-ratio:16/9; border-radius:var(--radius-photo); overflow:hidden;">
+          <img src="assets/salle.webp" alt="La salle du Bistro Burger à Gardanne, tables dressées et guirlande de drapeaux" style="width:100%; height:100%; object-fit:cover; display:block;">
+        </div>
+        <div style="aspect-ratio:1; border-radius:var(--radius-photo); overflow:hidden;">
+          <img src="assets/matin.webp" alt="Café, jus d'orange et viennoiserie sur une table du Bistro Burger le matin" style="width:100%; height:100%; object-fit:cover; display:block;">
+        </div>
+        <div style="aspect-ratio:1; border-radius:var(--radius-photo); overflow:hidden;">
+          <img src="assets/tablee.png" alt="Grande tablée d'une vingtaine de convives attablés au Bistro Burger" style="width:100%; height:100%; object-fit:cover; display:block;">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 · PLAT DU JOUR + SUGGESTION -->
+  <section id="plat-du-jour" style="background:var(--surface-alt); padding:80px 24px 96px;">
+    <div data-two-grid style="max-width:1240px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+      <div style="position:relative; border-radius:var(--radius-card); overflow:hidden; background:linear-gradient(115deg,var(--green-900) 0%,var(--color-primary) 55%,var(--green-700) 100%); color:var(--color-secondary); min-height:300px; display:flex;" data-reveal>
+        <div style="flex:1; padding:44px 42px; display:flex; flex-direction:column; justify-content:flex-end;">
+          <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+            <span class="badge badge-cream">Plat du jour</span>
+            <span style="font-size:13px; color:rgba(237,224,211,.7);">Jeudi 7 août · servi de 12h à 14h</span>
+          </div>
+          <h3 style="font-family:var(--font-heading); font-weight:700; font-size:36px; margin:18px 0 0; line-height:1.14;">Brochette de magret de canard aux abricots marinée, boulgour aux légumes croquants</h3>
+          <div style="display:flex; align-items:center; gap:24px; margin:26px 0 28px; flex-wrap:wrap;">
+            <span style="font-family:var(--font-heading); font-weight:700; font-size:32px;">14,50&nbsp;€</span>
+          </div>
+          <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <button type="button" class="btn btn-on-green btn-sm btn-cream" data-shine data-go="reservation">Réserver pour ce midi</button>
+            <button type="button" class="btn btn-outline-on-green btn-sm" data-go="commander">Commander à emporter</button>
+          </div>
+        </div>
+      </div>
+      <div style="position:relative; border-radius:var(--radius-card); overflow:hidden; background:linear-gradient(135deg,var(--cream-500) 0%,var(--cream-400) 50%,#C9B6A2 100%); min-height:300px; display:flex; color:var(--color-primary);" data-reveal>
+        <div style="position:relative; flex:1; padding:44px 42px; display:flex; flex-direction:column; justify-content:flex-end;">
+          <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+            <span class="badge badge-green">Suggestion du jour</span>
+          </div>
+          <h3 style="font-family:var(--font-heading); font-weight:700; font-size:38px; margin:18px 0 0; line-height:1.12;">Burger du boucher, sauce poivre</h3>
+          <p style="font-size:15.5px; line-height:1.65; color:rgba(18,87,76,.78); margin:14px 0 0; max-width:460px;">La suggestion que le chef ajoute à la carte, selon le marché du matin. Servie avec frites maison et salade.</p>
+          <div style="display:flex; align-items:center; gap:24px; margin:26px 0 28px; flex-wrap:wrap;">
+            <span style="font-family:var(--font-heading); font-weight:700; font-size:32px;">16,90&nbsp;€</span>
+          </div>
+          <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <button type="button" class="btn btn-primary btn-gradient btn-sm" data-shine data-go="reservation">Réserver</button>
+            <button type="button" class="btn btn-outline btn-sm" data-go="commander">Commander</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06a · NOS BURGERS -->
+  <section id="burgers" style="background:var(--surface-alt); padding:100px 24px;">
+    <div style="max-width:1240px; margin:0 auto;">
+      <div style="text-align:center;" data-reveal>
+        <div class="eyebrow">Nos burgers</div>
+        <h2 style="font-family:var(--font-heading); font-weight:700; font-size:42px; margin:16px 0 0; color:var(--color-primary);">Les burgers du BB</h2>
+        <p style="font-size:16px; line-height:1.65; color:var(--text-muted); max-width:620px; margin:14px auto 0;">Les originaux, les effilochés et les signatures BB, tous montés dans nos Bun's² et servis avec frites maison.</p>
+      </div>
+      <div style="position:relative; margin-top:44px; padding-bottom:0;" data-burger-shell>
+        <button type="button" data-burger-arrow data-dir="prev" aria-label="Burgers précédents" style="position:absolute; left:-22px; top:52%; transform:translateY(-50%); z-index:2; width:46px; height:46px; border-radius:50%; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; font-family:var(--font-heading); font-size:20px; line-height:1; color:var(--color-secondary); background:linear-gradient(115deg,#2E8F7C 0%,var(--green-700) 30%,var(--color-primary) 62%,var(--green-900) 100%); box-shadow:inset 0 1px 0 rgba(237,224,211,.3), 0 8px 22px rgba(18,87,76,.32);">‹</button>
+        <button type="button" data-burger-arrow data-dir="next" aria-label="Burgers suivants" style="position:absolute; right:-22px; top:52%; transform:translateY(-50%); z-index:2; width:46px; height:46px; border-radius:50%; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; font-family:var(--font-heading); font-size:20px; line-height:1; color:var(--color-secondary); background:linear-gradient(115deg,#2E8F7C 0%,var(--green-700) 30%,var(--color-primary) 62%,var(--green-900) 100%); box-shadow:inset 0 1px 0 rgba(237,224,211,.3), 0 8px 22px rgba(18,87,76,.32);">›</button>
+        <div data-burger-track id="burger-track" style="display:flex; gap:22px; overflow-x:auto; scroll-snap-type:x proximity; align-items:stretch; padding:10px 2px 20px;"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 · NOTRE CARTE -->
+  <section id="carte" style="position:relative; padding:100px 24px; color:var(--color-secondary); overflow:hidden;">
+    <img src="assets/carte-fond.png" alt="Assiette de frites maison et salade servie au Bistro Burger" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block;">
+    <div style="position:relative; max-width:1240px; margin:0 auto;">
+      <div style="text-align:center;" data-reveal>
+        <div class="eyebrow">Notre carte</div>
+        <h2 style="font-family:var(--font-heading); font-weight:700; font-size:42px; margin:16px 0 0; text-shadow:0 2px 14px rgba(0,0,0,.7);">Ce qu'on sert à Gardanne</h2>
+        <p style="font-size:16px; line-height:1.65; color:rgba(237,224,211,.9); max-width:620px; margin:14px auto 0; text-shadow:0 2px 12px rgba(0,0,0,.7);">Deux cartes : celle que l'on sert en salle, et celle à emporter et en livraison.</p>
+      </div>
+      <div style="display:flex; justify-content:center; margin-top:32px;">
+        <div id="mode-toggle" style="display:inline-flex; flex-wrap:wrap; justify-content:center; gap:6px; background:#FFFFFF; border:1px solid var(--border-default); border-radius:var(--radius-badge); padding:6px; box-shadow:var(--shadow-card);"></div>
+      </div>
+      <div style="display:flex; justify-content:center; margin-top:22px;">
+        <div style="display:inline-block; background:#FFFFFF; border:1px solid var(--border-default); border-radius:var(--radius-card); padding:4px 24px 0; box-shadow:var(--shadow-card);">
+          <div class="tabs" id="tabs-list"></div>
+        </div>
+      </div>
+      <div id="carte-groups" style="background:linear-gradient(115deg,rgba(46,143,124,.94) 0%,rgba(27,109,95,.95) 30%,rgba(18,87,76,.96) 62%,rgba(14,70,61,.97) 100%); border-radius:var(--radius-card); box-shadow:0 26px 60px rgba(14,70,61,.4); padding:56px 60px; display:flex; flex-direction:column; gap:52px; margin-top:44px;"></div>
+      <div style="display:flex; justify-content:center; gap:12px; margin-top:40px; flex-wrap:wrap;">
+        <button type="button" class="btn btn-primary btn-gradient" data-shine data-go="reservation">Réserver</button>
+        <button type="button" class="btn btn-outline-on-green" data-go="commander">Commander à emporter</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 · RÉSERVATION -->
+  <section id="reservation" style="position:relative; padding:96px 24px 0; color:var(--color-secondary);">
+    <div style="position:absolute; inset:0; overflow:hidden;">
+      <img src="assets/table-reservee.jpg" alt="Table dressée avec un carton Table Réservée" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block;">
+      <div style="position:absolute; inset:0; background:linear-gradient(100deg,var(--green-900) 0%,rgba(18,87,76,.88) 26%,rgba(27,109,95,.55) 50%,rgba(46,143,124,.18) 72%,transparent 88%);"></div>
+    </div>
+    <div style="position:relative; max-width:1240px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:start; padding-bottom:96px;">
+      <div data-reveal>
+        <div style="font-family:var(--font-heading); font-weight:700; font-size:12px; letter-spacing:.2em; text-transform:uppercase; color:var(--color-secondary); opacity:.8;">Réservation</div>
+        <h2 style="font-family:var(--font-heading); font-weight:800; font-size:52px; line-height:1.08; text-transform:uppercase; margin:18px 0 0;">Envie d'une table ?<br>Réservez la vôtre<br>maintenant</h2>
+        <div style="font-size:15px; color:rgba(237,224,211,.8); margin:26px 0 14px;">Ou appelez-nous directement</div>
+        <a href="tel:+33465848918" class="btn btn-gradient" style="display:inline-block; font-family:var(--font-heading); font-weight:700; font-size:17px; padding:16px 30px;">04 65 84 89 18</a>
+        <div style="display:flex; flex-direction:column; gap:8px; margin-top:34px; font-size:14.5px; color:rgba(237,224,211,.78);">
+          <div>Du lundi au vendredi · midi et soir</div>
+          <div>Samedi · soir uniquement</div>
+          <div>Fermé samedi midi et dimanche toute la journée</div>
+          <div>Parking gratuit devant le restaurant</div>
+        </div>
+      </div>
+      <form id="reservation-form" action="https://formsubmit.co/louangeprecieux0@gmail.com" method="POST" style="background:linear-gradient(115deg,#2E8F7C 0%,var(--green-700) 30%,var(--color-primary) 62%,var(--green-900) 100%); border-radius:var(--radius-card); box-shadow:0 26px 60px rgba(14,70,61,.5); padding:40px; position:relative; z-index:2; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:16px;" data-reveal>
+        <h3 style="grid-column:1 / -1; font-family:var(--font-heading); font-weight:800; font-size:22px; letter-spacing:.02em; text-transform:uppercase; text-align:center; margin:0 0 6px;">Réserver une table</h3>
+        <input type="hidden" name="_subject" value="Nouvelle réservation — Bistro Burger">
+        <input type="hidden" name="_template" value="table">
+        <input type="hidden" name="_captcha" value="false">
+        <input class="field" type="text" name="nom" required placeholder="Votre nom" style="width:100%; box-sizing:border-box; font-family:var(--font-body); font-size:16px; padding:12px 14px; border-radius:var(--radius-field); background:rgba(14,70,61,.32); border:1px solid rgba(237,224,211,.35); color:var(--color-secondary); outline:none;">
+        <input class="field" type="email" name="email" required placeholder="Votre e-mail" style="width:100%; box-sizing:border-box; font-family:var(--font-body); font-size:16px; padding:12px 14px; border-radius:var(--radius-field); background:rgba(14,70,61,.32); border:1px solid rgba(237,224,211,.35); color:var(--color-secondary); outline:none;">
+        <input class="field" type="tel" name="tel" required placeholder="Votre téléphone" style="width:100%; box-sizing:border-box; font-family:var(--font-body); font-size:16px; padding:12px 14px; border-radius:var(--radius-field); background:rgba(14,70,61,.32); border:1px solid rgba(237,224,211,.35); color:var(--color-secondary); outline:none;">
+        <input class="field" type="date" name="date" required style="width:100%; box-sizing:border-box; font-family:var(--font-body); font-size:16px; padding:12px 14px; border-radius:var(--radius-field); background:rgba(14,70,61,.32); border:1px solid rgba(237,224,211,.35); color:var(--color-secondary); outline:none;">
+        <select name="heure" style="width:100%; box-sizing:border-box; font-family:var(--font-body); font-size:16px; padding:12px 14px; border-radius:var(--radius-field); background:rgba(14,70,61,.32); border:1px solid rgba(237,224,211,.35); color:var(--color-secondary); outline:none; appearance:none;"><option style="color:#2C2C2A;">12h00</option><option style="color:#2C2C2A;">12h30</option><option style="color:#2C2C2A;">13h00</option><option style="color:#2C2C2A;">13h30</option><option style="color:#2C2C2A;">14h00</option><option style="color:#2C2C2A;">19h00</option><option style="color:#2C2C2A;">19h30</option><option style="color:#2C2C2A;">20h00</option><option style="color:#2C2C2A;">20h30</option><option style="color:#2C2C2A;">21h00</option></select>
+        <select name="couverts" style="width:100%; box-sizing:border-box; font-family:var(--font-body); font-size:16px; padding:12px 14px; border-radius:var(--radius-field); background:rgba(14,70,61,.32); border:1px solid rgba(237,224,211,.35); color:var(--color-secondary); outline:none; appearance:none;"><option style="color:#2C2C2A;">2 personnes</option><option style="color:#2C2C2A;">3 personnes</option><option style="color:#2C2C2A;">4 personnes</option><option style="color:#2C2C2A;">5 personnes</option><option style="color:#2C2C2A;">6 personnes et plus</option></select>
+        <div style="grid-column:1 / -1; color:rgba(237,224,211,.8); font-size:13px; line-height:1.5;">
+          <label class="field-check"><input type="checkbox" name="consent" required><span class="box">✓</span>J'accepte que mes coordonnées soient utilisées pour traiter cette réservation.</label>
+        </div>
+        <div style="grid-column:1 / -1; margin-top:4px;">
+          <button type="submit" class="btn btn-on-green btn-submit" data-shine style="width:100%;">Réserver ma table</button>
+        </div>
+        <div id="reservation-sent" hidden style="grid-column:1 / -1; background:rgba(237,224,211,.18); border:1px solid rgba(237,224,211,.4); border-radius:var(--radius-button); padding:14px; font-size:14px; text-align:center;">Merci, votre demande est bien enregistrée. Nous vous rappelons pour confirmer.</div>
+        <div id="reservation-error" hidden style="grid-column:1 / -1; background:rgba(181,101,29,.25); border:1px solid rgba(181,101,29,.6); border-radius:var(--radius-button); padding:14px; font-size:14px; text-align:center;">L'envoi a échoué. Réessayez, ou appelez-nous directement au 04 65 84 89 18.</div>
+      </form>
+    </div>
+  </section>
+
+  <!-- 08 · OFFRES DU MOMENT -->
+  <section style="background:var(--surface-alt); padding:100px 24px;">
+    <div style="max-width:1240px; margin:0 auto;">
+      <div style="text-align:center;" data-reveal>
+        <div class="eyebrow">Offres du moment</div>
+        <h2 style="font-family:var(--font-heading); font-weight:700; font-size:42px; margin:16px 0 0; color:var(--color-primary);">Les bonnes raisons de passer cette semaine</h2>
+        <p style="font-size:16px; line-height:1.65; color:var(--text-muted); max-width:620px; margin:14px auto 0;">Quatre offres en cours, sur place comme à emporter.</p>
+      </div>
+      <div data-offers-grid style="display:grid; grid-template-columns:repeat(4,1fr); gap:22px; margin-top:44px; align-items:stretch;">
+        <div data-offer="light" class="offer-card" style="background:linear-gradient(180deg,#FFFFFF,var(--cream-400)); border:1px solid var(--border-default); border-radius:var(--radius-card); overflow:hidden; display:flex; flex-direction:column;">
+          <div data-offer-visual style="aspect-ratio:16/10; overflow:hidden; position:relative;">
+            <img src="assets/menu-etudiant.png" alt="Menu étudiant : cheeseburger, frites maison et boisson sur plateau" style="width:100%; height:100%; object-fit:cover; display:block;">
+          </div>
+          <div style="padding:22px 22px 26px; display:flex; flex-direction:column; flex:1;">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+              <span data-offer-tag style="font-family:var(--font-heading); font-weight:700; font-size:11px; letter-spacing:.14em; text-transform:uppercase; padding:6px 13px; border-radius:var(--radius-badge);">Menu étudiant</span>
+              <span data-offer-price style="font-family:var(--font-heading); font-weight:700; font-size:17px;">11,90 €</span>
+            </div>
+            <h3 style="font-family:var(--font-heading); font-weight:600; font-size:17.5px; line-height:1.3; margin:16px 0 0;">Burger smash, frites maison, boisson 33 cl</h3>
+            <p style="font-size:13.5px; line-height:1.6; margin:10px 0 0; flex:1;">Offre valable uniquement sur présentation de la carte étudiante, un menu par carte.</p>
+          </div>
+        </div>
+        <div data-offer="light" class="offer-card" style="background:linear-gradient(180deg,#FFFFFF,var(--cream-400)); border:1px solid var(--border-default); border-radius:var(--radius-card); overflow:hidden; display:flex; flex-direction:column;">
+          <div data-offer-visual style="aspect-ratio:16/10; overflow:hidden; position:relative;">
+            <img src="assets/menu-enfant.png" alt="Menu enfant : cheeseburger, tenders de poulet, frites maison et boisson" style="width:100%; height:100%; object-fit:cover; display:block;">
+          </div>
+          <div style="padding:22px 22px 26px; display:flex; flex-direction:column; flex:1;">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+              <span data-offer-tag style="font-family:var(--font-heading); font-weight:700; font-size:11px; letter-spacing:.14em; text-transform:uppercase; padding:6px 13px; border-radius:var(--radius-badge);">Menu enfant</span>
+              <span data-offer-price style="font-family:var(--font-heading); font-weight:700; font-size:17px;">11,90 €</span>
+            </div>
+            <h3 style="font-family:var(--font-heading); font-weight:600; font-size:17.5px; line-height:1.3; margin:16px 0 0;">Cheeseburger, tenders de poulet ou steak haché, boisson 33 cl</h3>
+            <p style="font-size:13.5px; line-height:1.6; margin:10px 0 0; flex:1;">Le mardi soir et le mercredi midi, le menu enfant est offert pour tout achat d'un menu adulte. Valable également pour tout repas sur place.</p>
+          </div>
+        </div>
+        <div data-offer="light" class="offer-card" style="background:linear-gradient(180deg,#FFFFFF,var(--cream-400)); border:1px solid var(--border-default); border-radius:var(--radius-card); overflow:hidden; display:flex; flex-direction:column;">
+          <div data-offer-visual style="aspect-ratio:16/10; overflow:hidden; position:relative;">
+            <img src="assets/carte-fidelite.png" alt="Carte de fidélité Bistro Burger verte et dorée à dix cases" style="width:100%; height:100%; object-fit:cover; display:block;">
+          </div>
+          <div style="padding:22px 22px 26px; display:flex; flex-direction:column; flex:1;">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+              <span data-offer-tag style="font-family:var(--font-heading); font-weight:700; font-size:11px; letter-spacing:.14em; text-transform:uppercase; padding:6px 13px; border-radius:var(--radius-badge);">Carte de fidélité</span>
+            </div>
+            <h3 style="font-family:var(--font-heading); font-weight:600; font-size:17.5px; line-height:1.3; margin:16px 0 0;">Une case par tranche de 15 € d'achat</h3>
+            <p style="font-size:13.5px; line-height:1.6; margin:10px 0 0; flex:1;">Dix cases complétées, quinze euros offerts. Passez récupérer votre carte au comptoir. Offre non cumulable, carte nominative.</p>
+          </div>
+        </div>
+        <div data-offer="light" class="offer-card" style="background:linear-gradient(180deg,#FFFFFF,var(--cream-400)); border:1px solid var(--border-default); border-radius:var(--radius-card); overflow:hidden; display:flex; flex-direction:column;">
+          <div data-offer-visual style="aspect-ratio:16/10; overflow:hidden; position:relative;">
+            <img src="assets/carte-cadeau.png" alt="Carte cadeau Bistro Burger verte et dorée, nouée d'un ruban" style="width:100%; height:100%; object-fit:cover; display:block;">
+          </div>
+          <div style="padding:22px 22px 26px; display:flex; flex-direction:column; flex:1;">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+              <span data-offer-tag style="font-family:var(--font-heading); font-weight:700; font-size:11px; letter-spacing:.14em; text-transform:uppercase; padding:6px 13px; border-radius:var(--radius-badge);">Carte cadeau</span>
+            </div>
+            <h3 style="font-family:var(--font-heading); font-weight:600; font-size:17.5px; line-height:1.3; margin:16px 0 0;">Scannez le QR code en salle pour gagner des lots</h3>
+            <p style="font-size:13.5px; line-height:1.6; margin:10px 0 0; flex:1;">Tentez votre chance, gagnez, et venez récupérer vos cadeaux sur place.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 · AVIS CLIENTS -->
+  <section id="avis" style="background:linear-gradient(180deg,var(--cream-400),var(--surface-alt)); padding:100px 24px;">
+    <div style="max-width:1240px; margin:0 auto;">
+      <div style="text-align:center;" data-reveal>
+        <div class="eyebrow">Avis clients</div>
+        <h2 style="font-family:var(--font-heading); font-weight:700; font-size:42px; margin:16px 0 0; color:var(--color-primary);">Ce que nos clients pensent de nous</h2>
+      </div>
+      <div id="reviews-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:40px;"></div>
+      <div id="reviews-dots" style="display:flex; justify-content:center; gap:9px; margin-top:30px;"></div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:12px; margin-top:34px;" data-reveal>
+        <img src="assets/google-avis.png" alt="Avis clients Google — 5 étoiles" style="width:196px; height:auto; display:block; margin-bottom:4px;">
+        <p style="font-size:15.5px; line-height:1.6; color:var(--text-muted); margin:0; text-align:center; max-width:520px;">Vous avez déjeuné chez nous ? Votre avis nous aide à progresser et guide les prochains clients.</p>
+        <a href="https://www.google.com/maps/search/?api=1&amp;query=Bistro+Burger+Gardanne" target="_blank" rel="noopener" data-shine class="btn btn-gradient" style="font-family:var(--font-heading); font-weight:600; font-size:14.5px; padding:14px 26px;">Laisser un avis</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 · À EMPORTER ET LIVRAISON -->
+  <section id="commander" style="position:relative; background:linear-gradient(115deg,var(--color-primary),var(--green-700) 60%,var(--green-900)); color:var(--color-secondary); padding:96px 24px; overflow:hidden;">
+    <div style="position:absolute; inset:0; background-image:repeating-linear-gradient(115deg, rgba(237,224,211,.05) 0 2px, transparent 2px 26px);"></div>
+    <div style="position:relative; max-width:1240px; margin:0 auto; display:grid; grid-template-columns:1.05fr .95fr; gap:56px; align-items:center;">
+      <div data-reveal>
+        <div style="font-family:var(--font-heading); font-weight:600; font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:rgba(237,224,211,.65);">À emporter &amp; livraison</div>
+        <h2 style="font-family:var(--font-heading); font-weight:800; font-size:52px; line-height:1.08; letter-spacing:.01em; text-transform:uppercase; margin:16px 0 0;">Votre burger livré<br>en un temps record</h2>
+        <p style="font-size:16px; line-height:1.7; color:rgba(237,224,211,.8); margin:22px 0 0; max-width:470px;">Commandez en ligne et faites-vous livrer à Gardanne et dans les communes voisines.</p>
+        <div style="margin-top:34px;">
+          <button type="button" class="btn btn-on-green btn-cta" data-shine data-go="contact">Commander maintenant</button>
+        </div>
+      </div>
+      <div style="position:relative; aspect-ratio:1; border-radius:var(--radius-card); overflow:hidden; box-shadow:0 26px 60px rgba(14,70,61,.45);" data-reveal>
+        <img src="assets/livraison.png" alt="Livreur Bistro Burger à vélo dans les rues de Gardanne" style="width:100%; height:100%; object-fit:cover; display:block; animation:bbRide 9s ease-in-out infinite;">
+      </div>
+    </div>
+  </section>
+
+  <!-- 12 · FAQ -->
+  <section style="background:var(--surface-alt); padding:100px 24px;">
+    <div style="max-width:900px; margin:0 auto;">
+      <div style="text-align:center;" data-reveal>
+        <div style="font-family:var(--font-heading); font-weight:600; font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--green-700);">Questions fréquentes</div>
+        <h2 style="font-family:var(--font-heading); font-weight:700; font-size:42px; margin:14px 0 0; color:var(--color-primary);">Vous vous demandez peut-être</h2>
+      </div>
+      <div id="faq-list" style="display:flex; flex-direction:column; gap:12px; margin-top:40px;"></div>
+    </div>
+  </section>
+
+  <!-- 14 · NEWSLETTER -->
+  <section id="newsletter" style="position:relative; background:linear-gradient(115deg,#2E8F7C 0%,var(--green-700) 30%,var(--color-primary) 62%,var(--green-900) 100%); color:var(--color-secondary); padding:80px 24px; overflow:hidden;">
+    <div style="position:absolute; inset:0; background-image:radial-gradient(rgba(237,224,211,.08) 1px, transparent 1px); background-size:24px 24px;"></div>
+    <div style="position:relative; max-width:900px; margin:0 auto; text-align:center;" data-reveal>
+      <div class="badge" style="color:var(--color-primary); background:linear-gradient(115deg,#FFFBF6 0%,var(--cream-500) 45%,#D9C7B3 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,.7);">Newsletter</div>
+      <h2 style="font-family:var(--font-heading); font-weight:700; font-size:38px; line-height:1.15; margin:18px 0 0;">Le plat du jour dans votre boîte mail</h2>
+      <p style="font-size:16px; line-height:1.7; color:rgba(237,224,211,.82); margin:14px auto 0; max-width:560px;">Une fois par semaine : l'ardoise à venir, les nouveautés de la carte et les offres réservées aux abonnés. Désinscription en un clic.</p>
+      <form id="newsletter-form" style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:28px;">
+        <input type="email" name="email" required placeholder="votre@email.fr" style="flex:1; min-width:260px; max-width:380px; box-sizing:border-box; font-family:var(--font-body); font-size:16px; padding:14px 16px; border-radius:var(--radius-field); background:rgba(14,70,61,.32); border:1px solid rgba(237,224,211,.35); color:var(--color-secondary); outline:none;">
+        <button type="submit" class="btn btn-on-green btn-cream" data-shine>Je m'inscris</button>
+      </form>
+      <div id="newsletter-sent" hidden style="margin:18px auto 0; max-width:420px; background:rgba(237,224,211,.18); border:1px solid rgba(237,224,211,.4); border-radius:var(--radius-button); padding:13px; font-size:14px;">Merci, votre inscription est enregistrée.</div>
+      <div style="font-size:12.5px; color:rgba(237,224,211,.6); margin-top:16px;">Vos coordonnées servent uniquement à l'envoi de cette newsletter.</div>
+    </div>
+  </section>
+
+  <!-- 15 · INFOS PRATIQUES -->
+  <section id="contact" style="background:#FFFFFF; padding:100px 24px;">
+    <div style="max-width:1240px; margin:0 auto; display:grid; grid-template-columns:1fr 1.1fr; gap:56px; align-items:center;">
+      <div data-reveal>
+        <div style="font-family:var(--font-heading); font-weight:600; font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--green-700);">Infos pratiques</div>
+        <h2 style="font-family:var(--font-heading); font-weight:700; font-size:42px; margin:14px 0 0; color:var(--color-primary);">Nous trouver à Gardanne</h2>
+        <div style="display:flex; flex-direction:column; gap:20px; margin-top:28px;">
+          <div>
+            <div style="font-family:var(--font-heading); font-weight:600; font-size:14px; color:var(--color-primary);">Adresse</div>
+            <div style="font-size:15px; line-height:1.6; color:var(--text-muted); margin-top:4px;">ZAC Avon, Bretelle de la Plaine<br>13120 Gardanne · parking gratuit devant le restaurant</div>
+          </div>
+          <div>
+            <div style="font-family:var(--font-heading); font-weight:600; font-size:14px; color:var(--color-primary);">Horaires</div>
+            <div style="font-size:15px; line-height:1.6; color:var(--text-muted); margin-top:4px;">Du lundi au vendredi · midi et soir<br>Samedi · soir uniquement<br>Fermé samedi midi et dimanche</div>
+          </div>
+          <div>
+            <div style="font-family:var(--font-heading); font-weight:600; font-size:14px; color:var(--color-primary);">Contact</div>
+            <div style="font-size:15px; line-height:1.6; color:var(--text-muted); margin-top:4px;"><a href="tel:+33465848918">+33 4 65 84 89 18</a><br><a href="mailto:brasserie.zone.avon@gmail.com">brasserie.zone.avon@gmail.com</a></div>
+            <div style="display:flex; gap:10px; align-items:center; margin-top:14px;">
+              <a href="https://www.facebook.com/" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook" class="social-btn-dark" style="width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--color-secondary); background:linear-gradient(115deg,#2E8F7C 0%,var(--green-700) 30%,var(--color-primary) 62%,var(--green-900) 100%); box-shadow:inset 0 1px 0 rgba(237,224,211,.3), 0 6px 16px rgba(14,70,61,.35); border:1px solid rgba(237,224,211,.22);"><svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true"><path d="M14 8.5V6.8c0-.7.2-1.1 1.2-1.1H16.5V3.1C16.2 3.06 15.4 3 14.5 3 12.4 3 11 4.3 11 6.5v2H8.7V11H11v8h3v-8h2.2l.4-2.5H14z"></path></svg></a>
+              <a href="https://www.instagram.com/bistroburger_gardanne/" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram" class="social-btn-dark" style="width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--color-secondary); background:linear-gradient(115deg,#2E8F7C 0%,var(--green-700) 30%,var(--color-primary) 62%,var(--green-900) 100%); box-shadow:inset 0 1px 0 rgba(237,224,211,.3), 0 6px 16px rgba(14,70,61,.35); border:1px solid rgba(237,224,211,.22);"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"></circle></svg></a>
+              <a href="https://www.tiktok.com/" target="_blank" rel="noopener" aria-label="TikTok" title="TikTok" class="social-btn-dark" style="width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--color-secondary); background:linear-gradient(115deg,#2E8F7C 0%,var(--green-700) 30%,var(--color-primary) 62%,var(--green-900) 100%); box-shadow:inset 0 1px 0 rgba(237,224,211,.3), 0 6px 16px rgba(14,70,61,.35); border:1px solid rgba(237,224,211,.22);"><svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true"><path d="M16.3 3h-2.6v12.1a2.4 2.4 0 1 1-2-2.37V10.1a5 5 0 1 0 4.6 4.98V8.86a6.3 6.3 0 0 0 3.6 1.13V7.4a3.7 3.7 0 0 1-3.6-3.7V3z"></path></svg></a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="position:relative; aspect-ratio:4/3; border-radius:var(--radius-photo); overflow:hidden; border:1px solid var(--border-default); box-shadow:0 18px 44px rgba(14,70,61,.18);" data-reveal>
+        <iframe title="Plan d'accès — Bistro Burger, ZAC Avon, 13120 Gardanne" src="https://www.google.com/maps?q=Bistro%20Burger%2C%20ZAC%20Avon%2C%2013120%20Gardanne&amp;z=15&amp;output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" style="width:100%; height:100%; border:0; display:block;"></iframe>
+        <a href="https://www.google.com/maps/search/?api=1&amp;query=Bistro+Burger+ZAC+Avon+13120+Gardanne" target="_blank" rel="noopener" class="btn btn-gradient" style="position:absolute; left:14px; bottom:14px; font-family:var(--font-heading); font-weight:600; font-size:13px; padding:10px 18px; border-radius:var(--radius-button);">Itinéraire</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 15 · BANDE PHOTOS -->
+  <div style="overflow:hidden; background:linear-gradient(180deg,var(--green-900),var(--color-primary) 50%,var(--green-900)); border-top:3px solid var(--green-700); border-bottom:3px solid var(--green-700); padding:22px 0;">
+    <div data-band-track id="band-track" style="display:flex; width:max-content; animation:bbMarquee 40s linear infinite;"></div>
+  </div>
+
+  <!-- 16 · PIED DE PAGE -->
+  <footer style="background:linear-gradient(180deg,var(--green-900),var(--color-primary)); color:var(--color-secondary); padding:72px 24px 32px;">
+    <div style="max-width:1240px; margin:0 auto; display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr; gap:48px;">
+      <div>
+        <img src="assets/logo-cream-sm.png" alt="Bistro Burger — Brasserie &amp; Burgers" style="height:62px; width:auto; display:block;">
+        <p style="font-size:14.5px; line-height:1.7; color:rgba(237,224,211,.7); margin:18px 0 0; max-width:300px;">Burgers faits maison et plats du jour, à Gardanne, entre Aix-en-Provence et Marseille.</p>
+      </div>
+      <div>
+        <div class="footer-heading">Le site</div>
+        <div style="display:flex; flex-direction:column; gap:10px; font-size:14.5px;">
+          <a href="#accueil" class="footer-link">Accueil</a>
+          <a href="#plat-du-jour" class="footer-link">Plat du jour</a>
+          <a href="#carte" class="footer-link">Notre carte</a>
+          <a href="blog/index.html" class="footer-link">Blog</a>
+          <a href="#reservation" class="footer-link">Réserver</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-heading">Contact</div>
+        <div style="display:flex; flex-direction:column; gap:10px; font-size:14.5px; color:rgba(237,224,211,.75);">
+          <span>ZAC Avon, Bretelle de la Plaine</span>
+          <span>13120 Gardanne</span>
+          <a href="tel:+33465848918" class="footer-link">+33 4 65 84 89 18</a>
+          <a href="mailto:brasserie.zone.avon@gmail.com" class="footer-link" style="word-break:break-all;">brasserie.zone.avon@gmail.com</a>
+          <div style="display:flex; gap:10px; align-items:center; margin-top:6px;">
+            <a href="https://www.facebook.com/" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook" class="social-btn-dark" style="width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--color-secondary); background:linear-gradient(115deg,#2E8F7C 0%,var(--green-700) 30%,var(--color-primary) 62%,var(--green-900) 100%); box-shadow:inset 0 1px 0 rgba(237,224,211,.3), 0 6px 16px rgba(14,70,61,.35); border:1px solid rgba(237,224,211,.22);"><svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true"><path d="M14 8.5V6.8c0-.7.2-1.1 1.2-1.1H16.5V3.1C16.2 3.06 15.4 3 14.5 3 12.4 3 11 4.3 11 6.5v2H8.7V11H11v8h3v-8h2.2l.4-2.5H14z"></path></svg></a>
+            <a href="https://www.instagram.com/bistroburger_gardanne/" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram" class="social-btn-dark" style="width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--color-secondary); background:linear-gradient(115deg,#2E8F7C 0%,var(--green-700) 30%,var(--color-primary) 62%,var(--green-900) 100%); box-shadow:inset 0 1px 0 rgba(237,224,211,.3), 0 6px 16px rgba(14,70,61,.35); border:1px solid rgba(237,224,211,.22);"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"></circle></svg></a>
+            <a href="https://www.tiktok.com/" target="_blank" rel="noopener" aria-label="TikTok" title="TikTok" class="social-btn-dark" style="width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--color-secondary); background:linear-gradient(115deg,#2E8F7C 0%,var(--green-700) 30%,var(--color-primary) 62%,var(--green-900) 100%); box-shadow:inset 0 1px 0 rgba(237,224,211,.3), 0 6px 16px rgba(14,70,61,.35); border:1px solid rgba(237,224,211,.22);"><svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true"><path d="M16.3 3h-2.6v12.1a2.4 2.4 0 1 1-2-2.37V10.1a5 5 0 1 0 4.6 4.98V8.86a6.3 6.3 0 0 0 3.6 1.13V7.4a3.7 3.7 0 0 1-3.6-3.7V3z"></path></svg></a>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="footer-heading">Horaires</div>
+        <div style="display:flex; flex-direction:column; gap:10px; font-size:14.5px; color:rgba(237,224,211,.75);">
+          <span>Lun–Ven · midi et soir</span>
+          <span>Sam · soir uniquement</span>
+          <span>Fermé sam. midi et dim.</span>
+        </div>
+      </div>
+    </div>
+    <div style="max-width:1240px; margin:44px auto 0; padding-top:22px; border-top:1px solid var(--border-on-dark); display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap; font-size:13px; color:rgba(237,224,211,.6);">
+      <span>© 2026 Bistro Burger — Gardanne. Tous droits réservés.</span>
+      <span style="display:flex; gap:20px;"><a href="#contact" class="footer-link" style="color:rgba(237,224,211,.6);">Mentions légales</a><a href="#contact" class="footer-link" style="color:rgba(237,224,211,.6);">Confidentialité</a></span>
+    </div>
+  </footer>
+
+  <!-- BOUTON FLOTTANT -->
+  <div style="position:fixed; right:24px; bottom:24px; z-index:70; display:flex; gap:10px;">
+    <button type="button" class="btn btn-on-green btn-sm btn-sticky" data-shine data-go="commander">Commander</button>
+    <button type="button" class="btn btn-primary btn-sm btn-sticky-primary" data-shine data-go="reservation">Réserver</button>
+  </div>
+
+  <!-- POPUP PROMO -->
+  <div class="dialog-backdrop" id="promo-backdrop" hidden>
+    <div class="dialog-box" id="promo-box">
+      <div style="position:relative; text-align:center; padding:8px;">
+        <button type="button" aria-label="Fermer" id="promo-close" style="position:absolute; top:-6px; right:-6px; width:34px; height:34px; border-radius:50%; border:1px solid rgba(237,224,211,.6); background:linear-gradient(115deg,#FFFBF6 0%,var(--color-secondary) 38%,var(--cream-500) 66%,#D9C7B3 100%); color:var(--color-primary); font-size:16px; font-weight:700; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 16px rgba(14,70,61,.35);">✕</button>
+        <span class="badge badge-cream">Offre du moment</span>
+        <h3 style="font-family:var(--font-heading); font-weight:700; font-size:28px; margin:18px 0 0;">Le menu enfant offert</h3>
+        <p style="font-size:15px; line-height:1.65; color:rgba(237,224,211,.82); margin:12px 0 22px;">Le mardi soir et le mercredi midi, le menu enfant est offert pour tout menu adulte acheté. Réservez votre table pour en profiter.</p>
+        <button type="button" class="btn btn-on-green btn-cta" data-shine id="promo-reserve">Réserver</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script src="script.js"></script>
+</body>
+</html>
