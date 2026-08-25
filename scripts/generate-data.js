@@ -7,7 +7,7 @@ const path = require("path");
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const OUT_FILE = path.join(__dirname, "..", "data.generated.js");
+const OUT_FILE = path.join(__dirname, "..", "public", "data.generated.js");
 
 async function main() {
   if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
