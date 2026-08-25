@@ -95,6 +95,12 @@
   const passwordSubmit = document.getElementById("password-submit");
   const passwordSuccess = document.getElementById("password-success");
   const passwordError = document.getElementById("password-error");
+  const togglePasswordForm = document.getElementById("toggle-password-form");
+
+  togglePasswordForm.addEventListener("click", () => {
+    passwordForm.hidden = !passwordForm.hidden;
+    togglePasswordForm.textContent = passwordForm.hidden ? "Changer mon mot de passe" : "Annuler";
+  });
 
   passwordForm.addEventListener("submit", async (e) => {
     e.preventDefault();

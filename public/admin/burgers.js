@@ -132,12 +132,14 @@
     document.getElementById("b-delete-cat").addEventListener("click", deleteCategory);
     document.getElementById("b-add-item").addEventListener("click", () => {
       state.itemIndex = null;
+      state.editImgUrl = undefined;
       state.screen = "edit";
       render();
     });
     container.querySelectorAll("[data-item]").forEach((btn) => {
       btn.addEventListener("click", () => {
         state.itemIndex = Number(btn.dataset.item);
+        state.editImgUrl = undefined;
         state.screen = "edit";
         render();
       });
@@ -193,10 +195,49 @@
     persist("items");
   }
 
+  const IMAGE_BUCKET = "site-images";
+  const EXT_BY_TYPE = {
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/webp": "webp",
+    "image/gif": "gif",
+  };
+  const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
+
+  async function uploadImage(file) {
+    state.uploadingImg = true;
+    state.uploadError = null;
+    render();
+    try {
+      const ext = EXT_BY_TYPE[file.type];
+      if (!ext) throw new Error("Format non pris en charge. Utilisez JPG, PNG, WebP ou GIF.");
+      if (file.size > MAX_IMAGE_BYTES) throw new Error("Image trop lourde (8 Mo maximum).");
+
+      const path = crypto.randomUUID() + "." + ext;
+      const { error } = await window.adminAuth.supabase.storage
+        .from(IMAGE_BUCKET)
+        .upload(path, file, { contentType: file.type, upsert: false });
+      if (error) throw new Error(error.message);
+
+      const { data } = window.adminAuth.supabase.storage.from(IMAGE_BUCKET).getPublicUrl(path);
+      state.editImgUrl = data.publicUrl;
+    } catch (err) {
+      state.uploadError = err.message;
+    } finally {
+      state.uploadingImg = false;
+      render();
+    }
+  }
+
   function renderEdit() {
     const cat = state.data[state.catIndex];
     const isNew = state.itemIndex === null;
     const item = isNew ? { name: "", desc: "", sur: "", emp: "", img: "" } : cat.items[state.itemIndex];
+    if (state.editImgUrl === undefined) state.editImgUrl = item.img || "";
+
+    const imgPreview = state.editImgUrl
+      ? '<img class="image-preview" src="' + esc(state.editImgUrl) + '" alt="">'
+      : '<div class="image-preview image-preview-empty">Aucune image</div>';
 
     container.innerHTML =
       '<button type="button" class="back-btn" id="b-back-items">‹ ' + esc(cat.title) + "</button>" +
@@ -210,8 +251,20 @@
       '<input class="field" id="b-sur" placeholder="16 €" value="' + esc(item.sur) + '">' +
       '<label class="field-label" for="b-emp">Prix à emporter</label>' +
       '<input class="field" id="b-emp" placeholder="13 €" value="' + esc(item.emp) + '">' +
-      '<label class="field-label" for="b-img">Image (chemin, optionnel)</label>' +
-      '<input class="field" id="b-img" placeholder="assets/mon-burger.png" value="' + esc(item.img || "") + '">' +
+      '<label class="field-label">Image</label>' +
+      '<div class="image-field">' +
+      imgPreview +
+      '<div class="image-field-actions">' +
+      '<input type="file" id="b-img-file" accept="image/png,image/jpeg,image/webp,image/gif" hidden' + (state.uploadingImg ? " disabled" : "") + ">" +
+      '<button type="button" class="btn-secondary" id="b-img-pick"' + (state.uploadingImg ? " disabled" : "") + ">" +
+      (state.uploadingImg ? "Téléversement…" : state.editImgUrl ? "Changer l'image" : "Choisir une image") +
+      "</button>" +
+      (state.editImgUrl && !state.uploadingImg
+        ? '<button type="button" class="btn-ghost-danger" id="b-img-remove">Retirer</button>'
+        : "") +
+      "</div>" +
+      (state.uploadError ? '<div class="login-error">' + esc(state.uploadError) + "</div>" : "") +
+      "</div>" +
       '<button type="submit" class="btn-primary" id="b-save"' + (state.saving ? " disabled" : "") + ">" +
       (state.saving ? "Enregistrement…" : "Enregistrer") +
       "</button>" +
@@ -221,9 +274,24 @@
       (state.saveError ? '<div class="login-error">' + esc(state.saveError) + "</div>" : "") +
       "</form>";
 
+    document.getElementById("b-img-pick").addEventListener("click", () => {
+      document.getElementById("b-img-file").click();
+    });
+    document.getElementById("b-img-file").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file) uploadImage(file);
+    });
+    if (state.editImgUrl && !state.uploadingImg) {
+      document.getElementById("b-img-remove").addEventListener("click", () => {
+        state.editImgUrl = "";
+        render();
+      });
+    }
+
     document.getElementById("b-back-items").addEventListener("click", () => {
       state.screen = "items";
       state.saveError = null;
+      state.editImgUrl = undefined;
       render();
     });
 
@@ -235,12 +303,12 @@
         sur: document.getElementById("b-sur").value.trim(),
         emp: document.getElementById("b-emp").value.trim(),
       };
-      const img = document.getElementById("b-img").value.trim();
-      if (img) newItem.img = img;
+      if (state.editImgUrl) newItem.img = state.editImgUrl;
 
       if (isNew) cat.items.push(newItem);
       else cat.items[state.itemIndex] = newItem;
 
+      state.editImgUrl = undefined;
       await persist("items");
     });
 
