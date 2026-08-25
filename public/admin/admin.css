@@ -118,6 +118,26 @@ body{
 }
 .field:focus{border-color:var(--green-700)}
 
+.field-with-toggle{position:relative}
+.field-with-toggle .field{padding-right:46px}
+.field-toggle{
+  position:absolute;
+  top:0;
+  right:0;
+  height:100%;
+  width:44px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:transparent;
+  border:none;
+  padding:0;
+  color:var(--muted);
+  cursor:pointer;
+}
+.field-toggle:hover{color:var(--green-700)}
+.field-toggle.is-visible{color:var(--green-700)}
+
 .btn-primary{
   width:100%;
   margin-top:24px;

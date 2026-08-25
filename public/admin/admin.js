@@ -94,4 +94,21 @@
       passwordForm.reset();
     }
   });
+
+  const EYE_OPEN =
+    '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"></path><circle cx="12" cy="12" r="3"></circle>';
+  const EYE_CLOSED =
+    '<path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a20.3 20.3 0 0 1 5.06-5.94M9.9 4.24A10.4 10.4 0 0 1 12 4c7 0 11 8 11 8a20.3 20.3 0 0 1-3.66 4.94M14.12 14.12a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+
+  document.querySelectorAll(".field-toggle").forEach((btn) => {
+    const input = document.getElementById(btn.dataset.toggleFor);
+    const svg = btn.querySelector("svg");
+    btn.addEventListener("click", () => {
+      const show = input.type === "password";
+      input.type = show ? "text" : "password";
+      svg.innerHTML = show ? EYE_CLOSED : EYE_OPEN;
+      btn.classList.toggle("is-visible", show);
+      btn.setAttribute("aria-label", show ? "Masquer le mot de passe" : "Afficher le mot de passe");
+    });
+  });
 })();

@@ -32,7 +32,12 @@
           <input class="field" type="email" id="email" name="email" required autocomplete="username" placeholder="vous@exemple.com">
 
           <label class="field-label" for="password">Mot de passe</label>
-          <input class="field" type="password" id="password" name="password" required autocomplete="current-password" placeholder="••••••••">
+          <div class="field-with-toggle">
+            <input class="field" type="password" id="password" name="password" required autocomplete="current-password" placeholder="••••••••">
+            <button type="button" class="field-toggle" data-toggle-for="password" aria-label="Afficher le mot de passe">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </button>
+          </div>
 
           <button type="submit" class="btn-primary" id="login-submit">Se connecter</button>
 
@@ -51,7 +56,12 @@
         <p class="dashboard-note">La première fois, ou pour le changer : saisissez un nouveau mot de passe ci-dessous.</p>
         <form id="password-form">
           <label class="field-label" for="new-password">Nouveau mot de passe</label>
-          <input class="field" type="password" id="new-password" name="new-password" required autocomplete="new-password" placeholder="Au moins 8 caractères" minlength="8">
+          <div class="field-with-toggle">
+            <input class="field" type="password" id="new-password" name="new-password" required autocomplete="new-password" placeholder="Au moins 8 caractères" minlength="8">
+            <button type="button" class="field-toggle" data-toggle-for="new-password" aria-label="Afficher le mot de passe">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </button>
+          </div>
 
           <button type="submit" class="btn-primary" id="password-submit">Enregistrer le mot de passe</button>
 
