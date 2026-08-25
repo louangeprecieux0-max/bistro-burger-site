@@ -20,43 +20,72 @@
     },
   };
 
-  const topbar = document.getElementById("topbar");
-  const loginView = document.getElementById("login-view");
+  const loginScreen = document.getElementById("login-screen");
+  const appShell = document.getElementById("app-shell");
   const dashboardView = document.getElementById("dashboard-view");
   const burgersView = document.getElementById("burgers-view");
+  const pageTitle = document.getElementById("page-title");
   const userEmailEl = document.getElementById("user-email");
-  const dashboardEmailEl = document.getElementById("dashboard-email");
+  const userAvatarEl = document.getElementById("user-avatar");
+  const dashboardFirstnameEl = document.getElementById("dashboard-firstname");
   const loginForm = document.getElementById("login-form");
   const loginSubmit = document.getElementById("login-submit");
   const logoutBtn = document.getElementById("logout-btn");
+  const navDashboard = document.getElementById("nav-dashboard");
   const navBurgers = document.getElementById("nav-burgers");
+  const navBurgersCard = document.getElementById("nav-burgers-card");
+
+  const sidebar = document.getElementById("app-sidebar");
+  const sidebarBackdrop = document.getElementById("sidebar-backdrop");
+  const hamburgerBtn = document.getElementById("hamburger-btn");
+
+  const PAGES = { dashboard: "Accueil", burgers: "Les burgers" };
+
+  function closeSidebar() {
+    sidebar.classList.remove("is-open");
+    sidebarBackdrop.classList.remove("is-visible");
+  }
+
+  hamburgerBtn.addEventListener("click", () => {
+    sidebar.classList.toggle("is-open");
+    sidebarBackdrop.classList.toggle("is-visible");
+  });
+  sidebarBackdrop.addEventListener("click", closeSidebar);
 
   function showSection(view) {
     dashboardView.hidden = view !== "dashboard";
     burgersView.hidden = view !== "burgers";
+    pageTitle.textContent = PAGES[view] || "";
+    navDashboard.classList.toggle("is-active", view === "dashboard");
+    navBurgers.classList.toggle("is-active", view === "burgers");
+    closeSidebar();
+    window.scrollTo(0, 0);
   }
   window.adminShowDashboard = () => showSection("dashboard");
+
+  function openBurgers() {
+    showSection("burgers");
+    window.BurgersEditor.open();
+  }
+
+  navDashboard.addEventListener("click", () => showSection("dashboard"));
+  navBurgers.addEventListener("click", openBurgers);
+  navBurgersCard.addEventListener("click", openBurgers);
 
   function showLoggedIn(session) {
     const email = session.user.email;
     userEmailEl.textContent = email;
-    dashboardEmailEl.textContent = email;
-    topbar.hidden = false;
-    loginView.hidden = true;
+    userAvatarEl.textContent = email.charAt(0).toUpperCase();
+    dashboardFirstnameEl.textContent = email.split("@")[0];
+    loginScreen.hidden = true;
+    appShell.hidden = false;
     showSection("dashboard");
   }
 
   function showLoggedOut() {
-    topbar.hidden = true;
-    loginView.hidden = false;
-    dashboardView.hidden = true;
-    burgersView.hidden = true;
+    loginScreen.hidden = false;
+    appShell.hidden = true;
   }
-
-  navBurgers.addEventListener("click", () => {
-    showSection("burgers");
-    window.BurgersEditor.open();
-  });
 
   supabase.auth.getSession().then(({ data }) => {
     if (data.session) showLoggedIn(data.session);

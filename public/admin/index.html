@@ -6,79 +6,151 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Administration — Bistro Burger</title>
 <link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@600;700;800&family=Geologica:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="admin.css">
 </head>
 <body>
 
-  <div class="admin-shell">
+  <!-- Écran de connexion (plein écran, sans sidebar) -->
+  <div class="login-screen" id="login-screen">
+    <section id="login-view" class="login-card">
+      <div class="login-logo">Bistro Burger</div>
+      <h1>Espace admin</h1>
+      <p class="login-sub">Connectez-vous pour gérer le contenu du site.</p>
 
-    <header class="admin-topbar" id="topbar" hidden>
-      <span class="admin-topbar-brand">Bistro Burger — Admin</span>
-      <div class="admin-topbar-user">
-        <span id="user-email"></span>
-        <button type="button" id="logout-btn" class="btn-ghost">Se déconnecter</button>
-      </div>
-    </header>
+      <form id="login-form" autocomplete="on">
+        <label class="field-label" for="email">E-mail</label>
+        <input class="field" type="email" id="email" name="email" required autocomplete="username" placeholder="vous@exemple.com">
 
-    <main class="admin-main">
-
-      <section id="login-view" class="login-card">
-        <div class="login-logo">Bistro Burger</div>
-        <h1>Espace admin</h1>
-        <p class="login-sub">Connectez-vous pour gérer le contenu du site.</p>
-
-        <form id="login-form" autocomplete="on">
-          <label class="field-label" for="email">E-mail</label>
-          <input class="field" type="email" id="email" name="email" required autocomplete="username" placeholder="vous@exemple.com">
-
-          <label class="field-label" for="password">Mot de passe</label>
-          <div class="field-with-toggle">
-            <input class="field" type="password" id="password" name="password" required autocomplete="current-password" placeholder="••••••••">
-            <button type="button" class="field-toggle" data-toggle-for="password" aria-label="Afficher le mot de passe">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-            </button>
-          </div>
-
-          <button type="submit" class="btn-primary" id="login-submit">Se connecter</button>
-
-          <div id="login-error" class="login-error" hidden></div>
-        </form>
-      </section>
-
-      <section id="dashboard-view" class="dashboard-card" hidden>
-        <h1>Espace admin</h1>
-        <p>Vous êtes connecté en tant que <strong id="dashboard-email"></strong>.</p>
-
-        <div class="admin-menu">
-          <button type="button" class="menu-item" id="nav-burgers">
-            <span class="menu-item-label">Les burgers</span>
-            <span class="menu-item-arrow">›</span>
+        <label class="field-label" for="password">Mot de passe</label>
+        <div class="field-with-toggle">
+          <input class="field" type="password" id="password" name="password" required autocomplete="current-password" placeholder="••••••••">
+          <button type="button" class="field-toggle" data-toggle-for="password" aria-label="Afficher le mot de passe">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
           </button>
         </div>
-        <p class="dashboard-note">La carte complète, le plat du jour, les offres et les réglages de réservation arrivent dans une prochaine étape.</p>
 
-        <hr class="divider">
+        <button type="submit" class="btn-primary" id="login-submit">Se connecter</button>
 
-        <button type="button" class="back-btn" id="toggle-password-form">Changer mon mot de passe</button>
-        <form id="password-form" hidden>
-          <label class="field-label" for="new-password">Nouveau mot de passe</label>
-          <div class="field-with-toggle">
-            <input class="field" type="password" id="new-password" name="new-password" required autocomplete="new-password" placeholder="Au moins 8 caractères" minlength="8">
-            <button type="button" class="field-toggle" data-toggle-for="new-password" aria-label="Afficher le mot de passe">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-            </button>
+        <div id="login-error" class="login-error" hidden></div>
+      </form>
+    </section>
+  </div>
+
+  <!-- Application (sidebar + contenu), visible une fois connecté -->
+  <div class="app-shell" id="app-shell" hidden>
+
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+    <aside class="app-sidebar" id="app-sidebar">
+      <div class="sidebar-brand">
+        <span class="sidebar-brand-emoji">🍔</span>
+        <span>Bistro Burger</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button type="button" class="sidebar-link is-active" id="nav-dashboard" data-nav="dashboard">
+          <span class="sidebar-link-icon">⌂</span> Accueil
+        </button>
+        <button type="button" class="sidebar-link" id="nav-burgers" data-nav="burgers">
+          <span class="sidebar-link-icon">🍔</span> Les burgers
+        </button>
+        <button type="button" class="sidebar-link sidebar-link-soon" disabled>
+          <span class="sidebar-link-icon">📋</span> La carte <span class="soon-badge">Bientôt</span>
+        </button>
+        <button type="button" class="sidebar-link sidebar-link-soon" disabled>
+          <span class="sidebar-link-icon">⭐</span> Plat du jour <span class="soon-badge">Bientôt</span>
+        </button>
+        <button type="button" class="sidebar-link sidebar-link-soon" disabled>
+          <span class="sidebar-link-icon">🏷️</span> Offres <span class="soon-badge">Bientôt</span>
+        </button>
+        <button type="button" class="sidebar-link sidebar-link-soon" disabled>
+          <span class="sidebar-link-icon">📅</span> Réservations <span class="soon-badge">Bientôt</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button type="button" class="sidebar-link" id="logout-btn">
+          <span class="sidebar-link-icon">↪</span> Se déconnecter
+        </button>
+      </div>
+    </aside>
+
+    <div class="app-col">
+      <header class="app-topbar">
+        <button type="button" class="hamburger-btn" id="hamburger-btn" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+        <div class="app-topbar-title" id="page-title">Accueil</div>
+        <div class="app-topbar-user">
+          <span class="avatar-circle" id="user-avatar"></span>
+          <span class="app-topbar-email" id="user-email"></span>
+        </div>
+      </header>
+
+      <main class="app-main">
+
+        <section id="dashboard-view" class="page-view">
+          <div class="hero-card">
+            <div class="hero-card-eyebrow">Espace admin</div>
+            <h1>Bonjour <span id="dashboard-firstname"></span> 👋</h1>
+            <p>Gérez le contenu du site Bistro Burger directement depuis cette page — les changements sont publiés automatiquement.</p>
           </div>
 
-          <button type="submit" class="btn-primary" id="password-submit">Enregistrer le mot de passe</button>
+          <h2 class="section-title">Sections</h2>
+          <div class="section-grid">
+            <button type="button" class="section-card" id="nav-burgers-card">
+              <span class="section-card-icon">🍔</span>
+              <span class="section-card-label">Les burgers</span>
+              <span class="section-card-sub">Ajouter, modifier, réorganiser</span>
+            </button>
+            <div class="section-card section-card-soon">
+              <span class="section-card-icon">📋</span>
+              <span class="section-card-label">La carte</span>
+              <span class="section-card-sub">Bientôt disponible</span>
+            </div>
+            <div class="section-card section-card-soon">
+              <span class="section-card-icon">⭐</span>
+              <span class="section-card-label">Plat du jour</span>
+              <span class="section-card-sub">Bientôt disponible</span>
+            </div>
+            <div class="section-card section-card-soon">
+              <span class="section-card-icon">🏷️</span>
+              <span class="section-card-label">Offres</span>
+              <span class="section-card-sub">Bientôt disponible</span>
+            </div>
+            <div class="section-card section-card-soon">
+              <span class="section-card-icon">📅</span>
+              <span class="section-card-label">Réservations</span>
+              <span class="section-card-sub">Bientôt disponible</span>
+            </div>
+          </div>
 
-          <div id="password-success" class="password-success" hidden>Mot de passe enregistré.</div>
-          <div id="password-error" class="login-error" hidden></div>
-        </form>
-      </section>
+          <div class="settings-card">
+            <button type="button" class="back-btn" id="toggle-password-form">Changer mon mot de passe</button>
+            <form id="password-form" hidden>
+              <label class="field-label" for="new-password">Nouveau mot de passe</label>
+              <div class="field-with-toggle">
+                <input class="field" type="password" id="new-password" name="new-password" required autocomplete="new-password" placeholder="Au moins 8 caractères" minlength="8">
+                <button type="button" class="field-toggle" data-toggle-for="new-password" aria-label="Afficher le mot de passe">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                </button>
+              </div>
 
-      <section id="burgers-view" class="editor-card" hidden></section>
+              <button type="submit" class="btn-primary" id="password-submit">Enregistrer le mot de passe</button>
 
-    </main>
+              <div id="password-success" class="password-success" hidden>Mot de passe enregistré.</div>
+              <div id="password-error" class="login-error" hidden></div>
+            </form>
+          </div>
+        </section>
+
+        <section id="burgers-view" class="page-view editor-card" hidden></section>
+
+      </main>
+    </div>
 
   </div>
 
