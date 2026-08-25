@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Administration — Bistro Burger</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+  <div class="admin-shell">
+
+    <header class="admin-topbar" id="topbar" hidden>
+      <span class="admin-topbar-brand">Bistro Burger — Admin</span>
+      <div class="admin-topbar-user">
+        <span id="user-email"></span>
+        <button type="button" id="logout-btn" class="btn-ghost">Se déconnecter</button>
+      </div>
+    </header>
+
+    <main class="admin-main">
+
+      <section id="login-view" class="login-card">
+        <div class="login-logo">Bistro Burger</div>
+        <h1>Espace admin</h1>
+        <p class="login-sub">Connectez-vous pour gérer le contenu du site.</p>
+
+        <form id="login-form" autocomplete="on">
+          <label class="field-label" for="email">E-mail</label>
+          <input class="field" type="email" id="email" name="email" required autocomplete="username" placeholder="vous@exemple.com">
+
+          <label class="field-label" for="password">Mot de passe</label>
+          <input class="field" type="password" id="password" name="password" required autocomplete="current-password" placeholder="••••••••">
+
+          <button type="submit" class="btn-primary" id="login-submit">Se connecter</button>
+
+          <div id="login-error" class="login-error" hidden></div>
+        </form>
+      </section>
+
+      <section id="dashboard-view" class="dashboard-card" hidden>
+        <h1>Connexion réussie</h1>
+        <p>Vous êtes connecté en tant que <strong id="dashboard-email"></strong>.</p>
+        <p class="dashboard-note">L'édition des burgers, de la carte, du plat du jour, des offres et des réglages de réservation arrive dans une prochaine étape. Cette page confirme uniquement que la connexion fonctionne, sur ordinateur comme sur mobile.</p>
+      </section>
+
+    </main>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="config.generated.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
