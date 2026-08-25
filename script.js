@@ -1,9 +1,11 @@
 "use strict";
 (() => {
   /* ---------------------------------------------------------------- */
-  /* Data (verbatim from the source design's data-dc-script block)     */
+  /* Data — burgers & carte viennent de data.generated.js (Supabase),  */
+  /* généré au build. Repli vide sur les pages qui ne le chargent pas. */
   /* ---------------------------------------------------------------- */
-  const BURGERS = [
+  const SITE_DATA = window.SITE_DATA || {};
+  const BURGERS = SITE_DATA.burgers || [
     { title: "Les originaux", items: [
       { name: "Classique", desc: "Bun's², iceberg, tomate, steak, double cheddar, compotée d'oignons maison, sauce de notre enfance", sur: "16 €", emp: "13 €" },
       { name: "Smash", desc: "Bun's², steak smashé, double cheddar, oignons rouges, cornichon, smashed sauce", sur: "16 €", emp: "13 €" },
@@ -23,7 +25,7 @@
     ] }
   ];
 
-  const CARTES = {
+  const CARTES = SITE_DATA.cartes || {
     "Sur place": {
       "Apéro": [
         { title: "À partager", items: [

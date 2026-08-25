@@ -1,0 +1,12 @@
+{
+  "name": "bistro-burger-site",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Site web Bistro Burger — Gardanne",
+  "scripts": {
+    "build": "node scripts/generate-data.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.4"
+  }
+}
