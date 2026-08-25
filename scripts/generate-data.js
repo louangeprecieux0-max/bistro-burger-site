@@ -26,19 +26,18 @@ async function main() {
     throw new Error("Échec de la récupération du contenu Supabase : " + error.message);
   }
 
-  if (!data || data.length === 0) {
-    throw new Error("La table site_content est vide — avez-vous lancé la migration initiale ?");
-  }
-
   const siteData = {};
-  for (const row of data) {
+  for (const row of data || []) {
     siteData[row.key] = row.value;
   }
 
   const required = ["burgers", "cartes", "plat_du_jour", "offres", "reservation_settings"];
   const missing = required.filter((k) => !(k in siteData));
   if (missing.length) {
-    throw new Error("Clés manquantes dans site_content : " + missing.join(", "));
+    console.warn(
+      "[generate-data] Clés absentes dans site_content (le site utilisera son contenu de secours) : " +
+        missing.join(", ")
+    );
   }
 
   const contents =
