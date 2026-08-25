@@ -67,4 +67,31 @@
   logoutBtn.addEventListener("click", async () => {
     await supabase.auth.signOut();
   });
+
+  const passwordForm = document.getElementById("password-form");
+  const passwordSubmit = document.getElementById("password-submit");
+  const passwordSuccess = document.getElementById("password-success");
+  const passwordError = document.getElementById("password-error");
+
+  passwordForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    passwordSuccess.hidden = true;
+    passwordError.hidden = true;
+    passwordSubmit.disabled = true;
+    passwordSubmit.textContent = "Enregistrement…";
+
+    const newPassword = document.getElementById("new-password").value;
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+
+    passwordSubmit.disabled = false;
+    passwordSubmit.textContent = "Enregistrer le mot de passe";
+
+    if (error) {
+      passwordError.hidden = false;
+      passwordError.textContent = "Échec de l'enregistrement : " + error.message;
+    } else {
+      passwordSuccess.hidden = false;
+      passwordForm.reset();
+    }
+  });
 })();

@@ -166,6 +166,31 @@ body{
   font-size:13.5px;
 }
 
+.divider{
+  border:none;
+  border-top:1px solid var(--border);
+  margin:28px 0 24px;
+}
+
+.dashboard-card h2{
+  font-family:var(--font-heading);
+  font-weight:700;
+  font-size:18px;
+  color:var(--green-900);
+  margin:0 0 6px;
+}
+
+.password-success{
+  margin-top:16px;
+  background:rgba(27,109,95,.1);
+  border:1px solid rgba(27,109,95,.4);
+  color:var(--green-700);
+  border-radius:8px;
+  padding:12px 14px;
+  font-size:13.5px;
+  text-align:center;
+}
+
 @media (max-width:480px){
   .admin-main{padding:16px}
   .login-card, .dashboard-card{padding:28px 20px}

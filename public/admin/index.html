@@ -44,6 +44,20 @@
         <h1>Connexion réussie</h1>
         <p>Vous êtes connecté en tant que <strong id="dashboard-email"></strong>.</p>
         <p class="dashboard-note">L'édition des burgers, de la carte, du plat du jour, des offres et des réglages de réservation arrive dans une prochaine étape. Cette page confirme uniquement que la connexion fonctionne, sur ordinateur comme sur mobile.</p>
+
+        <hr class="divider">
+
+        <h2>Définir votre mot de passe</h2>
+        <p class="dashboard-note">La première fois, ou pour le changer : saisissez un nouveau mot de passe ci-dessous.</p>
+        <form id="password-form">
+          <label class="field-label" for="new-password">Nouveau mot de passe</label>
+          <input class="field" type="password" id="new-password" name="new-password" required autocomplete="new-password" placeholder="Au moins 8 caractères" minlength="8">
+
+          <button type="submit" class="btn-primary" id="password-submit">Enregistrer le mot de passe</button>
+
+          <div id="password-success" class="password-success" hidden>Mot de passe enregistré.</div>
+          <div id="password-error" class="login-error" hidden></div>
+        </form>
       </section>
 
     </main>
