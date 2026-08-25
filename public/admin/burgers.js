@@ -93,18 +93,14 @@
 
   function renderItems() {
     const cat = state.data[state.catIndex];
-    const last = cat.items.length - 1;
     const rows = cat.items
       .map((item, i) => {
         const meta = [];
         if (item.sur) meta.push(item.sur + " sur place");
         if (item.emp) meta.push(item.emp + " à emporter");
         return (
-          '<div class="list-row-wrap">' +
-          '<div class="reorder-btns">' +
-          '<button type="button" class="reorder-btn" data-up="' + i + '"' + (i === 0 ? " disabled" : "") + ' aria-label="Monter">▲</button>' +
-          '<button type="button" class="reorder-btn" data-down="' + i + '"' + (i === last ? " disabled" : "") + ' aria-label="Descendre">▼</button>' +
-          "</div>" +
+          '<div class="list-row-wrap" data-row="' + i + '">' +
+          '<span class="drag-handle" draggable="true" data-drag="' + i + '" aria-label="Glisser pour réorganiser">⠿</span>' +
           '<button type="button" class="list-row" data-item="' + i + '">' +
           '<span class="list-row-main">' +
           '<span class="list-row-title">' + esc(item.name) + "</span>" +
@@ -146,21 +142,54 @@
         render();
       });
     });
-    container.querySelectorAll("[data-up]").forEach((btn) => {
-      btn.addEventListener("click", () => moveItem(Number(btn.dataset.up), -1));
-    });
-    container.querySelectorAll("[data-down]").forEach((btn) => {
-      btn.addEventListener("click", () => moveItem(Number(btn.dataset.down), 1));
+    setupDragAndDrop();
+  }
+
+  function setupDragAndDrop() {
+    const rows = container.querySelectorAll(".list-row-wrap");
+    let dragFrom = null;
+
+    rows.forEach((row) => {
+      const handle = row.querySelector(".drag-handle");
+
+      handle.addEventListener("dragstart", (e) => {
+        dragFrom = Number(row.dataset.row);
+        e.dataTransfer.effectAllowed = "move";
+        e.dataTransfer.setData("text/plain", String(dragFrom));
+        row.classList.add("dragging");
+      });
+
+      handle.addEventListener("dragend", () => {
+        row.classList.remove("dragging");
+        rows.forEach((r) => r.classList.remove("drag-over"));
+        dragFrom = null;
+      });
+
+      row.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+        if (dragFrom === null || Number(row.dataset.row) === dragFrom) return;
+        row.classList.add("drag-over");
+      });
+
+      row.addEventListener("dragleave", () => {
+        row.classList.remove("drag-over");
+      });
+
+      row.addEventListener("drop", (e) => {
+        e.preventDefault();
+        row.classList.remove("drag-over");
+        const to = Number(row.dataset.row);
+        if (dragFrom === null || to === dragFrom) return;
+        moveItemTo(dragFrom, to);
+      });
     });
   }
 
-  function moveItem(index, direction) {
+  function moveItemTo(fromIndex, toIndex) {
     const items = state.data[state.catIndex].items;
-    const target = index + direction;
-    if (target < 0 || target >= items.length) return;
-    const tmp = items[index];
-    items[index] = items[target];
-    items[target] = tmp;
+    const [moved] = items.splice(fromIndex, 1);
+    items.splice(toIndex, 0, moved);
     persist("items");
   }
 
