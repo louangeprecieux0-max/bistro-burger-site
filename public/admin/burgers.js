@@ -93,19 +93,26 @@
 
   function renderItems() {
     const cat = state.data[state.catIndex];
+    const last = cat.items.length - 1;
     const rows = cat.items
       .map((item, i) => {
         const meta = [];
         if (item.sur) meta.push(item.sur + " sur place");
         if (item.emp) meta.push(item.emp + " à emporter");
         return (
+          '<div class="list-row-wrap">' +
+          '<div class="reorder-btns">' +
+          '<button type="button" class="reorder-btn" data-up="' + i + '"' + (i === 0 ? " disabled" : "") + ' aria-label="Monter">▲</button>' +
+          '<button type="button" class="reorder-btn" data-down="' + i + '"' + (i === last ? " disabled" : "") + ' aria-label="Descendre">▼</button>' +
+          "</div>" +
           '<button type="button" class="list-row" data-item="' + i + '">' +
           '<span class="list-row-main">' +
           '<span class="list-row-title">' + esc(item.name) + "</span>" +
           '<span class="list-row-sub">' + esc(meta.join(" · ")) + "</span>" +
           "</span>" +
           '<span class="list-row-arrow">›</span>' +
-          "</button>"
+          "</button>" +
+          "</div>"
         );
       })
       .join("");
@@ -139,6 +146,22 @@
         render();
       });
     });
+    container.querySelectorAll("[data-up]").forEach((btn) => {
+      btn.addEventListener("click", () => moveItem(Number(btn.dataset.up), -1));
+    });
+    container.querySelectorAll("[data-down]").forEach((btn) => {
+      btn.addEventListener("click", () => moveItem(Number(btn.dataset.down), 1));
+    });
+  }
+
+  function moveItem(index, direction) {
+    const items = state.data[state.catIndex].items;
+    const target = index + direction;
+    if (target < 0 || target >= items.length) return;
+    const tmp = items[index];
+    items[index] = items[target];
+    items[target] = tmp;
+    persist("items");
   }
 
   function renderEdit() {
