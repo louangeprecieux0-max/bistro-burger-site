@@ -46,9 +46,16 @@
       </section>
 
       <section id="dashboard-view" class="dashboard-card" hidden>
-        <h1>Connexion réussie</h1>
+        <h1>Espace admin</h1>
         <p>Vous êtes connecté en tant que <strong id="dashboard-email"></strong>.</p>
-        <p class="dashboard-note">L'édition des burgers, de la carte, du plat du jour, des offres et des réglages de réservation arrive dans une prochaine étape. Cette page confirme uniquement que la connexion fonctionne, sur ordinateur comme sur mobile.</p>
+
+        <div class="admin-menu">
+          <button type="button" class="menu-item" id="nav-burgers">
+            <span class="menu-item-label">Les burgers</span>
+            <span class="menu-item-arrow">›</span>
+          </button>
+        </div>
+        <p class="dashboard-note">La carte complète, le plat du jour, les offres et les réglages de réservation arrivent dans une prochaine étape.</p>
 
         <hr class="divider">
 
@@ -70,6 +77,8 @@
         </form>
       </section>
 
+      <section id="burgers-view" class="editor-card" hidden></section>
+
     </main>
 
   </div>
@@ -77,5 +86,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="config.generated.js"></script>
   <script src="admin.js"></script>
+  <script src="burgers.js"></script>
 </body>
 </html>

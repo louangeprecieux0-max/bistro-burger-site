@@ -11,14 +11,31 @@
 
   const supabase = window.supabase.createClient(cfg.url, cfg.anonKey);
 
+  window.adminAuth = {
+    supabase,
+    async authHeader() {
+      const { data } = await supabase.auth.getSession();
+      const token = data.session && data.session.access_token;
+      return token ? { Authorization: "Bearer " + token } : {};
+    },
+  };
+
   const topbar = document.getElementById("topbar");
   const loginView = document.getElementById("login-view");
   const dashboardView = document.getElementById("dashboard-view");
+  const burgersView = document.getElementById("burgers-view");
   const userEmailEl = document.getElementById("user-email");
   const dashboardEmailEl = document.getElementById("dashboard-email");
   const loginForm = document.getElementById("login-form");
   const loginSubmit = document.getElementById("login-submit");
   const logoutBtn = document.getElementById("logout-btn");
+  const navBurgers = document.getElementById("nav-burgers");
+
+  function showSection(view) {
+    dashboardView.hidden = view !== "dashboard";
+    burgersView.hidden = view !== "burgers";
+  }
+  window.adminShowDashboard = () => showSection("dashboard");
 
   function showLoggedIn(session) {
     const email = session.user.email;
@@ -26,14 +43,20 @@
     dashboardEmailEl.textContent = email;
     topbar.hidden = false;
     loginView.hidden = true;
-    dashboardView.hidden = false;
+    showSection("dashboard");
   }
 
   function showLoggedOut() {
     topbar.hidden = true;
     loginView.hidden = false;
     dashboardView.hidden = true;
+    burgersView.hidden = true;
   }
+
+  navBurgers.addEventListener("click", () => {
+    showSection("burgers");
+    window.BurgersEditor.open();
+  });
 
   supabase.auth.getSession().then(({ data }) => {
     if (data.session) showLoggedIn(data.session);
