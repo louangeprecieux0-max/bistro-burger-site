@@ -31,6 +31,12 @@
       body: JSON.stringify({ key: "burgers", value: data }),
     });
     if (!res.ok) throw new Error("Échec de l'enregistrement.");
+    const json = await res.json();
+    if (json.deployTriggered === false) {
+      throw new Error(
+        "Enregistré, mais la republication du site a échoué. Contactez la personne qui gère le site."
+      );
+    }
   }
 
   function render() {

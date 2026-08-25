@@ -82,11 +82,20 @@ module.exports = async (req, res) => {
       return;
     }
 
+    let deployTriggered = false;
     if (DEPLOY_HOOK_URL) {
-      fetch(DEPLOY_HOOK_URL, { method: "POST" }).catch(() => {});
+      try {
+        const hookRes = await fetch(DEPLOY_HOOK_URL, { method: "POST" });
+        deployTriggered = hookRes.ok;
+        if (!hookRes.ok) {
+          console.error("[content] Deploy hook a répondu avec le statut " + hookRes.status);
+        }
+      } catch (err) {
+        console.error("[content] Échec de l'appel au deploy hook : " + err.message);
+      }
     }
 
-    res.status(200).json({ ok: true });
+    res.status(200).json({ ok: true, deployTriggered });
     return;
   }
 
