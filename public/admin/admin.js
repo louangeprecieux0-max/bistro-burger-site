@@ -22,8 +22,6 @@
 
   const loginScreen = document.getElementById("login-screen");
   const appShell = document.getElementById("app-shell");
-  const dashboardView = document.getElementById("dashboard-view");
-  const burgersView = document.getElementById("burgers-view");
   const pageTitle = document.getElementById("page-title");
   const userEmailEl = document.getElementById("user-email");
   const userAvatarEl = document.getElementById("user-avatar");
@@ -31,15 +29,26 @@
   const loginForm = document.getElementById("login-form");
   const loginSubmit = document.getElementById("login-submit");
   const logoutBtn = document.getElementById("logout-btn");
-  const navDashboard = document.getElementById("nav-dashboard");
-  const navBurgers = document.getElementById("nav-burgers");
-  const navBurgersCard = document.getElementById("nav-burgers-card");
 
   const sidebar = document.getElementById("app-sidebar");
   const sidebarBackdrop = document.getElementById("sidebar-backdrop");
   const hamburgerBtn = document.getElementById("hamburger-btn");
 
-  const PAGES = { dashboard: "Accueil", burgers: "Les burgers" };
+  // Une entrée par section : editor est optionnel (le tableau de bord n'en a pas).
+  const SECTIONS = [
+    { key: "dashboard", title: "Accueil" },
+    { key: "burgers", title: "Les burgers", editor: () => window.BurgersEditor },
+    { key: "carte", title: "La carte", editor: () => window.CarteEditor },
+    { key: "platdujour", title: "Plat du jour", editor: () => window.PlatDuJourEditor },
+    { key: "offres", title: "Offres", editor: () => window.OffresEditor },
+    { key: "reservations", title: "Réservations", editor: () => window.ReservationsEditor },
+  ];
+
+  SECTIONS.forEach((s) => {
+    s.viewEl = document.getElementById(s.key + "-view");
+    s.navEl = document.getElementById("nav-" + s.key);
+    s.cardEl = document.getElementById("nav-" + s.key + "-card");
+  });
 
   function closeSidebar() {
     sidebar.classList.remove("is-open");
@@ -52,25 +61,26 @@
   });
   sidebarBackdrop.addEventListener("click", closeSidebar);
 
-  function showSection(view) {
-    dashboardView.hidden = view !== "dashboard";
-    burgersView.hidden = view !== "burgers";
-    pageTitle.textContent = PAGES[view] || "";
-    navDashboard.classList.toggle("is-active", view === "dashboard");
-    navBurgers.classList.toggle("is-active", view === "burgers");
+  function showSection(key) {
+    SECTIONS.forEach((s) => {
+      if (s.viewEl) s.viewEl.hidden = s.key !== key;
+      if (s.navEl) s.navEl.classList.toggle("is-active", s.key === key);
+    });
+    const active = SECTIONS.find((s) => s.key === key);
+    pageTitle.textContent = (active && active.title) || "";
     closeSidebar();
     window.scrollTo(0, 0);
   }
   window.adminShowDashboard = () => showSection("dashboard");
 
-  function openBurgers() {
-    showSection("burgers");
-    window.BurgersEditor.open();
-  }
-
-  navDashboard.addEventListener("click", () => showSection("dashboard"));
-  navBurgers.addEventListener("click", openBurgers);
-  navBurgersCard.addEventListener("click", openBurgers);
+  SECTIONS.forEach((s) => {
+    const open = () => {
+      showSection(s.key);
+      if (s.editor) s.editor().open();
+    };
+    if (s.navEl) s.navEl.addEventListener("click", open);
+    if (s.cardEl) s.cardEl.addEventListener("click", open);
+  });
 
   function showLoggedIn(session) {
     const email = session.user.email;

@@ -71,6 +71,21 @@ button, input{font-family:inherit}
   line-height:1.5;
 }
 
+.editor-card h2, .settings-card h2{
+  font-family:var(--font-heading);
+  font-weight:700;
+  font-size:15.5px;
+  color:var(--green-900);
+  margin:0 0 4px;
+}
+.dashboard-note{color:var(--muted); font-size:13.5px; line-height:1.5}
+
+.divider{
+  border:none;
+  border-top:1px solid var(--border);
+  margin:26px 0 22px;
+}
+
 /* ---------- Fields & buttons (shared) ---------- */
 .field-label{
   display:block;
@@ -571,6 +586,38 @@ button.section-card:hover{border-color:var(--green-700)}
   cursor:pointer;
 }
 .btn-ghost-danger:hover{background:rgba(181,101,29,.08)}
+
+.mode-toggle{
+  display:inline-flex;
+  gap:4px;
+  background:var(--page-bg);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:4px;
+  margin:16px 0 4px;
+}
+.mode-toggle-btn{
+  font-family:var(--font-heading);
+  font-weight:600;
+  font-size:13px;
+  padding:9px 16px;
+  border:none;
+  border-radius:9px;
+  background:transparent;
+  color:var(--muted);
+  cursor:pointer;
+}
+.mode-toggle-btn.is-active{
+  background:var(--green-800);
+  color:var(--cream-500);
+}
+
+.r-textarea{
+  resize:vertical;
+  min-height:80px;
+  line-height:1.6;
+  font-size:15px;
+}
 
 /* ---------- Responsive ---------- */
 @media (min-width:900px){

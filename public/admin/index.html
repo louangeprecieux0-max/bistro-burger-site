@@ -57,17 +57,17 @@
         <button type="button" class="sidebar-link" id="nav-burgers" data-nav="burgers">
           <span class="sidebar-link-icon">🍔</span> Les burgers
         </button>
-        <button type="button" class="sidebar-link sidebar-link-soon" disabled>
-          <span class="sidebar-link-icon">📋</span> La carte <span class="soon-badge">Bientôt</span>
+        <button type="button" class="sidebar-link" id="nav-carte" data-nav="carte">
+          <span class="sidebar-link-icon">📋</span> La carte
         </button>
-        <button type="button" class="sidebar-link sidebar-link-soon" disabled>
-          <span class="sidebar-link-icon">⭐</span> Plat du jour <span class="soon-badge">Bientôt</span>
+        <button type="button" class="sidebar-link" id="nav-platdujour" data-nav="platdujour">
+          <span class="sidebar-link-icon">⭐</span> Plat du jour
         </button>
-        <button type="button" class="sidebar-link sidebar-link-soon" disabled>
-          <span class="sidebar-link-icon">🏷️</span> Offres <span class="soon-badge">Bientôt</span>
+        <button type="button" class="sidebar-link" id="nav-offres" data-nav="offres">
+          <span class="sidebar-link-icon">🏷️</span> Offres
         </button>
-        <button type="button" class="sidebar-link sidebar-link-soon" disabled>
-          <span class="sidebar-link-icon">📅</span> Réservations <span class="soon-badge">Bientôt</span>
+        <button type="button" class="sidebar-link" id="nav-reservations" data-nav="reservations">
+          <span class="sidebar-link-icon">📅</span> Réservations
         </button>
       </nav>
 
@@ -106,26 +106,26 @@
               <span class="section-card-label">Les burgers</span>
               <span class="section-card-sub">Ajouter, modifier, réorganiser</span>
             </button>
-            <div class="section-card section-card-soon">
+            <button type="button" class="section-card" id="nav-carte-card">
               <span class="section-card-icon">📋</span>
               <span class="section-card-label">La carte</span>
-              <span class="section-card-sub">Bientôt disponible</span>
-            </div>
-            <div class="section-card section-card-soon">
+              <span class="section-card-sub">Catégories, plats, prix</span>
+            </button>
+            <button type="button" class="section-card" id="nav-platdujour-card">
               <span class="section-card-icon">⭐</span>
               <span class="section-card-label">Plat du jour</span>
-              <span class="section-card-sub">Bientôt disponible</span>
-            </div>
-            <div class="section-card section-card-soon">
+              <span class="section-card-sub">Plat et suggestion</span>
+            </button>
+            <button type="button" class="section-card" id="nav-offres-card">
               <span class="section-card-icon">🏷️</span>
               <span class="section-card-label">Offres</span>
-              <span class="section-card-sub">Bientôt disponible</span>
-            </div>
-            <div class="section-card section-card-soon">
+              <span class="section-card-sub">Ajouter, modifier, réorganiser</span>
+            </button>
+            <button type="button" class="section-card" id="nav-reservations-card">
               <span class="section-card-icon">📅</span>
               <span class="section-card-label">Réservations</span>
-              <span class="section-card-sub">Bientôt disponible</span>
-            </div>
+              <span class="section-card-sub">Créneaux, horaires, couverts</span>
+            </button>
           </div>
 
           <div class="settings-card">
@@ -148,6 +148,10 @@
         </section>
 
         <section id="burgers-view" class="page-view editor-card" hidden></section>
+        <section id="carte-view" class="page-view editor-card" hidden></section>
+        <section id="platdujour-view" class="page-view editor-card" hidden></section>
+        <section id="offres-view" class="page-view editor-card" hidden></section>
+        <section id="reservations-view" class="page-view editor-card" hidden></section>
 
       </main>
     </div>
@@ -158,5 +162,9 @@
   <script src="config.generated.js"></script>
   <script src="admin.js"></script>
   <script src="burgers.js"></script>
+  <script src="carte.js"></script>
+  <script src="platdujour.js"></script>
+  <script src="offres.js"></script>
+  <script src="reservations.js"></script>
 </body>
 </html>
