@@ -348,7 +348,6 @@ button, input{font-family:inherit}
   box-shadow:var(--shadow-card);
 }
 .app-sidebar.is-collapsed .sidebar-collapse-btn svg{transform:rotate(180deg)}
-.app-sidebar.is-collapsed{position:fixed}
 
 /* ---------- Main column ---------- */
 .app-col{
