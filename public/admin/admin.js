@@ -33,6 +33,20 @@
   const sidebar = document.getElementById("app-sidebar");
   const sidebarBackdrop = document.getElementById("sidebar-backdrop");
   const hamburgerBtn = document.getElementById("hamburger-btn");
+  const sidebarCollapseBtn = document.getElementById("sidebar-collapse-btn");
+
+  try {
+    if (localStorage.getItem("bb-admin-sidebar-collapsed") === "1") {
+      sidebar.classList.add("is-collapsed");
+    }
+  } catch {}
+
+  sidebarCollapseBtn.addEventListener("click", () => {
+    const collapsed = sidebar.classList.toggle("is-collapsed");
+    try {
+      localStorage.setItem("bb-admin-sidebar-collapsed", collapsed ? "1" : "0");
+    } catch {}
+  });
 
   // Une entrée par section : editor est optionnel (le tableau de bord n'en a pas).
   const SECTIONS = [
