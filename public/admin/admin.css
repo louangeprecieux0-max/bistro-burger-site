@@ -34,27 +34,11 @@ button, input{font-family:inherit}
   align-items:center;
   justify-content:center;
   padding:24px;
-}
-
-.login-frame{
-  display:flex;
-  width:100%;
-  max-width:920px;
-  border-radius:28px;
-  overflow:hidden;
-  box-shadow:0 24px 60px rgba(44,44,42,.14);
-  background:#FFFFFF;
-}
-
-.login-image{
-  flex:1;
-  min-width:0;
   background-size:cover;
   background-position:60% 45%;
-  display:none;
 }
 @media (min-width:760px){
-  .login-image{display:block}
+  .login-screen{justify-content:flex-end; padding-right:8vw}
 }
 
 .login-card, .editor-card{
@@ -64,22 +48,8 @@ button, input{font-family:inherit}
   padding:32px 28px;
   box-shadow:var(--shadow-card);
 }
-.login-card{max-width:400px; width:100%; box-shadow:0 20px 48px rgba(18,87,76,.12)}
+.login-card{max-width:400px; width:100%; box-shadow:0 30px 70px rgba(14,70,61,.35); border-radius:28px}
 .editor-card{max-width:640px; margin:0 auto}
-
-.login-frame .login-card{
-  flex:1;
-  min-width:0;
-  max-width:none;
-  width:auto;
-  border:none;
-  border-radius:0;
-  box-shadow:none;
-  padding:48px 44px;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-}
 
 .login-logo{
   font-family:var(--font-heading);
@@ -1028,7 +998,6 @@ button.section-card:hover .section-card-btn{
 @media (max-width:480px){
   .login-screen{padding:16px}
   .login-card{padding:28px 20px}
-  .login-frame .login-card{padding:28px 20px}
   .app-main{padding:18px 14px 32px}
   .editor-card{padding:24px 18px}
   .hero-card{padding:26px 20px}
