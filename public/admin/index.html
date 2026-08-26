@@ -15,28 +15,32 @@
 
   <!-- Écran de connexion (plein écran, sans sidebar) -->
   <div class="login-screen" id="login-screen">
-    <section id="login-view" class="login-card">
-      <div class="login-logo">Bistro Burger</div>
-      <h1>Espace admin</h1>
-      <p class="login-sub">Connectez-vous pour gérer le contenu du site.</p>
+    <div class="login-frame">
+      <div class="login-image" style="background-image:url('../assets/hero-burger.webp')"></div>
 
-      <form id="login-form" autocomplete="on">
-        <label class="field-label" for="email">E-mail</label>
-        <input class="field" type="email" id="email" name="email" required autocomplete="username" placeholder="vous@exemple.com">
+      <section id="login-view" class="login-card">
+        <div class="login-logo">Bistro Burger</div>
+        <h1>Espace admin</h1>
+        <p class="login-sub">Connectez-vous pour gérer le contenu du site.</p>
 
-        <label class="field-label" for="password">Mot de passe</label>
-        <div class="field-with-toggle">
-          <input class="field" type="password" id="password" name="password" required autocomplete="current-password" placeholder="••••••••">
-          <button type="button" class="field-toggle" data-toggle-for="password" aria-label="Afficher le mot de passe">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-          </button>
-        </div>
+        <form id="login-form" autocomplete="on">
+          <label class="field-label" for="email">E-mail</label>
+          <input class="field" type="email" id="email" name="email" required autocomplete="username" placeholder="vous@exemple.com">
 
-        <button type="submit" class="btn-primary" id="login-submit">Se connecter</button>
+          <label class="field-label" for="password">Mot de passe</label>
+          <div class="field-with-toggle">
+            <input class="field" type="password" id="password" name="password" required autocomplete="current-password" placeholder="••••••••">
+            <button type="button" class="field-toggle" data-toggle-for="password" aria-label="Afficher le mot de passe">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </button>
+          </div>
 
-        <div id="login-error" class="login-error" hidden></div>
-      </form>
-    </section>
+          <button type="submit" class="btn-primary" id="login-submit">Se connecter</button>
+
+          <div id="login-error" class="login-error" hidden></div>
+        </form>
+      </section>
+    </div>
   </div>
 
   <!-- Application (sidebar + contenu), visible une fois connecté -->
