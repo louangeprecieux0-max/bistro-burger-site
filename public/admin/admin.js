@@ -26,12 +26,13 @@
   const userEmailEl = document.getElementById("user-email");
   const userAvatarEl = document.getElementById("user-avatar");
   const dashboardFirstnameEl = document.getElementById("dashboard-firstname");
-  const profileAvatarEl = document.getElementById("profile-avatar");
-  const profileNameEl = document.getElementById("profile-name");
-  const profileEmailEl = document.getElementById("profile-email");
+  const ppAvatarEl = document.getElementById("pp-avatar");
+  const ppNameEl = document.getElementById("pp-name");
+  const ppEmailEl = document.getElementById("pp-email");
   const loginForm = document.getElementById("login-form");
   const loginSubmit = document.getElementById("login-submit");
   const logoutBtn = document.getElementById("logout-btn");
+  const logoutBtnPanel = document.getElementById("logout-btn-panel");
 
   const sidebar = document.getElementById("app-sidebar");
   const sidebarBackdrop = document.getElementById("sidebar-backdrop");
@@ -104,9 +105,9 @@
     userEmailEl.textContent = email;
     userAvatarEl.textContent = email.charAt(0).toUpperCase();
     dashboardFirstnameEl.textContent = email.split("@")[0];
-    profileAvatarEl.textContent = email.charAt(0).toUpperCase();
-    profileNameEl.textContent = email.split("@")[0];
-    profileEmailEl.textContent = email;
+    ppAvatarEl.textContent = email.charAt(0).toUpperCase();
+    ppNameEl.textContent = email.split("@")[0];
+    ppEmailEl.textContent = email;
     loginScreen.hidden = true;
     appShell.hidden = false;
     showSection("dashboard");
@@ -146,20 +147,78 @@
     }
   });
 
-  logoutBtn.addEventListener("click", async () => {
+  async function doLogout() {
     await supabase.auth.signOut();
+  }
+  logoutBtn.addEventListener("click", doLogout);
+  logoutBtnPanel.addEventListener("click", doLogout);
+
+  const profileTrigger = document.getElementById("profile-trigger");
+  const profilePanel = document.getElementById("profile-panel");
+  const profilePanelBackdrop = document.getElementById("profile-panel-backdrop");
+  const profilePanelClose = document.getElementById("profile-panel-close");
+
+  function openProfilePanel() {
+    profilePanel.classList.add("is-open");
+    profilePanelBackdrop.classList.add("is-visible");
+  }
+  function closeProfilePanel() {
+    profilePanel.classList.remove("is-open");
+    profilePanelBackdrop.classList.remove("is-visible");
+  }
+  profileTrigger.addEventListener("click", openProfilePanel);
+  profilePanelClose.addEventListener("click", closeProfilePanel);
+  profilePanelBackdrop.addEventListener("click", closeProfilePanel);
+
+  function wireExpandableRow(rowId, formId) {
+    const row = document.getElementById(rowId);
+    const form = document.getElementById(formId);
+    row.addEventListener("click", () => {
+      form.hidden = !form.hidden;
+      row.classList.toggle("is-open", !form.hidden);
+    });
+  }
+  wireExpandableRow("pp-password-toggle", "password-form");
+  wireExpandableRow("pp-invite-toggle", "invite-form");
+
+  const inviteForm = document.getElementById("invite-form");
+  const inviteSubmit = document.getElementById("invite-submit");
+  const inviteSuccess = document.getElementById("invite-success");
+  const inviteError = document.getElementById("invite-error");
+
+  inviteForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    inviteSuccess.hidden = true;
+    inviteError.hidden = true;
+    inviteSubmit.disabled = true;
+    inviteSubmit.textContent = "Envoi…";
+
+    const email = document.getElementById("invite-email").value.trim();
+
+    try {
+      const headers = await window.adminAuth.authHeader();
+      const res = await fetch("/api/admin/invite", {
+        method: "POST",
+        headers: Object.assign({ "Content-Type": "application/json" }, headers),
+        body: JSON.stringify({ email }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Échec de l'envoi.");
+      inviteSuccess.hidden = false;
+      inviteForm.reset();
+    } catch (err) {
+      inviteError.hidden = false;
+      inviteError.textContent = err.message;
+    } finally {
+      inviteSubmit.disabled = false;
+      inviteSubmit.textContent = "Envoyer l'invitation";
+    }
   });
 
   const passwordForm = document.getElementById("password-form");
   const passwordSubmit = document.getElementById("password-submit");
   const passwordSuccess = document.getElementById("password-success");
   const passwordError = document.getElementById("password-error");
-  const togglePasswordForm = document.getElementById("toggle-password-form");
-
-  togglePasswordForm.addEventListener("click", () => {
-    passwordForm.hidden = !passwordForm.hidden;
-    togglePasswordForm.textContent = passwordForm.hidden ? "Changer mon mot de passe" : "Annuler";
-  });
 
   passwordForm.addEventListener("submit", async (e) => {
     e.preventDefault();
