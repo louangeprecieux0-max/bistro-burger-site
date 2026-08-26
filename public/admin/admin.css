@@ -230,8 +230,8 @@ button, input{font-family:inherit}
   min-width:0;
 }
 .sidebar-logo{
-  width:32px;
-  height:32px;
+  height:36px;
+  padding:0 10px;
   flex:none;
   border-radius:9px;
   background:linear-gradient(135deg,var(--green-600) 0%,var(--green-800) 100%);
@@ -240,17 +240,13 @@ button, input{font-family:inherit}
   align-items:center;
   justify-content:center;
   box-shadow:0 4px 10px rgba(18,87,76,.28);
-}
-.sidebar-brand-text{
-  font-family:var(--font-heading);
-  font-weight:700;
-  font-size:14.5px;
-  color:var(--green-900);
-  white-space:nowrap;
   overflow:hidden;
-  text-overflow:ellipsis;
 }
-
+.sidebar-logo-img{
+  height:20px;
+  width:auto;
+  display:block;
+}
 .sidebar-collapse-btn{
   width:26px;
   height:26px;
@@ -333,7 +329,6 @@ button, input{font-family:inherit}
 
 /* ---------- Sidebar collapsed (desktop only) ---------- */
 .app-sidebar.is-collapsed{width:72px}
-.app-sidebar.is-collapsed .sidebar-brand-text,
 .app-sidebar.is-collapsed .sidebar-group-label,
 .app-sidebar.is-collapsed .sidebar-link-text{display:none}
 .app-sidebar.is-collapsed .sidebar-top{justify-content:center}
