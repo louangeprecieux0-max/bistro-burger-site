@@ -26,6 +26,9 @@
   const userEmailEl = document.getElementById("user-email");
   const userAvatarEl = document.getElementById("user-avatar");
   const dashboardFirstnameEl = document.getElementById("dashboard-firstname");
+  const profileAvatarEl = document.getElementById("profile-avatar");
+  const profileNameEl = document.getElementById("profile-name");
+  const profileEmailEl = document.getElementById("profile-email");
   const loginForm = document.getElementById("login-form");
   const loginSubmit = document.getElementById("login-submit");
   const logoutBtn = document.getElementById("logout-btn");
@@ -101,6 +104,9 @@
     userEmailEl.textContent = email;
     userAvatarEl.textContent = email.charAt(0).toUpperCase();
     dashboardFirstnameEl.textContent = email.split("@")[0];
+    profileAvatarEl.textContent = email.charAt(0).toUpperCase();
+    profileNameEl.textContent = email.split("@")[0];
+    profileEmailEl.textContent = email;
     loginScreen.hidden = true;
     appShell.hidden = false;
     showSection("dashboard");
