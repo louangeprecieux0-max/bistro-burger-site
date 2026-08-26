@@ -236,35 +236,35 @@
     if (state.editImgUrl === undefined) state.editImgUrl = item.img || "";
 
     const imgPreview = state.editImgUrl
-      ? '<img class="image-preview" src="' + esc(state.editImgUrl) + '" alt="">'
-      : '<div class="image-preview image-preview-empty">Aucune image</div>';
+      ? '<img class="edit-hero-img" src="' + esc(state.editImgUrl) + '" alt="">'
+      : '<div class="edit-hero-empty">Aucune image</div>';
 
     container.innerHTML =
       '<button type="button" class="back-btn" id="b-back-items">‹ ' + esc(cat.title) + "</button>" +
       "<h1>" + (isNew ? "Nouveau burger" : "Modifier le burger") + "</h1>" +
+      '<div class="edit-hero">' +
+      imgPreview +
+      '<div class="edit-hero-body">' +
+      '<input type="file" id="b-img-file" accept="image/png,image/jpeg,image/webp,image/gif" hidden' + (state.uploadingImg ? " disabled" : "") + ">" +
+      '<button type="button" class="edit-hero-btn" id="b-img-pick"' + (state.uploadingImg ? " disabled" : "") + ">" +
+      (state.uploadingImg ? "Téléversement…" : "Modifier") +
+      "</button>" +
+      (state.editImgUrl && !state.uploadingImg
+        ? '<button type="button" class="edit-hero-remove" id="b-img-remove">Retirer l\'image</button>'
+        : "") +
+      (state.uploadError ? '<div class="login-error">' + esc(state.uploadError) + "</div>" : "") +
+      "</div>" +
+      "</div>" +
       '<form id="b-item-form">' +
       '<label class="field-label" for="b-name">Nom</label>' +
       '<input class="field" id="b-name" required value="' + esc(item.name) + '">' +
       '<label class="field-label" for="b-desc">Description</label>' +
       '<input class="field" id="b-desc" value="' + esc(item.desc) + '">' +
+      '<hr class="divider">' +
       '<label class="field-label" for="b-sur">Prix sur place</label>' +
       '<input class="field" id="b-sur" placeholder="16 €" value="' + esc(item.sur) + '">' +
       '<label class="field-label" for="b-emp">Prix à emporter</label>' +
       '<input class="field" id="b-emp" placeholder="13 €" value="' + esc(item.emp) + '">' +
-      '<label class="field-label">Image</label>' +
-      '<div class="image-field">' +
-      imgPreview +
-      '<div class="image-field-actions">' +
-      '<input type="file" id="b-img-file" accept="image/png,image/jpeg,image/webp,image/gif" hidden' + (state.uploadingImg ? " disabled" : "") + ">" +
-      '<button type="button" class="btn-secondary" id="b-img-pick"' + (state.uploadingImg ? " disabled" : "") + ">" +
-      (state.uploadingImg ? "Téléversement…" : state.editImgUrl ? "Changer l'image" : "Choisir une image") +
-      "</button>" +
-      (state.editImgUrl && !state.uploadingImg
-        ? '<button type="button" class="btn-ghost-danger" id="b-img-remove">Retirer</button>'
-        : "") +
-      "</div>" +
-      (state.uploadError ? '<div class="login-error">' + esc(state.uploadError) + "</div>" : "") +
-      "</div>" +
       '<button type="submit" class="btn-primary" id="b-save"' + (state.saving ? " disabled" : "") + ">" +
       (state.saving ? "Enregistrement…" : "Enregistrer") +
       "</button>" +

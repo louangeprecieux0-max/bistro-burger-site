@@ -737,42 +737,57 @@ button.section-card:hover .section-card-btn{
 .btn-danger:hover{background:rgba(181,101,29,.08)}
 .btn-danger:disabled, .btn-primary:disabled{opacity:.6;cursor:default}
 
-.image-field{margin-top:2px}
-.image-preview{
-  width:100%;
-  max-width:220px;
-  aspect-ratio:4/3;
-  object-fit:cover;
-  border-radius:12px;
-  border:1px solid var(--border);
-  display:block;
+.edit-hero{
+  margin:-32px -28px 24px;
 }
-.image-preview-empty{
+.edit-hero-img, .edit-hero-empty{
+  width:100%;
+  aspect-ratio:16/11;
+  object-fit:cover;
+  display:block;
+  border-radius:18px 18px 0 0;
+}
+.edit-hero-empty{
   display:flex;
   align-items:center;
   justify-content:center;
   background:var(--page-bg);
   color:var(--muted);
-  font-size:13px;
+  font-size:13.5px;
 }
-.image-field-actions{
+.edit-hero-body{
+  padding:16px 28px 0;
   display:flex;
-  gap:10px;
-  margin-top:10px;
-  flex-wrap:wrap;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
 }
-.image-field-actions .btn-secondary{width:auto;padding:10px 16px}
-.btn-ghost-danger{
-  font-family:var(--font-body);
-  font-size:13px;
-  padding:10px 14px;
-  border-radius:9px;
-  border:1px solid rgba(181,101,29,.4);
-  background:transparent;
-  color:var(--error);
+.edit-hero-btn{
+  font-family:var(--font-heading);
+  font-weight:700;
+  font-size:13.5px;
+  padding:11px 26px;
+  border:none;
+  border-radius:999px;
   cursor:pointer;
+  background:linear-gradient(115deg,#3AA48E 0%,#2E8F7C 45%,var(--green-700) 100%);
+  color:var(--cream-500);
+  box-shadow:inset 0 1px 0 rgba(237,224,211,.35), inset 0 -1px 0 rgba(14,70,61,.5), 0 6px 16px rgba(46,143,124,.4);
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1), filter .18s ease;
 }
-.btn-ghost-danger:hover{background:rgba(181,101,29,.08)}
+.edit-hero-btn:hover:not(:disabled){transform:scale(1.04); filter:brightness(1.1)}
+.edit-hero-btn:disabled{opacity:.65; cursor:default}
+.edit-hero-remove{
+  font-family:var(--font-body);
+  font-size:12.5px;
+  color:var(--muted);
+  background:none;
+  border:none;
+  cursor:pointer;
+  text-decoration:underline;
+  padding:2px;
+}
+.edit-hero-remove:hover{color:var(--error)}
 
 .mode-toggle{
   display:inline-flex;
@@ -826,4 +841,6 @@ button.section-card:hover .section-card-btn{
   .editor-card, .profile-card{padding:24px 18px}
   .hero-card{padding:26px 20px}
   .app-topbar{padding:12px 14px}
+  .edit-hero{margin:-24px -18px 24px}
+  .edit-hero-body{padding:16px 18px 0}
 }

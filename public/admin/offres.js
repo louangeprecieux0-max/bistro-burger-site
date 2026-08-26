@@ -182,12 +182,25 @@
     if (state.editImgUrl === undefined) state.editImgUrl = offer.img || "";
 
     const imgPreview = state.editImgUrl
-      ? '<img class="image-preview" src="' + esc(state.editImgUrl) + '" alt="">'
-      : '<div class="image-preview image-preview-empty">Aucune image</div>';
+      ? '<img class="edit-hero-img" src="' + esc(state.editImgUrl) + '" alt="">'
+      : '<div class="edit-hero-empty">Aucune image</div>';
 
     container.innerHTML =
       '<button type="button" class="back-btn" id="o-back">‹ Offres</button>' +
       "<h1>" + (isNew ? "Nouvelle offre" : "Modifier l'offre") + "</h1>" +
+      '<div class="edit-hero">' +
+      imgPreview +
+      '<div class="edit-hero-body">' +
+      '<input type="file" id="o-img-file" accept="image/png,image/jpeg,image/webp,image/gif" hidden' + (state.uploadingImg ? " disabled" : "") + ">" +
+      '<button type="button" class="edit-hero-btn" id="o-img-pick"' + (state.uploadingImg ? " disabled" : "") + ">" +
+      (state.uploadingImg ? "Téléversement…" : "Modifier") +
+      "</button>" +
+      (state.editImgUrl && !state.uploadingImg
+        ? '<button type="button" class="edit-hero-remove" id="o-img-remove">Retirer l\'image</button>'
+        : "") +
+      (state.uploadError ? '<div class="login-error">' + esc(state.uploadError) + "</div>" : "") +
+      "</div>" +
+      "</div>" +
       '<form id="o-form">' +
       '<label class="field-label" for="o-tag">Étiquette</label>' +
       '<input class="field" id="o-tag" required placeholder="Menu étudiant" value="' + esc(offer.tag) + '">' +
@@ -195,22 +208,9 @@
       '<input class="field" id="o-title" required value="' + esc(offer.title) + '">' +
       '<label class="field-label" for="o-desc">Description</label>' +
       '<input class="field" id="o-desc" value="' + esc(offer.description) + '">' +
+      '<hr class="divider">' +
       '<label class="field-label" for="o-price">Prix (optionnel)</label>' +
       '<input class="field" id="o-price" placeholder="11,90 €" value="' + esc(offer.price) + '">' +
-      '<label class="field-label">Image</label>' +
-      '<div class="image-field">' +
-      imgPreview +
-      '<div class="image-field-actions">' +
-      '<input type="file" id="o-img-file" accept="image/png,image/jpeg,image/webp,image/gif" hidden' + (state.uploadingImg ? " disabled" : "") + ">" +
-      '<button type="button" class="btn-secondary" id="o-img-pick"' + (state.uploadingImg ? " disabled" : "") + ">" +
-      (state.uploadingImg ? "Téléversement…" : state.editImgUrl ? "Changer l'image" : "Choisir une image") +
-      "</button>" +
-      (state.editImgUrl && !state.uploadingImg
-        ? '<button type="button" class="btn-ghost-danger" id="o-img-remove">Retirer</button>'
-        : "") +
-      "</div>" +
-      (state.uploadError ? '<div class="login-error">' + esc(state.uploadError) + "</div>" : "") +
-      "</div>" +
       '<button type="submit" class="btn-primary" id="o-save"' + (state.saving ? " disabled" : "") + ">" +
       (state.saving ? "Enregistrement…" : "Enregistrer") +
       "</button>" +
