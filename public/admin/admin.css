@@ -125,14 +125,18 @@ button, input{font-family:inherit}
 
 /* ---------- Fields & buttons (shared) ---------- */
 .field-label{
-  display:block;
+  display:inline-block;
   font-family:var(--font-heading);
-  font-weight:600;
-  font-size:12px;
+  font-weight:700;
+  font-size:11px;
   letter-spacing:.04em;
   text-transform:uppercase;
-  color:var(--green-800);
-  margin:16px 0 6px;
+  color:var(--cream-500);
+  background:linear-gradient(115deg,#3AA48E 0%,#2E8F7C 45%,var(--green-700) 100%);
+  padding:6px 14px;
+  border-radius:999px;
+  box-shadow:inset 0 1px 0 rgba(237,224,211,.3), inset 0 -1px 0 rgba(14,70,61,.5), 0 4px 10px rgba(46,143,124,.35);
+  margin:18px 0 8px;
 }
 .field-label:first-of-type{margin-top:0}
 
@@ -738,14 +742,16 @@ button.section-card:hover .section-card-btn{
 .btn-danger:disabled, .btn-primary:disabled{opacity:.6;cursor:default}
 
 .edit-hero{
-  margin:-32px -28px 24px;
+  margin:16px 0 22px;
 }
 .edit-hero-img, .edit-hero-empty{
   width:100%;
-  aspect-ratio:16/11;
+  max-height:260px;
+  aspect-ratio:16/9;
   object-fit:cover;
   display:block;
-  border-radius:18px 18px 0 0;
+  border-radius:16px;
+  border:1px solid var(--border);
 }
 .edit-hero-empty{
   display:flex;
@@ -756,7 +762,7 @@ button.section-card:hover .section-card-btn{
   font-size:13.5px;
 }
 .edit-hero-body{
-  padding:16px 28px 0;
+  padding:14px 0 0;
   display:flex;
   flex-direction:column;
   align-items:center;
@@ -841,6 +847,4 @@ button.section-card:hover .section-card-btn{
   .editor-card, .profile-card{padding:24px 18px}
   .hero-card{padding:26px 20px}
   .app-topbar{padding:12px 14px}
-  .edit-hero{margin:-24px -18px 24px}
-  .edit-hero-body{padding:16px 18px 0}
 }
