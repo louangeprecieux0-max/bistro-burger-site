@@ -398,6 +398,9 @@ button, input{font-family:inherit}
   color:var(--green-900);
   flex:1;
   min-width:0;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 
 .profile-menu{position:relative}
@@ -1096,4 +1099,5 @@ button.section-card:hover .section-card-btn{
   .editor-card{padding:24px 18px}
   .hero-card{padding:26px 20px}
   .app-topbar{padding:12px 14px}
+  .app-topbar-email{display:none}
 }
