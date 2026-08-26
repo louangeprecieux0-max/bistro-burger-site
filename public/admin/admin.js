@@ -23,15 +23,12 @@
   const loginScreen = document.getElementById("login-screen");
   const appShell = document.getElementById("app-shell");
   const pageTitle = document.getElementById("page-title");
-  const userEmailEl = document.getElementById("user-email");
-  const userAvatarEl = document.getElementById("user-avatar");
   const dashboardFirstnameEl = document.getElementById("dashboard-firstname");
   const ppAvatarEl = document.getElementById("pp-avatar");
   const ppNameEl = document.getElementById("pp-name");
   const ppEmailEl = document.getElementById("pp-email");
   const loginForm = document.getElementById("login-form");
   const loginSubmit = document.getElementById("login-submit");
-  const logoutBtn = document.getElementById("logout-btn");
   const logoutBtnPanel = document.getElementById("logout-btn-panel");
 
   const sidebar = document.getElementById("app-sidebar");
@@ -100,14 +97,27 @@
     if (s.cardEl) s.cardEl.addEventListener("click", open);
   });
 
+  function renderAvatarInto(el, user) {
+    el.innerHTML = "";
+    const url = user.user_metadata && user.user_metadata.avatar_url;
+    if (url) {
+      const img = document.createElement("img");
+      img.src = url;
+      img.alt = "";
+      img.style.cssText = "width:100%;height:100%;border-radius:50%;object-fit:cover;display:block;";
+      el.appendChild(img);
+    } else {
+      el.textContent = user.email.charAt(0).toUpperCase();
+    }
+  }
+
   function showLoggedIn(session) {
     const email = session.user.email;
-    userEmailEl.textContent = email;
-    userAvatarEl.textContent = email.charAt(0).toUpperCase();
-    dashboardFirstnameEl.textContent = email.split("@")[0];
-    ppAvatarEl.textContent = email.charAt(0).toUpperCase();
-    ppNameEl.textContent = email.split("@")[0];
+    const firstname = email.split("@")[0];
+    dashboardFirstnameEl.textContent = firstname;
+    ppNameEl.textContent = firstname;
     ppEmailEl.textContent = email;
+    renderAvatarInto(ppAvatarEl, session.user);
     loginScreen.hidden = true;
     appShell.hidden = false;
     showSection("dashboard");
@@ -150,36 +160,7 @@
   async function doLogout() {
     await supabase.auth.signOut();
   }
-  logoutBtn.addEventListener("click", doLogout);
   logoutBtnPanel.addEventListener("click", doLogout);
-
-  const profileTrigger = document.getElementById("profile-trigger");
-  const profilePanel = document.getElementById("profile-panel");
-  const profilePanelBackdrop = document.getElementById("profile-panel-backdrop");
-  const profilePanelClose = document.getElementById("profile-panel-close");
-
-  function openProfilePanel() {
-    profilePanel.classList.add("is-open");
-    profilePanelBackdrop.classList.add("is-visible");
-  }
-  function closeProfilePanel() {
-    profilePanel.classList.remove("is-open");
-    profilePanelBackdrop.classList.remove("is-visible");
-  }
-  profileTrigger.addEventListener("click", openProfilePanel);
-  profilePanelClose.addEventListener("click", closeProfilePanel);
-  profilePanelBackdrop.addEventListener("click", closeProfilePanel);
-
-  function wireExpandableRow(rowId, formId) {
-    const row = document.getElementById(rowId);
-    const form = document.getElementById(formId);
-    row.addEventListener("click", () => {
-      form.hidden = !form.hidden;
-      row.classList.toggle("is-open", !form.hidden);
-    });
-  }
-  wireExpandableRow("pp-password-toggle", "password-form");
-  wireExpandableRow("pp-invite-toggle", "invite-form");
 
   const inviteForm = document.getElementById("invite-form");
   const inviteSubmit = document.getElementById("invite-submit");
@@ -239,6 +220,52 @@
     } else {
       passwordSuccess.hidden = false;
       passwordForm.reset();
+    }
+  });
+
+  const AVATAR_BUCKET = "site-images";
+  const AVATAR_EXT_BY_TYPE = {
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/webp": "webp",
+    "image/gif": "gif",
+  };
+  const MAX_AVATAR_BYTES = 4 * 1024 * 1024;
+
+  const ppAvatarEdit = document.getElementById("pp-avatar-edit");
+  const ppAvatarFile = document.getElementById("pp-avatar-file");
+  const ppAvatarError = document.getElementById("pp-avatar-error");
+
+  ppAvatarEdit.addEventListener("click", () => ppAvatarFile.click());
+  ppAvatarFile.addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    ppAvatarError.hidden = true;
+    ppAvatarEdit.disabled = true;
+    try {
+      const ext = AVATAR_EXT_BY_TYPE[file.type];
+      if (!ext) throw new Error("Format non pris en charge. Utilisez JPG, PNG, WebP ou GIF.");
+      if (file.size > MAX_AVATAR_BYTES) throw new Error("Image trop lourde (4 Mo maximum).");
+
+      const path = "avatars/" + crypto.randomUUID() + "." + ext;
+      const { error: uploadError } = await supabase.storage
+        .from(AVATAR_BUCKET)
+        .upload(path, file, { contentType: file.type, upsert: false });
+      if (uploadError) throw new Error(uploadError.message);
+
+      const { data: publicData } = supabase.storage.from(AVATAR_BUCKET).getPublicUrl(path);
+      const { data: updateData, error: updateError } = await supabase.auth.updateUser({
+        data: { avatar_url: publicData.publicUrl },
+      });
+      if (updateError) throw new Error(updateError.message);
+
+      renderAvatarInto(ppAvatarEl, updateData.user);
+    } catch (err) {
+      ppAvatarError.hidden = false;
+      ppAvatarError.textContent = err.message;
+    } finally {
+      ppAvatarEdit.disabled = false;
+      ppAvatarFile.value = "";
     }
   });
 
