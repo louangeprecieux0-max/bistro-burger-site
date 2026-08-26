@@ -47,13 +47,13 @@ module.exports = async (req, res) => {
       .from("site_content")
       .select("value")
       .eq("key", key)
-      .single();
+      .maybeSingle();
 
     if (error) {
       res.status(500).json({ error: error.message });
       return;
     }
-    res.status(200).json({ value: data.value });
+    res.status(200).json({ value: data ? data.value : null });
     return;
   }
 

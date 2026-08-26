@@ -107,6 +107,27 @@ button, input{font-family:inherit}
 }
 .field-label:first-of-type{margin-top:0}
 
+.login-field-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin:18px 0 8px;
+}
+.login-field-row .field-label{margin:0}
+.login-forgot-link{
+  font-family:var(--font-body);
+  font-weight:600;
+  font-size:12.5px;
+  color:var(--green-700);
+  background:none;
+  border:none;
+  padding:0;
+  cursor:pointer;
+  white-space:nowrap;
+}
+.login-forgot-link:hover{color:var(--green-900); text-decoration:underline}
+
 .field{
   width:100%;
   font-family:var(--font-body);

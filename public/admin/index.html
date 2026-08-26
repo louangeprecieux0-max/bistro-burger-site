@@ -24,7 +24,10 @@
           <label class="field-label" for="email">E-mail</label>
           <input class="field" type="email" id="email" name="email" required autocomplete="username" placeholder="vous@exemple.com">
 
-          <label class="field-label" for="password">Mot de passe</label>
+          <div class="login-field-row">
+            <label class="field-label" for="password">Mot de passe</label>
+            <button type="button" class="login-forgot-link" id="forgot-password-link">Mot de passe oublié ?</button>
+          </div>
           <div class="field-with-toggle">
             <input class="field" type="password" id="password" name="password" required autocomplete="current-password" placeholder="••••••••">
             <button type="button" class="field-toggle" data-toggle-for="password" aria-label="Afficher le mot de passe">
@@ -35,6 +38,18 @@
           <button type="submit" class="btn-primary" id="login-submit">Se connecter</button>
 
           <div id="login-error" class="login-error" hidden></div>
+        </form>
+
+        <form id="forgot-password-form" hidden>
+          <p class="login-sub" style="margin-bottom:18px">Indiquez votre e-mail : vous recevrez un lien pour définir un nouveau mot de passe.</p>
+          <label class="field-label" for="forgot-email">E-mail</label>
+          <input class="field" type="email" id="forgot-email" required autocomplete="username" placeholder="vous@exemple.com">
+
+          <button type="submit" class="btn-primary" id="forgot-submit">Envoyer le lien</button>
+          <button type="button" class="back-btn" id="forgot-back-link" style="margin-top:16px">‹ Retour à la connexion</button>
+
+          <div id="forgot-success" class="password-success" hidden>E-mail envoyé. Vérifiez votre boîte de réception.</div>
+          <div id="forgot-error" class="login-error" hidden></div>
         </form>
       </section>
     </div>

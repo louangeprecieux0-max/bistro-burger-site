@@ -162,6 +162,51 @@
     }
   });
 
+  const forgotPasswordLink = document.getElementById("forgot-password-link");
+  const forgotPasswordForm = document.getElementById("forgot-password-form");
+  const forgotBackLink = document.getElementById("forgot-back-link");
+  const forgotSubmit = document.getElementById("forgot-submit");
+  const forgotSuccess = document.getElementById("forgot-success");
+  const forgotError = document.getElementById("forgot-error");
+  const forgotEmailInput = document.getElementById("forgot-email");
+
+  forgotPasswordLink.addEventListener("click", () => {
+    forgotEmailInput.value = document.getElementById("email").value.trim();
+    loginForm.hidden = true;
+    errorBox.hidden = true;
+    forgotSuccess.hidden = true;
+    forgotError.hidden = true;
+    forgotPasswordForm.hidden = false;
+  });
+
+  forgotBackLink.addEventListener("click", () => {
+    forgotPasswordForm.hidden = true;
+    loginForm.hidden = false;
+  });
+
+  forgotPasswordForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    forgotSuccess.hidden = true;
+    forgotError.hidden = true;
+    forgotSubmit.disabled = true;
+    forgotSubmit.textContent = "Envoi…";
+
+    const email = forgotEmailInput.value.trim();
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + "/admin/",
+    });
+
+    forgotSubmit.disabled = false;
+    forgotSubmit.textContent = "Envoyer le lien";
+
+    if (error) {
+      forgotError.hidden = false;
+      forgotError.textContent = "Échec de l'envoi : " + error.message;
+    } else {
+      forgotSuccess.hidden = false;
+    }
+  });
+
   async function doLogout() {
     await supabase.auth.signOut();
   }
