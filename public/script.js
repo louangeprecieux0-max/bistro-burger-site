@@ -201,6 +201,13 @@
     }
   };
 
+  const PROMO_POPUP = SITE_DATA.promo_popup || {
+    badge: "Offre du moment",
+    title: "Le menu enfant offert",
+    description: "Le mardi soir et le mercredi midi, le menu enfant est offert pour tout menu adulte acheté. Réservez votre table pour en profiter.",
+    button_label: "Réserver",
+  };
+
   const GRADS = ["ph-1", "ph-2", "ph-3"];
 
   const REVIEWS = [
@@ -626,6 +633,14 @@
   /* ---------------------------------------------------------------- */
   const promoBackdrop = document.getElementById("promo-backdrop");
   if (promoBackdrop) {
+    const promoBadgeEl = document.getElementById("promo-badge");
+    const promoTitleEl = document.getElementById("promo-title");
+    const promoDescEl = document.getElementById("promo-desc");
+    const promoReserveEl = document.getElementById("promo-reserve");
+    if (promoBadgeEl) promoBadgeEl.textContent = PROMO_POPUP.badge;
+    if (promoTitleEl) promoTitleEl.textContent = PROMO_POPUP.title;
+    if (promoDescEl) promoDescEl.textContent = PROMO_POPUP.description;
+    if (promoReserveEl) promoReserveEl.textContent = PROMO_POPUP.button_label;
     function openPromo() { promoBackdrop.hidden = false; document.getElementById("promo-box").style.animation = "bbPromoIn .55s cubic-bezier(.22,.9,.3,1) both"; }
     function closePromo() { promoBackdrop.hidden = true; }
     setTimeout(openPromo, 5500);

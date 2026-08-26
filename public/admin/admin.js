@@ -59,6 +59,7 @@
     { key: "platdujour", title: "Plat du jour", editor: () => window.PlatDuJourEditor },
     { key: "offres", title: "Offres", editor: () => window.OffresEditor },
     { key: "reservations", title: "Réservations", editor: () => window.ReservationsEditor },
+    { key: "popup", title: "Pop-up promo", editor: () => window.PopupEditor },
   ];
 
   SECTIONS.forEach((s) => {
