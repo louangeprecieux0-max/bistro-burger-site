@@ -39,11 +39,35 @@
     }
   }
 
-  function linesToArray(text) {
-    return text
-      .split("\n")
-      .map((l) => l.trim())
-      .filter(Boolean);
+  const FIELDS = [
+    { key: "heures", label: "Créneaux horaires proposés", placeholder: "Ajouter un créneau (ex : 12h30)" },
+    { key: "couverts", label: "Nombre de couverts proposé", placeholder: "Ajouter un nombre (ex : 4 personnes)" },
+    { key: "horaires_text", label: "Horaires affichés sur le site", placeholder: "Ajouter une ligne d'horaire" },
+  ];
+
+  function chipRowHtml(key, values) {
+    if (!values.length) return '<p class="dashboard-note">Aucune valeur pour l\'instant.</p>';
+    return values
+      .map(
+        (v, i) =>
+          '<span class="r-chip">' +
+          esc(v) +
+          '<button type="button" class="r-chip-remove" data-remove-key="' + key + '" data-remove-i="' + i + '" aria-label="Retirer">×</button>' +
+          "</span>"
+      )
+      .join("");
+  }
+
+  function fieldHtml(field) {
+    const values = state.data[field.key] || [];
+    return (
+      '<label class="r-label">' + esc(field.label) + "</label>" +
+      '<div class="r-chip-row">' + chipRowHtml(field.key, values) + "</div>" +
+      '<div class="r-chip-add">' +
+      '<input class="r-chip-input" id="r-' + field.key + '-input" placeholder="' + esc(field.placeholder) + '">' +
+      '<button type="button" class="r-chip-add-btn" data-add-key="' + field.key + '">Ajouter</button>' +
+      "</div>"
+    );
   }
 
   function render() {
@@ -59,37 +83,69 @@
       return;
     }
 
-    const d = state.data;
-
     container.innerHTML =
       '<button type="button" class="back-btn" id="r-back-menu">‹ Retour</button>' +
       "<h1>Réglages de réservation</h1>" +
-      '<p class="dashboard-note">Une valeur par ligne. L\'ordre des lignes est celui affiché sur le site.</p>' +
-      '<form id="r-form">' +
-      "<h2>Créneaux horaires proposés</h2>" +
-      '<textarea class="field r-textarea" id="r-heures" rows="6">' + esc((d.heures || []).join("\n")) + "</textarea>" +
-      '<hr class="divider">' +
-      "<h2>Nombre de couverts proposé</h2>" +
-      '<textarea class="field r-textarea" id="r-couverts" rows="5">' + esc((d.couverts || []).join("\n")) + "</textarea>" +
-      '<hr class="divider">' +
-      "<h2>Horaires affichés sur le site</h2>" +
-      '<textarea class="field r-textarea" id="r-horaires" rows="4">' + esc((d.horaires_text || []).join("\n")) + "</textarea>" +
-      '<button type="submit" class="btn-primary" id="r-save"' + (state.saving ? " disabled" : "") + ">" +
+      '<p class="dashboard-note">Ajoutez ou retirez des valeurs. L\'ordre est celui affiché sur le site.</p>' +
+      FIELDS.map(fieldHtml).join('<hr class="divider">') +
+      '<div class="r-actions">' +
+      '<button type="button" class="r-btn-back" id="r-cancel"' + (state.saving ? " disabled" : "") + ">Annuler</button>" +
+      '<button type="button" class="r-btn-save" id="r-save"' + (state.saving ? " disabled" : "") + ">" +
       (state.saving ? "Enregistrement…" : "Enregistrer") +
       "</button>" +
+      "</div>" +
       (state.saveSuccess ? '<div class="password-success">Enregistré.</div>' : "") +
-      (state.saveError ? '<div class="login-error">' + esc(state.saveError) + "</div>" : "") +
-      "</form>";
+      (state.saveError ? '<div class="login-error">' + esc(state.saveError) + "</div>" : "");
 
     document.getElementById("r-back-menu").addEventListener("click", () => window.adminShowDashboard());
-    document.getElementById("r-form").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      state.data = {
-        heures: linesToArray(document.getElementById("r-heures").value),
-        couverts: linesToArray(document.getElementById("r-couverts").value),
-        horaires_text: linesToArray(document.getElementById("r-horaires").value),
-      };
 
+    container.querySelectorAll("[data-remove-key]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const key = btn.dataset.removeKey;
+        const i = Number(btn.dataset.removeI);
+        state.data[key].splice(i, 1);
+        render();
+      });
+    });
+
+    function addFromInput(key) {
+      const input = document.getElementById("r-" + key + "-input");
+      const val = input.value.trim();
+      if (!val) return;
+      if (!state.data[key]) state.data[key] = [];
+      state.data[key].push(val);
+      render();
+    }
+
+    container.querySelectorAll("[data-add-key]").forEach((btn) => {
+      btn.addEventListener("click", () => addFromInput(btn.dataset.addKey));
+    });
+    FIELDS.forEach((field) => {
+      const input = document.getElementById("r-" + field.key + "-input");
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          addFromInput(field.key);
+        }
+      });
+    });
+
+    document.getElementById("r-cancel").addEventListener("click", async () => {
+      state.screen = "loading";
+      state.saveError = null;
+      state.saveSuccess = false;
+      render();
+      try {
+        state.data = await apiGet();
+        state.screen = "ready";
+      } catch (err) {
+        state.screen = "error";
+        state.error = err.message;
+      }
+      render();
+    });
+
+    document.getElementById("r-save").addEventListener("click", async () => {
       state.saving = true;
       state.saveError = null;
       state.saveSuccess = false;
