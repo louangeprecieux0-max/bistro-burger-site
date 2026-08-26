@@ -23,6 +23,8 @@
   const loginScreen = document.getElementById("login-screen");
   const appShell = document.getElementById("app-shell");
   const pageTitle = document.getElementById("page-title");
+  const userEmailEl = document.getElementById("user-email");
+  const userAvatarEl = document.getElementById("user-avatar");
   const dashboardFirstnameEl = document.getElementById("dashboard-firstname");
   const ppAvatarEl = document.getElementById("pp-avatar");
   const ppNameEl = document.getElementById("pp-name");
@@ -114,6 +116,8 @@
   function showLoggedIn(session) {
     const email = session.user.email;
     const firstname = email.split("@")[0];
+    userEmailEl.textContent = email;
+    renderAvatarInto(userAvatarEl, session.user);
     dashboardFirstnameEl.textContent = firstname;
     ppNameEl.textContent = firstname;
     ppEmailEl.textContent = email;
@@ -161,6 +165,34 @@
     await supabase.auth.signOut();
   }
   logoutBtnPanel.addEventListener("click", doLogout);
+
+  const profileTrigger = document.getElementById("profile-trigger");
+  const profilePanel = document.getElementById("profile-panel");
+  const profilePanelBackdrop = document.getElementById("profile-panel-backdrop");
+  const profilePanelClose = document.getElementById("profile-panel-close");
+
+  function openProfilePanel() {
+    profilePanel.classList.add("is-open");
+    profilePanelBackdrop.classList.add("is-visible");
+  }
+  function closeProfilePanel() {
+    profilePanel.classList.remove("is-open");
+    profilePanelBackdrop.classList.remove("is-visible");
+  }
+  profileTrigger.addEventListener("click", openProfilePanel);
+  profilePanelClose.addEventListener("click", closeProfilePanel);
+  profilePanelBackdrop.addEventListener("click", closeProfilePanel);
+
+  function wireExpandableRow(rowId, formId) {
+    const row = document.getElementById(rowId);
+    const form = document.getElementById(formId);
+    row.addEventListener("click", () => {
+      form.hidden = !form.hidden;
+      row.classList.toggle("is-open", !form.hidden);
+    });
+  }
+  wireExpandableRow("pp-password-toggle", "password-form");
+  wireExpandableRow("pp-invite-toggle", "invite-form");
 
   const inviteForm = document.getElementById("invite-form");
   const inviteSubmit = document.getElementById("invite-submit");
@@ -260,6 +292,7 @@
       if (updateError) throw new Error(updateError.message);
 
       renderAvatarInto(ppAvatarEl, updateData.user);
+      renderAvatarInto(userAvatarEl, updateData.user);
     } catch (err) {
       ppAvatarError.hidden = false;
       ppAvatarError.textContent = err.message;
