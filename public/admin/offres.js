@@ -45,7 +45,10 @@
       return;
     }
     if (state.screen === "error") {
-      container.innerHTML = '<div class="login-error">' + esc(state.error) + "</div>";
+      container.innerHTML =
+        '<button type="button" class="back-btn" id="o-back-menu-error">‹ Retour</button>' +
+        '<div class="login-error">' + esc(state.error) + "</div>";
+      document.getElementById("o-back-menu-error").addEventListener("click", () => window.adminShowDashboard());
       return;
     }
     if (state.screen === "list") renderList();
@@ -71,12 +74,14 @@
       .join("");
 
     container.innerHTML =
+      '<button type="button" class="back-btn" id="o-back-menu">‹ Retour</button>' +
       "<h1>Offres du moment</h1>" +
       '<p class="dashboard-note">Les cartes affichées dans la section "Offres du moment" du site.</p>' +
       '<div class="list">' + (rows || '<p class="dashboard-note">Aucune offre.</p>') + "</div>" +
       '<button type="button" class="btn-secondary" id="o-add">+ Nouvelle offre</button>' +
       saveStatusHtml();
 
+    document.getElementById("o-back-menu").addEventListener("click", () => window.adminShowDashboard());
     document.getElementById("o-add").addEventListener("click", () => {
       state.itemIndex = null;
       state.editImgUrl = undefined;

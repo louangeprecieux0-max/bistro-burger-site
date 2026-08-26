@@ -52,13 +52,17 @@
       return;
     }
     if (state.screen === "error") {
-      container.innerHTML = '<div class="login-error">' + esc(state.error) + "</div>";
+      container.innerHTML =
+        '<button type="button" class="back-btn" id="r-back-menu-error">‹ Retour</button>' +
+        '<div class="login-error">' + esc(state.error) + "</div>";
+      document.getElementById("r-back-menu-error").addEventListener("click", () => window.adminShowDashboard());
       return;
     }
 
     const d = state.data;
 
     container.innerHTML =
+      '<button type="button" class="back-btn" id="r-back-menu">‹ Retour</button>' +
       "<h1>Réglages de réservation</h1>" +
       '<p class="dashboard-note">Une valeur par ligne. L\'ordre des lignes est celui affiché sur le site.</p>' +
       '<form id="r-form">' +
@@ -77,6 +81,7 @@
       (state.saveError ? '<div class="login-error">' + esc(state.saveError) + "</div>" : "") +
       "</form>";
 
+    document.getElementById("r-back-menu").addEventListener("click", () => window.adminShowDashboard());
     document.getElementById("r-form").addEventListener("submit", async (e) => {
       e.preventDefault();
       state.data = {

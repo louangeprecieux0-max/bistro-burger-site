@@ -50,7 +50,10 @@
       return;
     }
     if (state.screen === "error") {
-      container.innerHTML = '<div class="login-error">' + esc(state.error) + "</div>";
+      container.innerHTML =
+        '<button type="button" class="back-btn" id="pdj-back-menu-error">‹ Retour</button>' +
+        '<div class="login-error">' + esc(state.error) + "</div>";
+      document.getElementById("pdj-back-menu-error").addEventListener("click", () => window.adminShowDashboard());
       return;
     }
 
@@ -58,6 +61,7 @@
     const sug = state.data.suggestion;
 
     container.innerHTML =
+      '<button type="button" class="back-btn" id="pdj-back-menu">‹ Retour</button>' +
       "<h1>Plat du jour</h1>" +
       '<p class="dashboard-note">Affiché en haut de la page, mis à jour au fur et à mesure.</p>' +
       '<form id="pdj-form">' +
@@ -83,6 +87,7 @@
       (state.saveError ? '<div class="login-error">' + esc(state.saveError) + "</div>" : "") +
       "</form>";
 
+    document.getElementById("pdj-back-menu").addEventListener("click", () => window.adminShowDashboard());
     document.getElementById("pdj-form").addEventListener("submit", async (e) => {
       e.preventDefault();
       state.data.plat = {

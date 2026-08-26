@@ -53,7 +53,10 @@
       return;
     }
     if (state.screen === "error") {
-      container.innerHTML = '<div class="login-error">' + esc(state.error) + "</div>";
+      container.innerHTML =
+        '<button type="button" class="back-btn" id="c-back-menu-error">‹ Retour</button>' +
+        '<div class="login-error">' + esc(state.error) + "</div>";
+      document.getElementById("c-back-menu-error").addEventListener("click", () => window.adminShowDashboard());
       return;
     }
     if (state.screen === "categories") renderCategories();
@@ -95,12 +98,14 @@
       .join("");
 
     container.innerHTML =
+      '<button type="button" class="back-btn" id="c-back-menu">‹ Retour</button>' +
       "<h1>La carte</h1>" +
       modeToggleHtml() +
       '<div class="list">' + (rows || '<p class="dashboard-note">Aucune catégorie.</p>') + "</div>" +
       '<button type="button" class="btn-secondary" id="c-add-cat">+ Nouvelle catégorie</button>' +
       saveStatusHtml();
 
+    document.getElementById("c-back-menu").addEventListener("click", () => window.adminShowDashboard());
     container.querySelectorAll("[data-mode]").forEach((btn) => {
       btn.addEventListener("click", () => {
         state.mode = btn.dataset.mode;
