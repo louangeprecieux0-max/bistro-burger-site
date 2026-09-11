@@ -456,6 +456,7 @@
           '<div class="cart-product-thumb">' + (b.img ? '<img src="' + esc(b.img) + '" alt="' + esc(b.name) + '">' : "<span>Photo</span>") + "</div>" +
           '<div class="cart-product-info">' +
           '<span class="cart-product-name">' + esc(b.name) + "</span>" +
+          (b.desc ? '<span class="cart-product-desc">' + esc(b.desc) + "</span>" : "") +
           '<span class="cart-product-price">' + esc(b.emp) + "</span>" +
           "</div>" +
           '<div class="cart-product-actions">' +
