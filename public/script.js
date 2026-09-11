@@ -428,6 +428,7 @@
     const cartSubtotalEl = document.getElementById("cart-subtotal");
     const cartCountLabel = document.getElementById("cart-count-label");
     const cartBadges = document.querySelectorAll(".cart-badge-el");
+    const productGrid = document.getElementById("cart-product-grid");
 
     function getBurgerImg(name) {
       for (const fam of BURGERS) {
@@ -435,6 +436,41 @@
         if (found) return found.img || null;
       }
       return null;
+    }
+
+    function getFlatBurgers() {
+      const flat = BURGERS.flatMap((fam) => fam.items);
+      flat.sort((a, b) => (a.img ? 0 : 1) - (b.img ? 0 : 1));
+      return flat;
+    }
+
+    function renderProductGrid() {
+      if (!productGrid) return;
+      productGrid.innerHTML = "";
+      getFlatBurgers().forEach((b) => {
+        const cartItem = cart.find((it) => it.name === b.name);
+        const qty = cartItem ? cartItem.qty : 0;
+        const card = document.createElement("div");
+        card.className = "cart-product-card";
+        card.innerHTML =
+          '<div class="cart-product-thumb">' + (b.img ? '<img src="' + esc(b.img) + '" alt="' + esc(b.name) + '">' : "<span>Photo</span>") + "</div>" +
+          '<div class="cart-product-info">' +
+          '<span class="cart-product-name">' + esc(b.name) + "</span>" +
+          '<span class="cart-product-price">' + esc(b.emp) + "</span>" +
+          "</div>" +
+          '<div class="cart-product-actions">' +
+          (qty > 0
+            ? '<div class="cart-item-qty"><button type="button" class="cart-item-qty-btn" data-p-minus aria-label="Retirer un">−</button><span class="cart-item-qty-value">' + qty + '</span><button type="button" class="cart-item-qty-btn" data-p-plus aria-label="Ajouter un">+</button></div>'
+            : '<button type="button" class="cart-product-add" data-p-add aria-label="Ajouter">+</button>') +
+          "</div>";
+        const minusBtn = card.querySelector("[data-p-minus]");
+        const plusBtn = card.querySelector("[data-p-plus]");
+        const addBtn = card.querySelector("[data-p-add]");
+        if (minusBtn) minusBtn.addEventListener("click", () => setQty(b.name, qty - 1));
+        if (plusBtn) plusBtn.addEventListener("click", () => setQty(b.name, qty + 1));
+        if (addBtn) addBtn.addEventListener("click", () => { addToCart(b.name, b.emp); renderCart(); });
+        productGrid.appendChild(card);
+      });
     }
 
     function loadCart() {
@@ -484,6 +520,7 @@
     };
 
     function renderCart() {
+      renderProductGrid();
       if (!cart.length) {
         cartEmpty.hidden = false;
         cartFilled.hidden = true;
@@ -531,7 +568,6 @@
 
     document.getElementById("cart-close").addEventListener("click", closeCart);
     cartBackdrop.addEventListener("click", (e) => { if (e.target === cartBackdrop) closeCart(); });
-    document.getElementById("cart-go-burgers").addEventListener("click", () => { closeCart(); jump("burgers"); });
     document.getElementById("cart-clear").addEventListener("click", () => {
       cart = [];
       saveCart();
@@ -834,44 +870,44 @@
       })[c]);
     }
 
-    function getUpsellSupplements() {
-      const groups = (CARTES["À emporter"] && CARTES["À emporter"]["Menus & suppléments"]) || [];
-      return groups
-        .filter((g) => g.title === "Suppléments viandes" || g.title === "Suppléments fromages")
-        .map((g) => ({
-          label: g.title,
-          items: g.items.map((it) => {
-            const priceStr = it.price || g.price || "";
-            return { name: it.name, price: priceStr, priceNum: parsePriceToNumber(priceStr) };
-          }),
-        }));
-    }
-
-    function getUpsellBoissons() {
-      const groups = (CARTES["À emporter"] && CARTES["À emporter"]["Desserts & boissons"]) || [];
-      const boissonGroup = groups.find((g) => g.title === "Nos boissons");
-      if (!boissonGroup) return [];
+    function getUpsellGroup(category, title) {
+      const groups = (CARTES["À emporter"] && CARTES["À emporter"][category]) || [];
+      const group = groups.find((g) => g.title === title);
+      if (!group) return [];
       return [{
         label: null,
-        items: boissonGroup.items.map((it) => {
-          const priceStr = it.price || boissonGroup.price || "";
+        items: group.items.map((it) => {
+          const priceStr = it.price || group.price || "";
           return { name: it.name, price: priceStr, priceNum: parsePriceToNumber(priceStr) };
         }),
       }];
     }
 
+    function getUpsellViande() { return getUpsellGroup("Menus & suppléments", "Suppléments viandes"); }
+    function getUpsellFromage() { return getUpsellGroup("Menus & suppléments", "Suppléments fromages"); }
+    function getUpsellBoissons() { return getUpsellGroup("Desserts & boissons", "Nos boissons"); }
+    function getUpsellDesserts() { return getUpsellGroup("Desserts & boissons", "Nos desserts"); }
+
     const upsellBox = document.getElementById("upsell-box");
-    const stepSupplement = document.getElementById("upsell-step-supplement");
+    const stepViande = document.getElementById("upsell-step-viande");
+    const stepFromage = document.getElementById("upsell-step-fromage");
     const stepBoisson = document.getElementById("upsell-step-boisson");
+    const stepDessert = document.getElementById("upsell-step-dessert");
     const stepRecap = document.getElementById("upsell-step-recap");
-    const supplementList = document.getElementById("upsell-supplement-list");
+    const viandeList = document.getElementById("upsell-viande-list");
+    const fromageList = document.getElementById("upsell-fromage-list");
     const boissonList = document.getElementById("upsell-boisson-list");
+    const dessertList = document.getElementById("upsell-dessert-list");
     const recapItemsEl = document.getElementById("upsell-recap-items");
     const recapTotalEl = document.getElementById("upsell-recap-total");
     const continueBtn = document.getElementById("upsell-recap-continue");
+    const boissonNextBtn = document.getElementById("upsell-boisson-next");
 
-    let selectedSupplements = [];
+    let selectedViandes = [];
+    let selectedFromages = [];
     let selectedBoissons = [];
+    let selectedDesserts = [];
+    let hasDesserts = false;
 
     function renderItemRows(container, groups, selectedArr) {
       container.innerHTML = "";
@@ -908,8 +944,10 @@
     }
 
     function showStep(step) {
-      stepSupplement.hidden = step !== "supplement";
+      stepViande.hidden = step !== "viande";
+      stepFromage.hidden = step !== "fromage";
       stepBoisson.hidden = step !== "boisson";
+      stepDessert.hidden = step !== "dessert";
       stepRecap.hidden = step !== "recap";
     }
 
@@ -930,7 +968,7 @@
           "<span>" + escHtml(formatPrice(it.price * it.qty)) + "</span>";
         recapItemsEl.appendChild(row);
       });
-      selectedSupplements.forEach((s) => {
+      [].concat(selectedViandes, selectedFromages).forEach((s) => {
         total += s.priceNum;
         const row = document.createElement("div");
         row.style.cssText = "display:flex; justify-content:space-between; gap:10px;";
@@ -944,17 +982,33 @@
         row.innerHTML = "<span>" + escHtml("Boisson : " + s.name) + "</span><span>" + escHtml(formatPrice(s.priceNum)) + "</span>";
         recapItemsEl.appendChild(row);
       });
+      selectedDesserts.forEach((s) => {
+        total += s.priceNum;
+        const row = document.createElement("div");
+        row.style.cssText = "display:flex; justify-content:space-between; gap:10px;";
+        row.innerHTML = "<span>" + escHtml("Dessert : " + s.name) + "</span><span>" + escHtml(formatPrice(s.priceNum)) + "</span>";
+        recapItemsEl.appendChild(row);
+      });
 
       recapTotalEl.textContent = formatPrice(total);
       showStep("recap");
     }
 
+    function goToDessertOrRecap() {
+      if (hasDesserts) showStep("dessert");
+      else showRecap();
+    }
+
     document.getElementById("upsell-close").addEventListener("click", closeUpsell);
     upsellBackdrop.addEventListener("click", (e) => { if (e.target === upsellBackdrop) closeUpsell(); });
-    document.getElementById("upsell-supplement-next").addEventListener("click", () => showStep("boisson"));
-    document.getElementById("upsell-supplement-skip").addEventListener("click", () => showStep("boisson"));
-    document.getElementById("upsell-boisson-next").addEventListener("click", showRecap);
-    document.getElementById("upsell-boisson-skip").addEventListener("click", showRecap);
+    document.getElementById("upsell-viande-next").addEventListener("click", () => showStep("fromage"));
+    document.getElementById("upsell-viande-skip").addEventListener("click", () => showStep("fromage"));
+    document.getElementById("upsell-fromage-next").addEventListener("click", () => showStep("boisson"));
+    document.getElementById("upsell-fromage-skip").addEventListener("click", () => showStep("boisson"));
+    boissonNextBtn.addEventListener("click", goToDessertOrRecap);
+    document.getElementById("upsell-boisson-skip").addEventListener("click", goToDessertOrRecap);
+    document.getElementById("upsell-dessert-next").addEventListener("click", showRecap);
+    document.getElementById("upsell-dessert-skip").addEventListener("click", showRecap);
     document.getElementById("upsell-recap-close").addEventListener("click", closeUpsell);
     if (continueBtn) {
       continueBtn.addEventListener("click", () => {
@@ -969,11 +1023,18 @@
     }
 
     openUpsell = function () {
-      selectedSupplements = [];
+      selectedViandes = [];
+      selectedFromages = [];
       selectedBoissons = [];
-      renderItemRows(supplementList, getUpsellSupplements(), selectedSupplements);
+      selectedDesserts = [];
+      const desserts = getUpsellDesserts();
+      hasDesserts = desserts.length > 0 && desserts[0].items.length > 0;
+      boissonNextBtn.textContent = hasDesserts ? "Continuer" : "Voir ma commande";
+      renderItemRows(viandeList, getUpsellViande(), selectedViandes);
+      renderItemRows(fromageList, getUpsellFromage(), selectedFromages);
       renderItemRows(boissonList, getUpsellBoissons(), selectedBoissons);
-      showStep("supplement");
+      renderItemRows(dessertList, desserts, selectedDesserts);
+      showStep("viande");
       upsellBackdrop.hidden = false;
       upsellBox.style.animation = "bbPromoIn .4s cubic-bezier(.22,.9,.3,1) both";
     };
