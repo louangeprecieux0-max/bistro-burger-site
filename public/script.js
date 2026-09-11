@@ -5,6 +5,12 @@
   /* généré au build. Repli vide sur les pages qui ne le chargent pas. */
   /* ---------------------------------------------------------------- */
   const SITE_DATA = window.SITE_DATA || {};
+  let openUpsell = null;
+  let openCart = null;
+  let closeCart = null;
+  let addToCart = null;
+  let updateCartBadge = null;
+  let cart = [];
   const BURGERS = SITE_DATA.burgers || [
     { title: "Les originaux", items: [
       { name: "Classique", desc: "Bun's², iceberg, tomate, steak, double cheddar, compotée d'oignons maison, sauce de notre enfance", sur: "16 €", emp: "13 €" },
@@ -252,6 +258,17 @@
     return n;
   };
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  function parsePriceToNumber(str) {
+    if (!str) return 0;
+    const cleaned = String(str).replace(/[^\d,.\-]/g, "").replace(",", ".");
+    const n = parseFloat(cleaned);
+    return isNaN(n) ? 0 : n;
+  }
+  function formatPrice(n) {
+    const rounded = Math.round(n * 100) / 100;
+    const hasCents = Math.abs(rounded % 1) > 0.001;
+    return (hasCents ? rounded.toFixed(2).replace(".", ",") : String(rounded)) + " €";
+  }
 
   /* ---------------------------------------------------------------- */
   /* Smooth-scroll to a section (accounts for the fixed header)        */
@@ -269,7 +286,25 @@
   }
   document.addEventListener("click", (e) => {
     const goEl = e.target.closest("[data-go]");
-    if (goEl) { jump(goEl.getAttribute("data-go")); return; }
+    if (goEl) {
+      const target = goEl.getAttribute("data-go");
+      jump(target);
+      return;
+    }
+    const cartOpenEl = e.target.closest(".cart-open-trigger");
+    if (cartOpenEl && openCart) {
+      openCart();
+      return;
+    }
+    const addEl = e.target.closest("[data-cart-add]");
+    if (addEl && addToCart) {
+      addToCart(addEl.getAttribute("data-cart-add"), addEl.getAttribute("data-cart-price"));
+      const original = addEl.textContent;
+      addEl.textContent = "Ajouté ✓";
+      addEl.disabled = true;
+      setTimeout(() => { addEl.textContent = original; addEl.disabled = false; }, 1100);
+      return;
+    }
   });
 
   /* ---------------------------------------------------------------- */
@@ -371,7 +406,7 @@
       card.appendChild(el("span", { "data-b-name": "", style: "align-self:flex-start; font-family:var(--font-heading); font-weight:700; font-size:17px; line-height:1.2; color:var(--color-secondary); background:linear-gradient(115deg,#2E8F7C 0%,var(--green-700) 40%,var(--color-primary) 100%); box-shadow:inset 0 1px 0 rgba(237,224,211,.28), 0 5px 14px rgba(14,70,61,.2); padding:7px 15px; border-radius:var(--radius-badge);" }, esc(b.name)));
       card.appendChild(el("p", { "data-b-desc": "", style: "font-size:13.5px; line-height:1.55; color:var(--text-muted); margin:0; flex:1;" }, esc(b.desc)));
       const actions = el("div", { style: "display:flex; flex-wrap:wrap; gap:9px;" });
-      const orderBtn = el("button", { type: "button", "data-shine": "", "data-b-order": "", "data-go": "commander", style: "font-family:var(--font-heading); font-weight:600; font-size:13px; padding:10px 18px; border:none; cursor:pointer; border-radius:var(--radius-badge); color:var(--color-secondary); background:linear-gradient(115deg,#2E8F7C 0%,var(--green-700) 30%,var(--color-primary) 62%,var(--green-900) 100%); box-shadow:inset 0 1px 0 rgba(237,224,211,.3), 0 6px 16px rgba(18,87,76,.26);" }, "Commander");
+      const orderBtn = el("button", { type: "button", "data-shine": "", "data-b-order": "", "data-cart-add": b.name, "data-cart-price": b.emp, style: "font-family:var(--font-heading); font-weight:600; font-size:13px; padding:10px 18px; border:none; cursor:pointer; border-radius:var(--radius-badge); color:var(--color-secondary); background:linear-gradient(115deg,#2E8F7C 0%,var(--green-700) 30%,var(--color-primary) 62%,var(--green-900) 100%); box-shadow:inset 0 1px 0 rgba(237,224,211,.3), 0 6px 16px rgba(18,87,76,.26);" }, "Ajouter au panier");
       const reserveBtn = el("button", { type: "button", "data-b-reserve": "", "data-go": "reservation", style: "font-family:var(--font-heading); font-weight:600; font-size:13px; padding:10px 18px; cursor:pointer; border-radius:var(--radius-badge); color:var(--color-primary); background:transparent; border:1.5px solid rgba(18,87,76,.45);" }, "Réserver");
       actions.appendChild(orderBtn); actions.appendChild(reserveBtn);
       card.appendChild(actions);
@@ -379,6 +414,144 @@
     });
   }
   renderBurgers();
+
+  /* ---------------------------------------------------------------- */
+  /* Panier (burgers uniquement)                                       */
+  /* ---------------------------------------------------------------- */
+  const cartBackdrop = document.getElementById("cart-backdrop");
+  if (cartBackdrop) {
+    const cartBox = document.getElementById("cart-box");
+    const cartEmpty = document.getElementById("cart-empty");
+    const cartFilled = document.getElementById("cart-filled");
+    const cartItemsList = document.getElementById("cart-items-list");
+    const cartTotalEl = document.getElementById("cart-total");
+    const cartSubtotalEl = document.getElementById("cart-subtotal");
+    const cartCountLabel = document.getElementById("cart-count-label");
+    const cartBadges = document.querySelectorAll(".cart-badge-el");
+
+    function getBurgerImg(name) {
+      for (const fam of BURGERS) {
+        const found = fam.items.find((it) => it.name === name);
+        if (found) return found.img || null;
+      }
+      return null;
+    }
+
+    function loadCart() {
+      try {
+        const raw = localStorage.getItem("bb-cart-v1");
+        cart = raw ? JSON.parse(raw) : [];
+      } catch {
+        cart = [];
+      }
+    }
+    function saveCart() {
+      try { localStorage.setItem("bb-cart-v1", JSON.stringify(cart)); } catch {}
+    }
+    function cartTotal() {
+      return cart.reduce((sum, it) => sum + it.price * it.qty, 0);
+    }
+    function cartCount() {
+      return cart.reduce((sum, it) => sum + it.qty, 0);
+    }
+    updateCartBadge = function () {
+      const count = cartCount();
+      cartBadges.forEach((badge) => {
+        badge.textContent = String(count);
+        badge.style.display = count > 0 ? "flex" : "none";
+      });
+    };
+    function setQty(name, qty) {
+      const item = cart.find((it) => it.name === name);
+      if (!item) return;
+      if (qty <= 0) {
+        cart = cart.filter((it) => it.name !== name);
+      } else {
+        item.qty = qty;
+      }
+      saveCart();
+      updateCartBadge();
+      renderCart();
+    }
+
+    addToCart = function (name, priceStr) {
+      const price = parsePriceToNumber(priceStr);
+      const existing = cart.find((it) => it.name === name);
+      if (existing) existing.qty += 1;
+      else cart.push({ name, price, qty: 1 });
+      saveCart();
+      updateCartBadge();
+    };
+
+    function renderCart() {
+      if (!cart.length) {
+        cartEmpty.hidden = false;
+        cartFilled.hidden = true;
+        return;
+      }
+      cartEmpty.hidden = true;
+      cartFilled.hidden = false;
+      cartItemsList.innerHTML = "";
+      cart.forEach((it) => {
+        const img = getBurgerImg(it.name);
+        const row = document.createElement("div");
+        row.className = "cart-item-row";
+        row.innerHTML =
+          '<div class="cart-item-thumb">' + (img ? '<img src="' + esc(img) + '" alt="' + esc(it.name) + '">' : "<span>Photo</span>") + "</div>" +
+          '<div class="cart-item-info">' +
+          '<span class="cart-item-name">' + esc(it.name) + "</span>" +
+          '<span class="cart-item-price">' + esc(formatPrice(it.price)) + " l'unité</span>" +
+          "</div>" +
+          '<div class="cart-item-right">' +
+          '<span class="cart-item-line-total">' + esc(formatPrice(it.price * it.qty)) + "</span>" +
+          '<div class="cart-item-qty">' +
+          '<button type="button" class="cart-item-qty-btn" data-qty-minus aria-label="Retirer un">−</button>' +
+          '<span class="cart-item-qty-value">' + it.qty + "</span>" +
+          '<button type="button" class="cart-item-qty-btn" data-qty-plus aria-label="Ajouter un">+</button>' +
+          "</div>" +
+          "</div>";
+        row.querySelector("[data-qty-minus]").addEventListener("click", () => setQty(it.name, it.qty - 1));
+        row.querySelector("[data-qty-plus]").addEventListener("click", () => setQty(it.name, it.qty + 1));
+        cartItemsList.appendChild(row);
+      });
+      const count = cartCount();
+      cartCountLabel.textContent = "Articles (" + count + ")";
+      cartSubtotalEl.textContent = formatPrice(cartTotal());
+      cartTotalEl.textContent = formatPrice(cartTotal());
+    }
+
+    openCart = function () {
+      renderCart();
+      cartBackdrop.hidden = false;
+      cartBox.style.animation = "bbPromoIn .4s cubic-bezier(.22,.9,.3,1) both";
+    };
+    closeCart = function () {
+      cartBackdrop.hidden = true;
+    };
+
+    document.getElementById("cart-close").addEventListener("click", closeCart);
+    cartBackdrop.addEventListener("click", (e) => { if (e.target === cartBackdrop) closeCart(); });
+    document.getElementById("cart-go-burgers").addEventListener("click", () => { closeCart(); jump("burgers"); });
+    document.getElementById("cart-clear").addEventListener("click", () => {
+      cart = [];
+      saveCart();
+      updateCartBadge();
+      renderCart();
+    });
+    document.getElementById("cart-checkout").addEventListener("click", () => {
+      if (openUpsell) openUpsell();
+    });
+
+    loadCart();
+    updateCartBadge();
+  }
+
+  const orderContactBackdrop = document.getElementById("order-contact-backdrop");
+  if (orderContactBackdrop) {
+    const closeOrderContact = () => { orderContactBackdrop.hidden = true; };
+    document.getElementById("order-contact-close").addEventListener("click", closeOrderContact);
+    orderContactBackdrop.addEventListener("click", (e) => { if (e.target === orderContactBackdrop) closeOrderContact(); });
+  }
 
   (function burgerCarousel() {
     const track = document.getElementById("burger-track");
@@ -648,5 +821,161 @@
     document.getElementById("promo-close").addEventListener("click", closePromo);
     promoBackdrop.addEventListener("click", (e) => { if (e.target === promoBackdrop) closePromo(); });
     document.getElementById("promo-reserve").addEventListener("click", () => { closePromo(); jump("reservation"); });
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* Upsell avant commande (supplément puis boisson)                   */
+  /* ---------------------------------------------------------------- */
+  const upsellBackdrop = document.getElementById("upsell-backdrop");
+  if (upsellBackdrop) {
+    function escHtml(s) {
+      return String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+      })[c]);
+    }
+
+    function getUpsellSupplements() {
+      const groups = (CARTES["À emporter"] && CARTES["À emporter"]["Menus & suppléments"]) || [];
+      return groups
+        .filter((g) => g.title === "Suppléments viandes" || g.title === "Suppléments fromages")
+        .map((g) => ({
+          label: g.title,
+          items: g.items.map((it) => {
+            const priceStr = it.price || g.price || "";
+            return { name: it.name, price: priceStr, priceNum: parsePriceToNumber(priceStr) };
+          }),
+        }));
+    }
+
+    function getUpsellBoissons() {
+      const groups = (CARTES["À emporter"] && CARTES["À emporter"]["Desserts & boissons"]) || [];
+      const boissonGroup = groups.find((g) => g.title === "Nos boissons");
+      if (!boissonGroup) return [];
+      return [{
+        label: null,
+        items: boissonGroup.items.map((it) => {
+          const priceStr = it.price || boissonGroup.price || "";
+          return { name: it.name, price: priceStr, priceNum: parsePriceToNumber(priceStr) };
+        }),
+      }];
+    }
+
+    const upsellBox = document.getElementById("upsell-box");
+    const stepSupplement = document.getElementById("upsell-step-supplement");
+    const stepBoisson = document.getElementById("upsell-step-boisson");
+    const stepRecap = document.getElementById("upsell-step-recap");
+    const supplementList = document.getElementById("upsell-supplement-list");
+    const boissonList = document.getElementById("upsell-boisson-list");
+    const recapItemsEl = document.getElementById("upsell-recap-items");
+    const recapTotalEl = document.getElementById("upsell-recap-total");
+    const continueBtn = document.getElementById("upsell-recap-continue");
+
+    let selectedSupplements = [];
+    let selectedBoissons = [];
+
+    function renderItemRows(container, groups, selectedArr) {
+      container.innerHTML = "";
+      groups.forEach((group) => {
+        if (group.label) {
+          const label = document.createElement("div");
+          label.className = "upsell-group-label";
+          label.textContent = group.label;
+          container.appendChild(label);
+        }
+        group.items.forEach((item) => {
+          const row = document.createElement("button");
+          row.type = "button";
+          row.className = "upsell-item";
+          row.innerHTML =
+            '<span class="upsell-item-name">' + escHtml(item.name) + "</span>" +
+            '<span class="upsell-item-price">' + escHtml(item.price) + "</span>" +
+            '<span class="upsell-item-check">+</span>';
+          row.addEventListener("click", () => {
+            const idx = selectedArr.findIndex((s) => s.name === item.name);
+            if (idx === -1) {
+              selectedArr.push({ name: item.name, priceNum: item.priceNum });
+              row.classList.add("is-selected");
+              row.querySelector(".upsell-item-check").textContent = "✓";
+            } else {
+              selectedArr.splice(idx, 1);
+              row.classList.remove("is-selected");
+              row.querySelector(".upsell-item-check").textContent = "+";
+            }
+          });
+          container.appendChild(row);
+        });
+      });
+    }
+
+    function showStep(step) {
+      stepSupplement.hidden = step !== "supplement";
+      stepBoisson.hidden = step !== "boisson";
+      stepRecap.hidden = step !== "recap";
+    }
+
+    function closeUpsell() {
+      upsellBackdrop.hidden = true;
+    }
+
+    function showRecap() {
+      recapItemsEl.innerHTML = "";
+      let total = 0;
+
+      cart.forEach((it) => {
+        total += it.price * it.qty;
+        const row = document.createElement("div");
+        row.style.cssText = "display:flex; justify-content:space-between; gap:10px;";
+        row.innerHTML =
+          "<span>" + escHtml(it.qty + " × " + it.name) + "</span>" +
+          "<span>" + escHtml(formatPrice(it.price * it.qty)) + "</span>";
+        recapItemsEl.appendChild(row);
+      });
+      selectedSupplements.forEach((s) => {
+        total += s.priceNum;
+        const row = document.createElement("div");
+        row.style.cssText = "display:flex; justify-content:space-between; gap:10px;";
+        row.innerHTML = "<span>" + escHtml("Supplément : " + s.name) + "</span><span>" + escHtml(formatPrice(s.priceNum)) + "</span>";
+        recapItemsEl.appendChild(row);
+      });
+      selectedBoissons.forEach((s) => {
+        total += s.priceNum;
+        const row = document.createElement("div");
+        row.style.cssText = "display:flex; justify-content:space-between; gap:10px;";
+        row.innerHTML = "<span>" + escHtml("Boisson : " + s.name) + "</span><span>" + escHtml(formatPrice(s.priceNum)) + "</span>";
+        recapItemsEl.appendChild(row);
+      });
+
+      recapTotalEl.textContent = formatPrice(total);
+      showStep("recap");
+    }
+
+    document.getElementById("upsell-close").addEventListener("click", closeUpsell);
+    upsellBackdrop.addEventListener("click", (e) => { if (e.target === upsellBackdrop) closeUpsell(); });
+    document.getElementById("upsell-supplement-next").addEventListener("click", () => showStep("boisson"));
+    document.getElementById("upsell-supplement-skip").addEventListener("click", () => showStep("boisson"));
+    document.getElementById("upsell-boisson-next").addEventListener("click", showRecap);
+    document.getElementById("upsell-boisson-skip").addEventListener("click", showRecap);
+    document.getElementById("upsell-recap-close").addEventListener("click", closeUpsell);
+    if (continueBtn) {
+      continueBtn.addEventListener("click", () => {
+        cart = [];
+        try { localStorage.setItem("bb-cart-v1", "[]"); } catch {}
+        if (updateCartBadge) updateCartBadge();
+        closeUpsell();
+        if (closeCart) closeCart();
+        const orderContactBackdrop = document.getElementById("order-contact-backdrop");
+        if (orderContactBackdrop) orderContactBackdrop.hidden = false;
+      });
+    }
+
+    openUpsell = function () {
+      selectedSupplements = [];
+      selectedBoissons = [];
+      renderItemRows(supplementList, getUpsellSupplements(), selectedSupplements);
+      renderItemRows(boissonList, getUpsellBoissons(), selectedBoissons);
+      showStep("supplement");
+      upsellBackdrop.hidden = false;
+      upsellBox.style.animation = "bbPromoIn .4s cubic-bezier(.22,.9,.3,1) both";
+    };
   }
 })();
