@@ -138,6 +138,59 @@
   }
   window.refreshAdminAlerts = refreshAdminAlerts;
 
+  const presenceStack = document.getElementById("presence-stack");
+  let presenceChannel = null;
+
+  function renderPresenceAvatar(entry) {
+    const el = document.createElement("span");
+    el.className = "presence-avatar";
+    el.title = entry.email || "";
+    if (entry.avatar_url) {
+      const img = document.createElement("img");
+      img.src = entry.avatar_url;
+      img.alt = "";
+      el.appendChild(img);
+    } else {
+      el.textContent = (entry.email || "?").charAt(0).toUpperCase();
+    }
+    return el;
+  }
+
+  function renderPresence(state) {
+    presenceStack.innerHTML = "";
+    Object.values(state).forEach((entries) => {
+      const entry = entries[0];
+      if (entry) presenceStack.appendChild(renderPresenceAvatar(entry));
+    });
+  }
+
+  function startPresence(session) {
+    if (presenceChannel) return;
+    presenceChannel = supabase.channel("admin-presence", {
+      config: { presence: { key: session.user.id } },
+    });
+    presenceChannel
+      .on("presence", { event: "sync" }, () => {
+        renderPresence(presenceChannel.presenceState());
+      })
+      .subscribe(async (status) => {
+        if (status === "SUBSCRIBED") {
+          await presenceChannel.track({
+            email: session.user.email,
+            avatar_url: (session.user.user_metadata && session.user.user_metadata.avatar_url) || null,
+          });
+        }
+      });
+  }
+
+  function stopPresence() {
+    if (presenceChannel) {
+      supabase.removeChannel(presenceChannel);
+      presenceChannel = null;
+    }
+    presenceStack.innerHTML = "";
+  }
+
   function showLoggedIn(session) {
     const email = session.user.email;
     const firstname = email.split("@")[0];
@@ -152,6 +205,7 @@
     showSection("dashboard");
     refreshAdminAlerts();
     if (!alertsInterval) alertsInterval = setInterval(refreshAdminAlerts, 60000);
+    startPresence(session);
   }
 
   function showLoggedOut() {
@@ -161,6 +215,7 @@
       clearInterval(alertsInterval);
       alertsInterval = null;
     }
+    stopPresence();
   }
 
   supabase.auth.getSession().then(({ data }) => {
