@@ -821,6 +821,20 @@
         if (!res.ok || !payload || payload.success === "false" || payload.success === false) {
           throw new Error((payload && payload.message) || "request failed");
         }
+        try {
+          await fetch("/api/reservations", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: data.get("nom"),
+              email: data.get("email"),
+              phone: data.get("tel"),
+              date: data.get("date"),
+              time: data.get("heure"),
+              partySize: data.get("couverts"),
+            }),
+          });
+        } catch {}
         sentBox.hidden = false;
         form.reset();
       } catch (err) {
@@ -956,6 +970,14 @@
       upsellBackdrop.hidden = true;
     }
 
+    function buildOrderItemsForApi() {
+      const items = cart.map((it) => ({ name: it.name, qty: it.qty, price: it.price }));
+      [].concat(selectedViandes, selectedFromages).forEach((s) => items.push({ name: "Supplément : " + s.name, qty: 1, price: s.priceNum }));
+      selectedBoissons.forEach((s) => items.push({ name: "Boisson : " + s.name, qty: 1, price: s.priceNum }));
+      selectedDesserts.forEach((s) => items.push({ name: "Dessert : " + s.name, qty: 1, price: s.priceNum }));
+      return items;
+    }
+
     function showRecap() {
       recapItemsEl.innerHTML = "";
       let total = 0;
@@ -1012,12 +1034,43 @@
     document.getElementById("upsell-dessert-skip").addEventListener("click", showRecap);
     document.getElementById("upsell-recap-close").addEventListener("click", closeUpsell);
     if (continueBtn) {
-      continueBtn.addEventListener("click", () => {
+      continueBtn.addEventListener("click", async () => {
+        const nameInput = document.getElementById("upsell-recap-name");
+        const phoneInput = document.getElementById("upsell-recap-phone");
+        const formError = document.getElementById("upsell-recap-form-error");
+        const customerName = nameInput.value.trim();
+        const customerPhone = phoneInput.value.trim();
+        if (!customerName || !customerPhone) {
+          formError.hidden = false;
+          return;
+        }
+        formError.hidden = true;
+
+        const originalLabel = continueBtn.textContent;
+        continueBtn.disabled = true;
+        continueBtn.textContent = "Envoi…";
+        try {
+          await fetch("/api/orders", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              customerName,
+              customerPhone,
+              items: buildOrderItemsForApi(),
+              total: parsePriceToNumber(recapTotalEl.textContent),
+            }),
+          });
+        } catch {}
+        continueBtn.disabled = false;
+        continueBtn.textContent = originalLabel;
+
         cart = [];
         try { localStorage.setItem("bb-cart-v1", "[]"); } catch {}
         if (updateCartBadge) updateCartBadge();
         closeUpsell();
         if (closeCart) closeCart();
+        nameInput.value = "";
+        phoneInput.value = "";
         const orderContactBackdrop = document.getElementById("order-contact-backdrop");
         if (orderContactBackdrop) orderContactBackdrop.hidden = false;
       });

@@ -645,6 +645,11 @@
           <span>Total</span>
           <span id="upsell-recap-total">0 €</span>
         </div>
+        <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:14px;">
+          <input id="upsell-recap-name" type="text" required placeholder="Votre nom" style="width:100%; box-sizing:border-box; font-family:var(--font-body); font-size:15px; padding:12px 14px; border-radius:var(--radius-field); background:rgba(18,87,76,.05); border:1px solid var(--border-default); color:var(--color-primary); outline:none;">
+          <input id="upsell-recap-phone" type="tel" required placeholder="Votre téléphone" style="width:100%; box-sizing:border-box; font-family:var(--font-body); font-size:15px; padding:12px 14px; border-radius:var(--radius-field); background:rgba(18,87,76,.05); border:1px solid var(--border-default); color:var(--color-primary); outline:none;">
+        </div>
+        <p id="upsell-recap-form-error" hidden style="font-size:13px; color:var(--error, #B5651D); margin:0 0 14px;">Merci d'indiquer votre nom et votre téléphone.</p>
         <p class="upsell-recap" id="upsell-recap-text">Ce site ne prend pas encore les paiements en ligne : rendez-vous sur notre page contact pour confirmer votre commande.</p>
         <button type="button" class="btn btn-gradient cart-call-btn" id="upsell-recap-continue" data-shine style="width:100%;">Passer ma commande</button>
         <button type="button" class="upsell-skip" id="upsell-recap-close">Fermer</button>

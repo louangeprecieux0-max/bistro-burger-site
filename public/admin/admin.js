@@ -60,6 +60,8 @@
     { key: "offres", title: "Offres", editor: () => window.OffresEditor },
     { key: "reservations", title: "Réservations", editor: () => window.ReservationsEditor },
     { key: "popup", title: "Pop-up promo", editor: () => window.PopupEditor },
+    { key: "commandes", title: "Commandes", editor: () => window.CommandesEditor },
+    { key: "reservations-clients", title: "Réservations reçues", editor: () => window.ReservationsClientsEditor },
   ];
 
   SECTIONS.forEach((s) => {
