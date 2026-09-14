@@ -4,6 +4,26 @@ const { createClient } = require("@supabase/supabase-js");
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const ALERT_EMAIL = "louangeprecieux0@gmail.com";
+
+async function sendAlertEmail(row) {
+  try {
+    const params = new URLSearchParams();
+    params.set("_subject", "Nouvelle commande — Bistro Burger");
+    params.set("nom", row.customer_name);
+    params.set("téléphone", row.customer_phone);
+    params.set(
+      "articles",
+      row.items.map((it) => (it.qty || 1) + "x " + it.name).join(", ")
+    );
+    params.set("total", row.total + " €");
+    await fetch("https://formsubmit.co/ajax/" + encodeURIComponent(ALERT_EMAIL), {
+      method: "POST",
+      headers: { Accept: "application/json", "Content-Type": "application/x-www-form-urlencoded" },
+      body: params,
+    });
+  } catch {}
+}
 
 module.exports = async (req, res) => {
   if (req.method !== "POST") {
@@ -52,6 +72,8 @@ module.exports = async (req, res) => {
     res.status(500).json({ error: error.message });
     return;
   }
+
+  await sendAlertEmail(row);
 
   res.status(200).json({ ok: true });
 };

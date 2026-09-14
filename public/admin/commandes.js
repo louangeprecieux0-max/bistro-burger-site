@@ -139,6 +139,7 @@
           const order = state.items.find((o) => o.id === id);
           if (order) order.status = next;
           render();
+          if (window.refreshAdminAlerts) window.refreshAdminAlerts();
         } catch (err) {
           btn.disabled = false;
           alert(err.message);
@@ -155,6 +156,7 @@
           await apiDelete(id);
           state.items = state.items.filter((o) => o.id !== id);
           render();
+          if (window.refreshAdminAlerts) window.refreshAdminAlerts();
         } catch (err) {
           btn.disabled = false;
           alert(err.message);

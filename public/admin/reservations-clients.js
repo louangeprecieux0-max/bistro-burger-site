@@ -143,6 +143,7 @@
           const r = state.items.find((x) => x.id === id);
           if (r) r.status = status;
           render();
+          if (window.refreshAdminAlerts) window.refreshAdminAlerts();
         } catch (err) {
           btn.disabled = false;
           alert(err.message);
@@ -159,6 +160,7 @@
           await apiDelete(id);
           state.items = state.items.filter((r) => r.id !== id);
           render();
+          if (window.refreshAdminAlerts) window.refreshAdminAlerts();
         } catch (err) {
           btn.disabled = false;
           alert(err.message);

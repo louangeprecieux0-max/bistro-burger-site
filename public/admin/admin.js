@@ -116,6 +116,28 @@
     }
   }
 
+  let alertsInterval = null;
+
+  function setAlertBadge(key, count) {
+    [document.getElementById("badge-" + key), document.getElementById("card-badge-" + key)].forEach((el) => {
+      if (!el) return;
+      el.textContent = count > 99 ? "99+" : String(count);
+      el.hidden = count <= 0;
+    });
+  }
+
+  async function refreshAdminAlerts() {
+    try {
+      const headers = await window.adminAuth.authHeader();
+      const res = await fetch("/api/admin/alerts", { headers });
+      if (!res.ok) return;
+      const json = await res.json();
+      setAlertBadge("commandes", json.newOrders || 0);
+      setAlertBadge("reservations-clients", json.newReservations || 0);
+    } catch {}
+  }
+  window.refreshAdminAlerts = refreshAdminAlerts;
+
   function showLoggedIn(session) {
     const email = session.user.email;
     const firstname = email.split("@")[0];
@@ -128,11 +150,17 @@
     loginScreen.hidden = true;
     appShell.hidden = false;
     showSection("dashboard");
+    refreshAdminAlerts();
+    if (!alertsInterval) alertsInterval = setInterval(refreshAdminAlerts, 60000);
   }
 
   function showLoggedOut() {
     loginScreen.hidden = false;
     appShell.hidden = true;
+    if (alertsInterval) {
+      clearInterval(alertsInterval);
+      alertsInterval = null;
+    }
   }
 
   supabase.auth.getSession().then(({ data }) => {

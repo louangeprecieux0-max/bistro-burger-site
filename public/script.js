@@ -812,29 +812,19 @@
       submitBtn.textContent = "Envoi en cours…";
       try {
         const data = new FormData(form);
-        const res = await fetch("https://formsubmit.co/ajax/" + encodeURIComponent("louangeprecieux0@gmail.com"), {
+        const res = await fetch("/api/reservations", {
           method: "POST",
-          headers: { Accept: "application/json" },
-          body: data
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: data.get("nom"),
+            email: data.get("email"),
+            phone: data.get("tel"),
+            date: data.get("date"),
+            time: data.get("heure"),
+            partySize: data.get("couverts"),
+          }),
         });
-        const payload = await res.json().catch(() => null);
-        if (!res.ok || !payload || payload.success === "false" || payload.success === false) {
-          throw new Error((payload && payload.message) || "request failed");
-        }
-        try {
-          await fetch("/api/reservations", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              name: data.get("nom"),
-              email: data.get("email"),
-              phone: data.get("tel"),
-              date: data.get("date"),
-              time: data.get("heure"),
-              partySize: data.get("couverts"),
-            }),
-          });
-        } catch {}
+        if (!res.ok) throw new Error("request failed");
         sentBox.hidden = false;
         form.reset();
       } catch (err) {
