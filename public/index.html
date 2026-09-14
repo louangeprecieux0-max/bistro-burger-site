@@ -163,11 +163,11 @@
         <div style="flex:1; padding:44px 42px; display:flex; flex-direction:column; justify-content:flex-end;">
           <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
             <span class="badge badge-cream">Plat du jour</span>
-            <span style="font-size:13px; color:rgba(237,224,211,.7);">Jeudi 7 août · servi de 12h à 14h</span>
+            <span id="pdj-meta" style="font-size:13px; color:rgba(237,224,211,.7);">Jeudi 7 août · servi de 12h à 14h</span>
           </div>
-          <h3 style="font-family:var(--font-heading); font-weight:700; font-size:36px; margin:18px 0 0; line-height:1.14;">Brochette de magret de canard aux abricots marinée, boulgour aux légumes croquants</h3>
+          <h3 id="pdj-title" style="font-family:var(--font-heading); font-weight:700; font-size:36px; margin:18px 0 0; line-height:1.14;">Brochette de magret de canard aux abricots marinée, boulgour aux légumes croquants</h3>
           <div style="display:flex; align-items:center; gap:24px; margin:26px 0 28px; flex-wrap:wrap;">
-            <span style="font-family:var(--font-heading); font-weight:700; font-size:32px;">14,50&nbsp;€</span>
+            <span id="pdj-price" style="font-family:var(--font-heading); font-weight:700; font-size:32px;">14,50&nbsp;€</span>
           </div>
           <div style="display:flex; gap:12px; flex-wrap:wrap;">
             <button type="button" class="btn btn-on-green btn-sm btn-cream" data-shine data-go="reservation">Réserver pour ce midi</button>
@@ -180,10 +180,10 @@
           <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
             <span class="badge badge-green">Suggestion du jour</span>
           </div>
-          <h3 style="font-family:var(--font-heading); font-weight:700; font-size:38px; margin:18px 0 0; line-height:1.12;">Burger du boucher, sauce poivre</h3>
-          <p style="font-size:15.5px; line-height:1.65; color:rgba(18,87,76,.78); margin:14px 0 0; max-width:460px;">La suggestion que le chef ajoute à la carte, selon le marché du matin. Servie avec frites maison et salade.</p>
+          <h3 id="sug-title" style="font-family:var(--font-heading); font-weight:700; font-size:38px; margin:18px 0 0; line-height:1.12;">Burger du boucher, sauce poivre</h3>
+          <p id="sug-desc" style="font-size:15.5px; line-height:1.65; color:rgba(18,87,76,.78); margin:14px 0 0; max-width:460px;">La suggestion que le chef ajoute à la carte, selon le marché du matin. Servie avec frites maison et salade.</p>
           <div style="display:flex; align-items:center; gap:24px; margin:26px 0 28px; flex-wrap:wrap;">
-            <span style="font-family:var(--font-heading); font-weight:700; font-size:32px;">16,90&nbsp;€</span>
+            <span id="sug-price" style="font-family:var(--font-heading); font-weight:700; font-size:32px;">16,90&nbsp;€</span>
           </div>
           <div style="display:flex; gap:12px; flex-wrap:wrap;">
             <button type="button" class="btn btn-primary btn-gradient btn-sm" data-shine data-go="reservation">Réserver</button>
@@ -247,7 +247,7 @@
         <h2 style="font-family:var(--font-heading); font-weight:800; font-size:52px; line-height:1.08; text-transform:uppercase; margin:18px 0 0;">Envie d'une table ?<br>Réservez la vôtre<br>maintenant</h2>
         <div style="font-size:15px; color:rgba(237,224,211,.8); margin:26px 0 14px;">Ou appelez-nous directement</div>
         <a href="tel:+33465848918" class="btn btn-gradient" style="display:inline-block; font-family:var(--font-heading); font-weight:700; font-size:17px; padding:16px 30px;">04 65 84 89 18</a>
-        <div style="display:flex; flex-direction:column; gap:8px; margin-top:34px; font-size:14.5px; color:rgba(237,224,211,.78);">
+        <div id="reservation-horaires-list" style="display:flex; flex-direction:column; gap:8px; margin-top:34px; font-size:14.5px; color:rgba(237,224,211,.78);">
           <div>Du lundi au vendredi · midi et soir</div>
           <div>Samedi · soir uniquement</div>
           <div>Fermé samedi midi et dimanche toute la journée</div>
@@ -263,8 +263,8 @@
         <input class="field" type="email" name="email" required placeholder="Votre e-mail" style="width:100%; box-sizing:border-box; font-family:var(--font-body); font-size:16px; padding:12px 14px; border-radius:var(--radius-field); background:rgba(14,70,61,.32); border:1px solid rgba(237,224,211,.35); color:var(--color-secondary); outline:none;">
         <input class="field" type="tel" name="tel" required placeholder="Votre téléphone" style="width:100%; box-sizing:border-box; font-family:var(--font-body); font-size:16px; padding:12px 14px; border-radius:var(--radius-field); background:rgba(14,70,61,.32); border:1px solid rgba(237,224,211,.35); color:var(--color-secondary); outline:none;">
         <input class="field" type="date" name="date" required style="width:100%; box-sizing:border-box; font-family:var(--font-body); font-size:16px; padding:12px 14px; border-radius:var(--radius-field); background:rgba(14,70,61,.32); border:1px solid rgba(237,224,211,.35); color:var(--color-secondary); outline:none;">
-        <select name="heure" style="width:100%; box-sizing:border-box; font-family:var(--font-body); font-size:16px; padding:12px 14px; border-radius:var(--radius-field); background:rgba(14,70,61,.32); border:1px solid rgba(237,224,211,.35); color:var(--color-secondary); outline:none; appearance:none;"><option style="color:#2C2C2A;">12h00</option><option style="color:#2C2C2A;">12h30</option><option style="color:#2C2C2A;">13h00</option><option style="color:#2C2C2A;">13h30</option><option style="color:#2C2C2A;">14h00</option><option style="color:#2C2C2A;">19h00</option><option style="color:#2C2C2A;">19h30</option><option style="color:#2C2C2A;">20h00</option><option style="color:#2C2C2A;">20h30</option><option style="color:#2C2C2A;">21h00</option></select>
-        <select name="couverts" style="width:100%; box-sizing:border-box; font-family:var(--font-body); font-size:16px; padding:12px 14px; border-radius:var(--radius-field); background:rgba(14,70,61,.32); border:1px solid rgba(237,224,211,.35); color:var(--color-secondary); outline:none; appearance:none;"><option style="color:#2C2C2A;">2 personnes</option><option style="color:#2C2C2A;">3 personnes</option><option style="color:#2C2C2A;">4 personnes</option><option style="color:#2C2C2A;">5 personnes</option><option style="color:#2C2C2A;">6 personnes et plus</option></select>
+        <select name="heure" id="reservation-heure-select" style="width:100%; box-sizing:border-box; font-family:var(--font-body); font-size:16px; padding:12px 14px; border-radius:var(--radius-field); background:rgba(14,70,61,.32); border:1px solid rgba(237,224,211,.35); color:var(--color-secondary); outline:none; appearance:none;"><option style="color:#2C2C2A;">12h00</option><option style="color:#2C2C2A;">12h30</option><option style="color:#2C2C2A;">13h00</option><option style="color:#2C2C2A;">13h30</option><option style="color:#2C2C2A;">14h00</option><option style="color:#2C2C2A;">19h00</option><option style="color:#2C2C2A;">19h30</option><option style="color:#2C2C2A;">20h00</option><option style="color:#2C2C2A;">20h30</option><option style="color:#2C2C2A;">21h00</option></select>
+        <select name="couverts" id="reservation-couverts-select" style="width:100%; box-sizing:border-box; font-family:var(--font-body); font-size:16px; padding:12px 14px; border-radius:var(--radius-field); background:rgba(14,70,61,.32); border:1px solid rgba(237,224,211,.35); color:var(--color-secondary); outline:none; appearance:none;"><option style="color:#2C2C2A;">2 personnes</option><option style="color:#2C2C2A;">3 personnes</option><option style="color:#2C2C2A;">4 personnes</option><option style="color:#2C2C2A;">5 personnes</option><option style="color:#2C2C2A;">6 personnes et plus</option></select>
         <div style="grid-column:1 / -1; color:rgba(237,224,211,.8); font-size:13px; line-height:1.5;">
           <label class="field-check"><input type="checkbox" name="consent" required><span class="box">✓</span>J'accepte que mes coordonnées soient utilisées pour traiter cette réservation.</label>
         </div>
@@ -285,7 +285,7 @@
         <h2 style="font-family:var(--font-heading); font-weight:700; font-size:42px; margin:16px 0 0; color:var(--color-primary);">Les bonnes raisons de passer cette semaine</h2>
         <p style="font-size:16px; line-height:1.65; color:var(--text-muted); max-width:620px; margin:14px auto 0;">Quatre offres en cours, sur place comme à emporter.</p>
       </div>
-      <div data-offers-grid style="display:grid; grid-template-columns:repeat(4,1fr); gap:22px; margin-top:44px; align-items:stretch;">
+      <div id="offers-grid" data-offers-grid style="display:grid; grid-template-columns:repeat(4,1fr); gap:22px; margin-top:44px; align-items:stretch;">
         <div data-offer="light" class="offer-card" style="background:linear-gradient(180deg,#FFFFFF,var(--cream-400)); border:1px solid var(--border-default); border-radius:var(--radius-card); overflow:hidden; display:flex; flex-direction:column;">
           <div data-offer-visual style="aspect-ratio:16/10; overflow:hidden; position:relative;">
             <img src="assets/menu-etudiant.png" alt="Menu étudiant : cheeseburger, frites maison et boisson sur plateau" style="width:100%; height:100%; object-fit:cover; display:block;">

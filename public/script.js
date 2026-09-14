@@ -214,6 +214,24 @@
     button_label: "Réserver",
   };
 
+  const PLAT_DU_JOUR = SITE_DATA.plat_du_jour || {
+    plat: { label: "Plat du jour", meta: "Jeudi 7 août · servi de 12h à 14h", title: "Brochette de magret de canard aux abricots marinée, boulgour aux légumes croquants", price: "14,50 €" },
+    suggestion: { label: "Suggestion du jour", title: "Burger du boucher, sauce poivre", description: "La suggestion que le chef ajoute à la carte, selon le marché du matin. Servie avec frites maison et salade.", price: "16,90 €" },
+  };
+
+  const OFFRES = SITE_DATA.offres || [
+    { tag: "Menu étudiant", price: "11,90 €", title: "Burger smash, frites maison, boisson 33 cl", description: "Offre valable uniquement sur présentation de la carte étudiante, un menu par carte.", img: "assets/menu-etudiant.png" },
+    { tag: "Menu enfant", price: "11,90 €", title: "Cheeseburger, tenders de poulet ou steak haché, boisson 33 cl", description: "Le mardi soir et le mercredi midi, le menu enfant est offert pour tout achat d'un menu adulte. Valable également pour tout repas sur place.", img: "assets/menu-enfant.png" },
+    { tag: "Carte de fidélité", price: "", title: "Une case par tranche de 15 € d'achat", description: "Dix cases complétées, quinze euros offerts. Passez récupérer votre carte au comptoir. Offre non cumulable, carte nominative.", img: "assets/carte-fidelite.png" },
+    { tag: "Carte cadeau", price: "", title: "Scannez le QR code en salle pour gagner des lots", description: "Tentez votre chance, gagnez, et venez récupérer vos cadeaux sur place.", img: "assets/carte-cadeau.png" },
+  ];
+
+  const RESERVATION_SETTINGS = SITE_DATA.reservation_settings || {
+    heures: ["12h00", "12h30", "13h00", "13h30", "14h00", "19h00", "19h30", "20h00", "20h30", "21h00"],
+    couverts: ["2 personnes", "3 personnes", "4 personnes", "5 personnes", "6 personnes et plus"],
+    horaires_text: ["Du lundi au vendredi · midi et soir", "Samedi · soir uniquement", "Fermé samedi midi et dimanche toute la journée", "Parking gratuit devant le restaurant"],
+  };
+
   const GRADS = ["ph-1", "ph-2", "ph-3"];
 
   const REVIEWS = [
@@ -414,6 +432,69 @@
     });
   }
   renderBurgers();
+
+  /* ---------------------------------------------------------------- */
+  /* Plat du jour / suggestion                                         */
+  /* ---------------------------------------------------------------- */
+  function renderPlatDuJour() {
+    const plat = PLAT_DU_JOUR.plat || {};
+    const sug = PLAT_DU_JOUR.suggestion || {};
+    const setText = (id, val) => {
+      const target = document.getElementById(id);
+      if (target && val) target.textContent = val;
+    };
+    setText("pdj-meta", plat.meta);
+    setText("pdj-title", plat.title);
+    setText("pdj-price", plat.price);
+    setText("sug-title", sug.title);
+    setText("sug-desc", sug.description);
+    setText("sug-price", sug.price);
+  }
+  renderPlatDuJour();
+
+  /* ---------------------------------------------------------------- */
+  /* Offres du moment                                                   */
+  /* ---------------------------------------------------------------- */
+  function renderOffres() {
+    const grid = document.getElementById("offers-grid");
+    if (!grid) return;
+    grid.innerHTML = "";
+    OFFRES.forEach((offer) => {
+      const card = el("div", { "data-offer": "light", class: "offer-card", style: "background:linear-gradient(180deg,#FFFFFF,var(--cream-400)); border:1px solid var(--border-default); border-radius:var(--radius-card); overflow:hidden; display:flex; flex-direction:column;" });
+      const visual = el("div", { "data-offer-visual": "", style: "aspect-ratio:16/10; overflow:hidden; position:relative;" },
+        offer.img ? '<img src="' + esc(offer.img) + '" alt="' + esc(offer.title || offer.tag || "") + '" style="width:100%; height:100%; object-fit:cover; display:block;">' : "");
+      card.appendChild(visual);
+      const body = el("div", { style: "padding:22px 22px 26px; display:flex; flex-direction:column; flex:1;" });
+      const head = el("div", { style: "display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;" });
+      head.appendChild(el("span", { "data-offer-tag": "", style: "font-family:var(--font-heading); font-weight:700; font-size:11px; letter-spacing:.14em; text-transform:uppercase; padding:6px 13px; border-radius:var(--radius-badge);" }, esc(offer.tag || "")));
+      if (offer.price) head.appendChild(el("span", { "data-offer-price": "", style: "font-family:var(--font-heading); font-weight:700; font-size:17px;" }, esc(offer.price)));
+      body.appendChild(head);
+      body.appendChild(el("h3", { style: "font-family:var(--font-heading); font-weight:600; font-size:17.5px; line-height:1.3; margin:16px 0 0;" }, esc(offer.title || "")));
+      body.appendChild(el("p", { style: "font-size:13.5px; line-height:1.6; margin:10px 0 0; flex:1;" }, esc(offer.description || "")));
+      card.appendChild(body);
+      grid.appendChild(card);
+    });
+  }
+  renderOffres();
+
+  /* ---------------------------------------------------------------- */
+  /* Réglages de réservation (créneaux, couverts, horaires affichés)   */
+  /* ---------------------------------------------------------------- */
+  function renderReservationSettings() {
+    const heureSelect = document.getElementById("reservation-heure-select");
+    if (heureSelect && Array.isArray(RESERVATION_SETTINGS.heures) && RESERVATION_SETTINGS.heures.length) {
+      heureSelect.innerHTML = RESERVATION_SETTINGS.heures.map((h) => '<option style="color:#2C2C2A;">' + esc(h) + "</option>").join("");
+    }
+    const couvertsSelect = document.getElementById("reservation-couverts-select");
+    if (couvertsSelect && Array.isArray(RESERVATION_SETTINGS.couverts) && RESERVATION_SETTINGS.couverts.length) {
+      couvertsSelect.innerHTML = RESERVATION_SETTINGS.couverts.map((c) => '<option style="color:#2C2C2A;">' + esc(c) + "</option>").join("");
+    }
+    const horairesList = document.getElementById("reservation-horaires-list");
+    if (horairesList && Array.isArray(RESERVATION_SETTINGS.horaires_text) && RESERVATION_SETTINGS.horaires_text.length) {
+      horairesList.innerHTML = RESERVATION_SETTINGS.horaires_text.map((line) => "<div>" + esc(line) + "</div>").join("");
+    }
+  }
+  renderReservationSettings();
 
   /* ---------------------------------------------------------------- */
   /* Panier (burgers uniquement)                                       */
