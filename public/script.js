@@ -876,6 +876,26 @@
   }
 
   /* ---------------------------------------------------------------- */
+  /* Masque le bouton flottant pendant qu'il recouvrirait le bouton     */
+  /* "Réserver ma table" (les deux se superposent sinon en bas d'écran) */
+  /* ---------------------------------------------------------------- */
+  (function hideFloatingCtaOverForm() {
+    const floatingCta = document.getElementById("floating-cta");
+    const reservationForm = document.getElementById("reservation-form");
+    if (!floatingCta || !reservationForm) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          floatingCta.style.visibility = entry.isIntersecting ? "hidden" : "visible";
+          floatingCta.style.opacity = entry.isIntersecting ? "0" : "1";
+        });
+      },
+      { threshold: 0, rootMargin: "0px 0px -90px 0px" }
+    );
+    io.observe(reservationForm);
+  })();
+
+  /* ---------------------------------------------------------------- */
   /* Reservation & newsletter forms (static site — no backend)         */
   /* ---------------------------------------------------------------- */
   (function reservationSubmit() {

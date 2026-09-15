@@ -1,6 +1,8 @@
 // Utilitaire partagé : notifie par e-mail tous les comptes admin (Supabase Auth)
 // qu'une nouvelle commande ou réservation vient d'arriver. Best-effort, ne bloque
 // jamais l'enregistrement principal en base (chaque échec est avalé silencieusement).
+const SITE_URL = process.env.SITE_URL || "https://bistro-burger-site.vercel.app";
+
 async function getAdminEmails(supabase) {
   try {
     const { data, error } = await supabase.auth.admin.listUsers();
@@ -27,7 +29,12 @@ async function notifyAdmins(supabase, fallbackEmail, subject, fields) {
         });
         await fetch("https://formsubmit.co/ajax/" + encodeURIComponent(email), {
           method: "POST",
-          headers: { Accept: "application/json", "Content-Type": "application/x-www-form-urlencoded" },
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/x-www-form-urlencoded",
+            Referer: SITE_URL + "/",
+            Origin: SITE_URL,
+          },
           body: params,
         });
       } catch {}
