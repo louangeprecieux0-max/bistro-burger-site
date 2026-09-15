@@ -152,6 +152,26 @@
 
         <div class="presence-stack" id="presence-stack"></div>
 
+        <div class="notif-bell-wrap">
+          <button type="button" class="notif-bell-btn" id="notif-bell-btn" aria-label="Notifications">
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+            <span class="nav-alert-badge notif-bell-badge" id="notif-bell-badge" hidden>0</span>
+          </button>
+          <div class="notif-bell-backdrop" id="notif-bell-backdrop"></div>
+          <div class="notif-bell-panel" id="notif-bell-panel">
+            <div class="notif-bell-title">Notifications</div>
+            <button type="button" class="notif-bell-row" id="notif-bell-row-commandes">
+              <span class="notif-bell-row-label">Commandes</span>
+              <span class="nav-alert-badge" id="notif-row-badge-commandes" hidden>0</span>
+            </button>
+            <button type="button" class="notif-bell-row" id="notif-bell-row-reservations">
+              <span class="notif-bell-row-label">Réservations reçues</span>
+              <span class="nav-alert-badge" id="notif-row-badge-reservations" hidden>0</span>
+            </button>
+            <p class="notif-bell-empty" id="notif-bell-empty" hidden>Rien de nouveau pour l'instant.</p>
+          </div>
+        </div>
+
         <div class="profile-menu">
           <button type="button" class="app-topbar-user" id="profile-trigger">
             <span class="avatar-circle" id="user-avatar"></span>

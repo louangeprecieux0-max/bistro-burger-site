@@ -117,6 +117,38 @@
   }
 
   let alertsInterval = null;
+  let lastKnownAlertTotal = null;
+  let audioCtx = null;
+
+  function ensureAudioContext() {
+    if (!audioCtx) {
+      try {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      } catch {}
+    }
+    return audioCtx;
+  }
+
+  function playNotificationSound() {
+    const ctx = ensureAudioContext();
+    if (!ctx) return;
+    try {
+      if (ctx.state === "suspended") ctx.resume();
+      const now = ctx.currentTime;
+      [880, 1318.51].forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0, now + i * 0.13);
+        gain.gain.linearRampToValueAtTime(0.22, now + i * 0.13 + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.13 + 0.45);
+        osc.connect(gain).connect(ctx.destination);
+        osc.start(now + i * 0.13);
+        osc.stop(now + i * 0.13 + 0.45);
+      });
+    } catch {}
+  }
 
   function setAlertBadge(key, count) {
     [document.getElementById("badge-" + key), document.getElementById("card-badge-" + key)].forEach((el) => {
@@ -126,14 +158,68 @@
     });
   }
 
+  document.addEventListener("click", () => ensureAudioContext(), { once: true });
+
+  const notifBellBtn = document.getElementById("notif-bell-btn");
+  const notifBellBadge = document.getElementById("notif-bell-badge");
+  const notifBellPanel = document.getElementById("notif-bell-panel");
+  const notifBellBackdrop = document.getElementById("notif-bell-backdrop");
+  const notifRowBadgeCommandes = document.getElementById("notif-row-badge-commandes");
+  const notifRowBadgeReservations = document.getElementById("notif-row-badge-reservations");
+  const notifBellEmpty = document.getElementById("notif-bell-empty");
+
+  function openNotifBell() {
+    notifBellPanel.classList.add("is-open");
+    notifBellBackdrop.classList.add("is-visible");
+  }
+  function closeNotifBell() {
+    notifBellPanel.classList.remove("is-open");
+    notifBellBackdrop.classList.remove("is-visible");
+  }
+  notifBellBtn.addEventListener("click", () => {
+    if (notifBellPanel.classList.contains("is-open")) closeNotifBell();
+    else openNotifBell();
+  });
+  notifBellBackdrop.addEventListener("click", closeNotifBell);
+  document.getElementById("notif-bell-row-commandes").addEventListener("click", () => {
+    closeNotifBell();
+    const navEl = document.getElementById("nav-commandes");
+    if (navEl) navEl.click();
+  });
+  document.getElementById("notif-bell-row-reservations").addEventListener("click", () => {
+    closeNotifBell();
+    const navEl = document.getElementById("nav-reservations-clients");
+    if (navEl) navEl.click();
+  });
+
   async function refreshAdminAlerts() {
     try {
       const headers = await window.adminAuth.authHeader();
       const res = await fetch("/api/admin/alerts", { headers });
       if (!res.ok) return;
       const json = await res.json();
-      setAlertBadge("commandes", json.newOrders || 0);
-      setAlertBadge("reservations-clients", json.newReservations || 0);
+      const newOrders = json.newOrders || 0;
+      const newReservations = json.newReservations || 0;
+      const total = newOrders + newReservations;
+
+      setAlertBadge("commandes", newOrders);
+      setAlertBadge("reservations-clients", newReservations);
+
+      notifBellBadge.textContent = total > 99 ? "99+" : String(total);
+      notifBellBadge.hidden = total <= 0;
+      notifRowBadgeCommandes.textContent = newOrders > 99 ? "99+" : String(newOrders);
+      notifRowBadgeCommandes.hidden = newOrders <= 0;
+      notifRowBadgeReservations.textContent = newReservations > 99 ? "99+" : String(newReservations);
+      notifRowBadgeReservations.hidden = newReservations <= 0;
+      notifBellEmpty.hidden = total > 0;
+
+      if (lastKnownAlertTotal !== null && total > lastKnownAlertTotal) {
+        playNotificationSound();
+        notifBellBtn.classList.remove("has-alert");
+        void notifBellBtn.offsetWidth;
+        notifBellBtn.classList.add("has-alert");
+      }
+      lastKnownAlertTotal = total;
     } catch {}
   }
   window.refreshAdminAlerts = refreshAdminAlerts;
@@ -229,6 +315,7 @@
 
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
+    ensureAudioContext();
     errorBox.hidden = true;
     loginSubmit.disabled = true;
     loginSubmit.textContent = "Connexion…";

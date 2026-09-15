@@ -1104,6 +1104,11 @@
     document.getElementById("upsell-dessert-next").addEventListener("click", showRecap);
     document.getElementById("upsell-dessert-skip").addEventListener("click", showRecap);
     document.getElementById("upsell-recap-close").addEventListener("click", closeUpsell);
+    function isValidPhone(raw) {
+      const cleaned = raw.replace(/[\s.\-()]/g, "");
+      return /^(0[1-9]\d{8}|\+33[1-9]\d{8}|0033[1-9]\d{8})$/.test(cleaned);
+    }
+
     if (continueBtn) {
       continueBtn.addEventListener("click", async () => {
         const nameInput = document.getElementById("upsell-recap-name");
@@ -1112,6 +1117,12 @@
         const customerName = nameInput.value.trim();
         const customerPhone = phoneInput.value.trim();
         if (!customerName || !customerPhone) {
+          formError.textContent = "Merci d'indiquer votre nom et votre téléphone.";
+          formError.hidden = false;
+          return;
+        }
+        if (!isValidPhone(customerPhone)) {
+          formError.textContent = "Merci d'indiquer un numéro de téléphone valide (ex : 06 12 34 56 78).";
           formError.hidden = false;
           return;
         }
@@ -1120,8 +1131,9 @@
         const originalLabel = continueBtn.textContent;
         continueBtn.disabled = true;
         continueBtn.textContent = "Envoi…";
+        let saved = false;
         try {
-          await fetch("/api/orders", {
+          const res = await fetch("/api/orders", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -1131,6 +1143,7 @@
               total: parsePriceToNumber(recapTotalEl.textContent),
             }),
           });
+          saved = res.ok;
         } catch {}
         continueBtn.disabled = false;
         continueBtn.textContent = originalLabel;
@@ -1143,6 +1156,17 @@
         nameInput.value = "";
         phoneInput.value = "";
         const orderContactBackdrop = document.getElementById("order-contact-backdrop");
+        const confirmMsg = document.getElementById("order-confirm-message");
+        if (confirmMsg) {
+          confirmMsg.hidden = false;
+          if (saved) {
+            confirmMsg.textContent = "✓ Votre commande a bien été enregistrée.";
+            confirmMsg.style.cssText = "font-family:var(--font-heading); font-weight:600; font-size:14.5px; padding:14px 16px; border-radius:var(--radius-field); margin:0 0 20px; background:rgba(46,143,124,.12); border:1px solid rgba(46,143,124,.4); color:var(--green-700);";
+          } else {
+            confirmMsg.textContent = "Votre commande n'a pas pu être enregistrée automatiquement : merci de nous appeler pour la confirmer.";
+            confirmMsg.style.cssText = "font-family:var(--font-heading); font-weight:600; font-size:14.5px; padding:14px 16px; border-radius:var(--radius-field); margin:0 0 20px; background:rgba(181,101,29,.12); border:1px solid rgba(181,101,29,.4); color:#B5651D;";
+          }
+        }
         if (orderContactBackdrop) orderContactBackdrop.hidden = false;
       });
     }

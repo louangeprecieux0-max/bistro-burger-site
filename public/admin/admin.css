@@ -1123,6 +1123,62 @@ button.section-card:hover .section-card-btn{
   .app-topbar-email{display:none}
 }
 
+/* ---------- Cloche de notifications ---------- */
+.notif-bell-wrap{position:relative; flex:none}
+.notif-bell-btn{
+  position:relative;
+  width:38px;
+  height:38px;
+  flex:none;
+  border-radius:50%;
+  border:none;
+  background:transparent;
+  color:var(--ink);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+.notif-bell-btn:hover{background:var(--page-bg)}
+.notif-bell-btn.has-alert svg{animation:bellRing 1.8s ease-in-out}
+@keyframes bellRing{
+  0%, 100%{transform:rotate(0);}
+  10%{transform:rotate(14deg);}
+  20%{transform:rotate(-12deg);}
+  30%{transform:rotate(9deg);}
+  40%{transform:rotate(-7deg);}
+  50%{transform:rotate(4deg);}
+  60%{transform:rotate(0);}
+}
+.notif-bell-badge{position:absolute; top:2px; right:2px}
+.notif-bell-backdrop{display:none; position:fixed; inset:0; background:transparent; z-index:45}
+.notif-bell-backdrop.is-visible{display:block}
+.notif-bell-panel{
+  position:absolute;
+  top:calc(100% + 10px);
+  right:0;
+  width:280px;
+  max-width:calc(100vw - 24px);
+  background:#FFFFFF;
+  border-radius:20px;
+  box-shadow:0 24px 60px rgba(14,70,61,.28);
+  z-index:50;
+  padding:14px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  opacity:0;
+  visibility:hidden;
+  transform:translateY(-6px) scale(.98);
+  transform-origin:top right;
+  transition:opacity .16s ease, transform .16s ease, visibility .16s;
+}
+.notif-bell-panel.is-open{opacity:1; visibility:visible; transform:translateY(0) scale(1)}
+.notif-bell-title{font-family:var(--font-heading); font-weight:700; font-size:13px; color:var(--green-900); padding:4px 6px 6px}
+.notif-bell-row{display:flex; align-items:center; justify-content:space-between; gap:10px; width:100%; text-align:left; padding:11px 12px; border-radius:14px; border:none; background:var(--page-bg); cursor:pointer; font-family:var(--font-body); font-size:13.5px; font-weight:600; color:var(--ink)}
+.notif-bell-row:hover{background:rgba(27,109,95,.1)}
+.notif-bell-empty{font-size:13px; color:var(--muted); text-align:center; padding:10px 6px 4px}
+
 /* ---------- Présence : qui consulte l'espace admin en ce moment ---------- */
 .presence-stack{display:flex; align-items:center; flex:none}
 .presence-avatar{
