@@ -61,6 +61,112 @@
     { key: "traite", label: "Traitées" },
   ];
 
+  const RESTAURANT = {
+    name: "Bistro Burger",
+    address: "ZAC Avon, Bretelle de la Plaine, 13120 Gardanne",
+    phone: "04 65 84 89 18",
+    email: "brasserie.zone.avon@gmail.com",
+  };
+
+  function shortId(id) {
+    return String(id || "").replace(/-/g, "").slice(0, 8).toUpperCase();
+  }
+
+  function downloadInvoice(order) {
+    if (!window.jspdf || !window.jspdf.jsPDF) {
+      alert("Le générateur de facture n'a pas pu se charger. Vérifiez votre connexion et réessayez.");
+      return;
+    }
+    const doc = new window.jspdf.jsPDF({ unit: "mm", format: "a4" });
+    const pageW = doc.internal.pageSize.getWidth();
+    const marginX = 18;
+    let y = 22;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text(RESTAURANT.name, marginX, y);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9.5);
+    doc.setTextColor(90, 90, 90);
+    y += 6;
+    doc.text(RESTAURANT.address, marginX, y);
+    y += 5;
+    doc.text(RESTAURANT.phone + "  ·  " + RESTAURANT.email, marginX, y);
+
+    doc.setTextColor(20, 20, 20);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.text("FACTURE", pageW - marginX, 22, { align: "right" });
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9.5);
+    doc.setTextColor(90, 90, 90);
+    doc.text("N° " + shortId(order.id), pageW - marginX, 28, { align: "right" });
+    doc.text(formatDate(order.created_at), pageW - marginX, 33, { align: "right" });
+
+    y = 46;
+    doc.setDrawColor(220, 213, 201);
+    doc.line(marginX, y, pageW - marginX, y);
+
+    y += 8;
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10.5);
+    doc.setTextColor(20, 20, 20);
+    doc.text("Client", marginX, y);
+    y += 6;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10.5);
+    doc.text(order.customer_name || "", marginX, y);
+    y += 5.5;
+    doc.text(order.customer_phone || "", marginX, y);
+
+    y += 10;
+    doc.setFillColor(27, 109, 95);
+    doc.rect(marginX, y, pageW - marginX * 2, 9, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9.5);
+    doc.text("ARTICLE", marginX + 3, y + 6);
+    doc.text("QTÉ", pageW - marginX - 45, y + 6, { align: "right" });
+    doc.text("PRIX", pageW - marginX - 24, y + 6, { align: "right" });
+    doc.text("TOTAL", pageW - marginX - 3, y + 6, { align: "right" });
+    y += 9;
+
+    const items = Array.isArray(order.items) ? order.items : [];
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(30, 30, 30);
+    items.forEach((it, i) => {
+      const qty = it.qty || 1;
+      const price = it.price || 0;
+      if (i % 2 === 1) {
+        doc.setFillColor(246, 243, 238);
+        doc.rect(marginX, y, pageW - marginX * 2, 8, "F");
+      }
+      doc.text(String(it.name || ""), marginX + 3, y + 5.5);
+      doc.text(String(qty), pageW - marginX - 45, y + 5.5, { align: "right" });
+      doc.text(formatPrice(price), pageW - marginX - 24, y + 5.5, { align: "right" });
+      doc.text(formatPrice(price * qty), pageW - marginX - 3, y + 5.5, { align: "right" });
+      y += 8;
+    });
+
+    y += 4;
+    doc.setDrawColor(220, 213, 201);
+    doc.line(marginX, y, pageW - marginX, y);
+    y += 9;
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12.5);
+    doc.setTextColor(20, 20, 20);
+    doc.text("Total", marginX, y);
+    doc.text(formatPrice(order.total), pageW - marginX, y, { align: "right" });
+
+    y += 16;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8.5);
+    doc.setTextColor(140, 140, 140);
+    doc.text("Reçu de commande généré automatiquement, à titre de justificatif d'achat.", marginX, y);
+
+    doc.save("facture-" + shortId(order.id) + ".pdf");
+  }
+
   function infoRow(label, value) {
     if (!value) return "";
     return '<div class="rec-info-row"><span class="rec-info-label">' + esc(label) + '</span><span class="rec-info-value">' + value + "</span></div>";
@@ -94,6 +200,7 @@
       '<button type="button" class="rec-btn rec-btn-primary" data-toggle-status="' + esc(order.id) + '" data-current-status="' + esc(status) + '">' +
       (status === "traite" ? "Marquer comme nouvelle" : "Marquer comme traitée") +
       "</button>" +
+      '<button type="button" class="rec-btn" data-invoice="' + esc(order.id) + '">⬇ Télécharger</button>' +
       '<button type="button" class="rec-btn rec-btn-danger" data-delete="' + esc(order.id) + '">Supprimer</button>' +
       "</div>" +
       "</div>"
@@ -150,6 +257,14 @@
           btn.disabled = false;
           alert(err.message);
         }
+      });
+    });
+
+    container.querySelectorAll("[data-invoice]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const id = btn.dataset.invoice;
+        const order = state.items.find((o) => o.id === id);
+        if (order) downloadInvoice(order);
       });
     });
 
