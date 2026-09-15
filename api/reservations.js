@@ -1,29 +1,11 @@
 // API publique : enregistre une demande de réservation dans Supabase
 // pour qu'elle soit consultable depuis l'espace admin.
 const { createClient } = require("@supabase/supabase-js");
+const { notifyAdmins } = require("./_lib/notify");
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const ALERT_EMAIL = "louangeprecieux0@gmail.com";
-
-async function sendAlertEmail(row) {
-  try {
-    const params = new URLSearchParams();
-    params.set("_subject", "Nouvelle réservation — Bistro Burger");
-    params.set("nom", row.name);
-    params.set("téléphone", row.phone);
-    params.set("email", row.email || "");
-    params.set("date", row.reservation_date || "");
-    params.set("heure", row.reservation_time || "");
-    params.set("couverts", row.party_size || "");
-    if (row.message) params.set("message", row.message);
-    await fetch("https://formsubmit.co/ajax/" + encodeURIComponent(ALERT_EMAIL), {
-      method: "POST",
-      headers: { Accept: "application/json", "Content-Type": "application/x-www-form-urlencoded" },
-      body: params,
-    });
-  } catch {}
-}
 
 module.exports = async (req, res) => {
   if (req.method !== "POST") {
@@ -73,7 +55,15 @@ module.exports = async (req, res) => {
     return;
   }
 
-  await sendAlertEmail(row);
+  await notifyAdmins(supabase, ALERT_EMAIL, "Nouvelle réservation — Bistro Burger", {
+    nom: row.name,
+    téléphone: row.phone,
+    email: row.email,
+    date: row.reservation_date,
+    heure: row.reservation_time,
+    couverts: row.party_size,
+    message: row.message,
+  });
 
   res.status(200).json({ ok: true });
 };
