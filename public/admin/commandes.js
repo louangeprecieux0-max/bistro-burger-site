@@ -61,10 +61,16 @@
     { key: "traite", label: "Traitées" },
   ];
 
+  function infoRow(label, value) {
+    if (!value) return "";
+    return '<div class="rec-info-row"><span class="rec-info-label">' + esc(label) + '</span><span class="rec-info-value">' + value + "</span></div>";
+  }
+
   function itemsHtml(items) {
     if (!Array.isArray(items) || !items.length) return "";
     return (
       '<div class="rec-items">' +
+      '<div class="rec-items-head"><span>Article</span><span>Total</span></div>' +
       items.map((it) =>
         '<div class="rec-items-row"><span>' + esc((it.qty || 1) + " × " + it.name) + '</span><span>' + esc(formatPrice((it.price || 0) * (it.qty || 1))) + "</span></div>"
       ).join("") +
@@ -81,7 +87,7 @@
       '<div><div class="rec-card-title">' + esc(order.customer_name) + '</div><div class="rec-card-date">' + esc(formatDate(order.created_at)) + "</div></div>" +
       '<span class="rec-status is-' + esc(status) + '">' + esc(statusLabel) + "</span>" +
       "</div>" +
-      '<div class="rec-meta"><span class="rec-meta-item"><strong>' + esc(order.customer_phone) + "</strong></span></div>" +
+      '<div class="rec-info-grid">' + infoRow("Téléphone", esc(order.customer_phone)) + "</div>" +
       itemsHtml(order.items) +
       '<div class="rec-total"><span>Total</span><span>' + esc(formatPrice(order.total)) + "</span></div>" +
       '<div class="rec-actions">' +

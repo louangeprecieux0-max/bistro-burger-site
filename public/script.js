@@ -958,8 +958,24 @@
     if (promoReserveEl) promoReserveEl.textContent = PROMO_POPUP.button_label;
     function openPromo() { promoBackdrop.hidden = false; document.getElementById("promo-box").style.animation = "bbPromoIn .55s cubic-bezier(.22,.9,.3,1) both"; }
     function closePromo() { promoBackdrop.hidden = true; }
-    setTimeout(openPromo, 5500);
-    setInterval(() => { if (promoBackdrop.hidden) openPromo(); }, 180000);
+    function reservationInView() {
+      const form = document.getElementById("reservation-form");
+      if (!form) return false;
+      const r = form.getBoundingClientRect();
+      return r.top < window.innerHeight && r.bottom > 0;
+    }
+    function otherModalOpen() {
+      return ["cart-backdrop", "upsell-backdrop", "order-contact-backdrop"].some((id) => {
+        const el = document.getElementById(id);
+        return el && !el.hidden;
+      });
+    }
+    function tryOpenPromo() {
+      if (reservationInView() || otherModalOpen()) { setTimeout(tryOpenPromo, 2000); return; }
+      openPromo();
+    }
+    setTimeout(tryOpenPromo, 5500);
+    setInterval(() => { if (promoBackdrop.hidden) tryOpenPromo(); }, 180000);
     document.getElementById("promo-close").addEventListener("click", closePromo);
     promoBackdrop.addEventListener("click", (e) => { if (e.target === promoBackdrop) closePromo(); });
     document.getElementById("promo-reserve").addEventListener("click", () => { closePromo(); jump("reservation"); });

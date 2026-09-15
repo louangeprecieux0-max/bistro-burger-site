@@ -78,19 +78,27 @@
     return '<div class="rec-actions">' + btns.join("") + "</div>";
   }
 
+  function infoRow(label, value) {
+    if (!value) return "";
+    return '<div class="rec-info-row"><span class="rec-info-label">' + esc(label) + '</span><span class="rec-info-value">' + value + "</span></div>";
+  }
+
   function cardHtml(r) {
     const status = r.status || "nouveau";
+    const when = r.reservation_date
+      ? esc(formatReservationDate(r.reservation_date)) + (r.reservation_time ? " · " + esc(r.reservation_time) : "")
+      : "";
     return (
       '<div class="rec-card" data-resa-id="' + esc(r.id) + '">' +
       '<div class="rec-card-head">' +
       '<div><div class="rec-card-title">' + esc(r.name) + '</div><div class="rec-card-date">Reçue le ' + esc(formatDate(r.created_at)) + "</div></div>" +
       '<span class="rec-status is-' + esc(status) + '">' + esc(STATUS_LABELS[status] || status) + "</span>" +
       "</div>" +
-      '<div class="rec-meta">' +
-      '<span class="rec-meta-item"><strong>' + esc(r.phone) + "</strong></span>" +
-      (r.email ? '<span class="rec-meta-item">' + esc(r.email) + "</span>" : "") +
-      (r.reservation_date ? '<span class="rec-meta-item">📅 ' + esc(formatReservationDate(r.reservation_date)) + (r.reservation_time ? " · " + esc(r.reservation_time) : "") + "</span>" : "") +
-      (r.party_size ? '<span class="rec-meta-item">' + esc(r.party_size) + "</span>" : "") +
+      '<div class="rec-info-grid">' +
+      infoRow("Téléphone", esc(r.phone)) +
+      infoRow("E-mail", r.email ? esc(r.email) : "") +
+      infoRow("Réservation", when) +
+      infoRow("Couverts", r.party_size ? esc(r.party_size) : "") +
       "</div>" +
       (r.message ? '<p class="rec-note">' + esc(r.message) + "</p>" : "") +
       actionsHtml(r) +
