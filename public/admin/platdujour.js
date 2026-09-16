@@ -109,9 +109,6 @@
 
     return (
       '<div class="pdj-cal">' +
-      (selected
-        ? '<div class="pdj-cal-selected-box"><span class="pdj-cal-selected-check">✓</span>' + esc(formatDisplayDate(selected)) + "</div>"
-        : '<div class="pdj-cal-selected-box is-empty">Choisissez une date ci-dessous</div>') +
       '<div class="pdj-cal-head">' +
       '<button type="button" class="pdj-cal-nav" id="pdj-cal-prev" aria-label="Mois précédent">‹</button>' +
       '<span class="pdj-cal-month">' + esc(monthLabelCap) + "</span>" +
@@ -121,6 +118,9 @@
       ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"].map((d) => '<span class="pdj-cal-dow">' + d + "</span>").join("") +
       cells +
       "</div>" +
+      (selected
+        ? '<div class="pdj-cal-selected-box"><span class="pdj-cal-selected-check">✓</span>' + esc(formatDisplayDate(selected)) + "</div>"
+        : '<div class="pdj-cal-selected-box is-empty">Choisissez une date ci-dessous</div>') +
       "</div>"
     );
   }
