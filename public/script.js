@@ -451,6 +451,14 @@
     pdjSetText("sug-price", sug.price || "");
     if (counterEl) counterEl.textContent = (pdjSugIndex + 1) + " / " + pdjSuggestions.length;
   }
+  function formatPdjDate(iso) {
+    try {
+      const s = new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long" }).format(new Date(iso + "T00:00:00"));
+      return s.charAt(0).toUpperCase() + s.slice(1);
+    } catch {
+      return iso;
+    }
+  }
   function renderPlatDuJour(data) {
     const plat = (data && data.plat) || {};
     pdjSuggestions = Array.isArray(data && data.suggestions)
@@ -459,7 +467,10 @@
       ? [data.suggestion]
       : [];
     pdjSugIndex = 0;
-    pdjSetText("pdj-meta", plat.meta);
+    const metaText = plat.date
+      ? formatPdjDate(plat.date) + (plat.horaire ? " · " + plat.horaire : "")
+      : plat.meta || plat.horaire || "";
+    pdjSetText("pdj-meta", metaText);
     pdjSetText("pdj-title", plat.title);
     pdjSetText("pdj-price", plat.price);
     if (!pdjSuggestions.length) return;

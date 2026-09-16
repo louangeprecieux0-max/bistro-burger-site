@@ -15,8 +15,32 @@
     })[c]);
   }
 
+  function pad2(n) {
+    return String(n).padStart(2, "0");
+  }
+
+  function toISODate(d) {
+    return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate());
+  }
+
+  function formatDisplayDate(iso) {
+    try {
+      const s = new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long" }).format(new Date(iso + "T00:00:00"));
+      return s.charAt(0).toUpperCase() + s.slice(1);
+    } catch {
+      return iso;
+    }
+  }
+
   function normalize(value) {
-    const plat = (value && value.plat) || { label: "Plat du jour", meta: "", title: "", price: "" };
+    const rawPlat = (value && value.plat) || {};
+    const plat = {
+      label: rawPlat.label || "Plat du jour",
+      date: rawPlat.date || "",
+      horaire: rawPlat.horaire != null ? rawPlat.horaire : rawPlat.meta || "",
+      title: rawPlat.title || "",
+      price: rawPlat.price || "",
+    };
     let suggestions = value && Array.isArray(value.suggestions) ? value.suggestions : null;
     if (!suggestions) {
       suggestions = value && value.suggestion ? [value.suggestion] : [{ label: "Suggestion du jour", title: "", description: "", price: "" }];
@@ -54,10 +78,48 @@
   function readPlatFromDom() {
     return {
       label: state.data.plat.label || "Plat du jour",
-      meta: document.getElementById("pdj-meta").value.trim(),
+      date: state.data.plat.date || "",
+      horaire: document.getElementById("pdj-horaire").value.trim(),
       title: document.getElementById("pdj-title").value.trim(),
       price: document.getElementById("pdj-price").value.trim(),
     };
+  }
+
+  function calendarHtml() {
+    const y = state.calYear;
+    const m = state.calMonth;
+    const first = new Date(y, m, 1);
+    const startOffset = (first.getDay() + 6) % 7;
+    const daysInMonth = new Date(y, m + 1, 0).getDate();
+    const todayStr = toISODate(new Date());
+    const selected = state.data.plat.date || "";
+    const monthLabel = first.toLocaleDateString("fr-FR", { month: "long", year: "numeric" });
+    const monthLabelCap = monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1);
+
+    let cells = "";
+    for (let i = 0; i < startOffset; i++) cells += "<span></span>";
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateStr = y + "-" + pad2(m + 1) + "-" + pad2(d);
+      const cls = ["pdj-cal-day"];
+      if (dateStr === selected) cls.push("is-selected");
+      if (dateStr === todayStr) cls.push("is-today");
+      cells += '<button type="button" class="' + cls.join(" ") + '" data-cal-day="' + dateStr + '">' + d + "</button>";
+    }
+
+    return (
+      '<div class="pdj-cal">' +
+      '<div class="pdj-cal-head">' +
+      '<button type="button" class="pdj-cal-nav" id="pdj-cal-prev" aria-label="Mois précédent">‹</button>' +
+      '<span class="pdj-cal-month">' + esc(monthLabelCap) + "</span>" +
+      '<button type="button" class="pdj-cal-nav" id="pdj-cal-next" aria-label="Mois suivant">›</button>' +
+      "</div>" +
+      '<div class="pdj-cal-grid">' +
+      ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"].map((d) => '<span class="pdj-cal-dow">' + d + "</span>").join("") +
+      cells +
+      "</div>" +
+      (selected ? '<div class="pdj-cal-selected">' + esc(formatDisplayDate(selected)) + "</div>" : "") +
+      "</div>"
+    );
   }
 
   function readSuggestionsFromDom() {
@@ -110,8 +172,10 @@
       '<p class="dashboard-note">Affiché en haut de la page, mis à jour au fur et à mesure. Le plat du jour et les suggestions s\'enregistrent séparément.</p>' +
       '<form id="pdj-form">' +
       "<h2>Plat du jour</h2>" +
-      '<label class="field-label" for="pdj-meta">Jour et horaire</label>' +
-      '<input class="field" id="pdj-meta" placeholder="Jeudi 7 août · servi de 12h à 14h" value="' + esc(plat.meta) + '">' +
+      '<label class="field-label">Date</label>' +
+      calendarHtml() +
+      '<label class="field-label" for="pdj-horaire">Horaire (optionnel)</label>' +
+      '<input class="field" id="pdj-horaire" placeholder="Servi de 12h à 14h" value="' + esc(plat.horaire) + '">' +
       '<label class="field-label" for="pdj-title">Nom du plat</label>' +
       '<input class="field" id="pdj-title" required value="' + esc(plat.title) + '">' +
       '<label class="field-label" for="pdj-price">Prix</label>' +
@@ -135,6 +199,27 @@
       "</form>";
 
     document.getElementById("pdj-back-menu").addEventListener("click", () => window.adminShowDashboard());
+
+    document.getElementById("pdj-cal-prev").addEventListener("click", () => {
+      state.data.plat = readPlatFromDom();
+      state.calMonth -= 1;
+      if (state.calMonth < 0) { state.calMonth = 11; state.calYear -= 1; }
+      render();
+    });
+    document.getElementById("pdj-cal-next").addEventListener("click", () => {
+      state.data.plat = readPlatFromDom();
+      state.calMonth += 1;
+      if (state.calMonth > 11) { state.calMonth = 0; state.calYear += 1; }
+      render();
+    });
+    container.querySelectorAll("[data-cal-day]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const plat = readPlatFromDom();
+        plat.date = btn.dataset.calDay;
+        state.data.plat = plat;
+        render();
+      });
+    });
 
     document.getElementById("pdj-form").addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -209,6 +294,9 @@
       render();
       try {
         state.data = await apiGet();
+        const initial = state.data.plat.date ? new Date(state.data.plat.date + "T00:00:00") : new Date();
+        state.calYear = initial.getFullYear();
+        state.calMonth = initial.getMonth();
         state.screen = "ready";
       } catch (err) {
         state.screen = "error";
