@@ -1109,7 +1109,7 @@
       openPromo();
     }
     setTimeout(tryOpenPromo, 60000);
-    setInterval(() => { if (promoBackdrop.hidden) tryOpenPromo(); }, 180000);
+    setInterval(() => { if (promoBackdrop.hidden) tryOpenPromo(); }, 60000);
     document.getElementById("promo-close").addEventListener("click", closePromo);
     promoBackdrop.addEventListener("click", (e) => { if (e.target === promoBackdrop) closePromo(); });
     document.getElementById("promo-reserve").addEventListener("click", () => { closePromo(); jump("reservation"); });
