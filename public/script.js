@@ -141,6 +141,13 @@
           { name: "Sauces", desc: "Sauce de notre enfance, smashed sauce, tartare, moutarde miel, gorgonzola, mayo sriracha, Saint-Marcellin", price: "0,30 €" }
         ] }
       ],
+      "Menu étudiant": [
+        { title: "Menu étudiant", price: "11,90 €", note: "Sur présentation de la carte étudiante, un menu par carte.", items: [
+          { name: "Burger Smash", desc: "", price: "" },
+          { name: "Frites maison", desc: "", price: "" },
+          { name: "Boisson 33 cl", desc: "", price: "" }
+        ] }
+      ],
       "Petites faims": [
         { title: "À partager", note: "Nos frites peuvent aussi être intégrées à un menu.", items: [
           { name: "Frites bleu d'Auvergne & noix", desc: "", price: "6 €" },
@@ -155,14 +162,9 @@
           { name: "Saint-Marcellin pané x2", desc: "", price: "4 €" },
           { name: "Chilli cheese x6", desc: "", price: "6 €" },
           { name: "Stick de mozzarella x6", desc: "", price: "6 €" }
-        ] },
-        { title: "Menu étudiant", price: "11,90 €", note: "Sur présentation de la carte étudiante, un menu par carte.", items: [
-          { name: "Burger Smash", desc: "", price: "" },
-          { name: "Frites maison", desc: "", price: "" },
-          { name: "Boisson 33 cl", desc: "", price: "" }
         ] }
       ],
-      "Desserts & boissons": [
+      "Dessert": [
         { title: "Nos desserts", price: "6 €", note: "Tous nos desserts sont faits maison. Demandez les créations du moment, elles changent au fil des saisons.", items: [
           { name: "Tiramisu", desc: "", price: "" },
           { name: "Mousse au chocolat", desc: "", price: "" },
@@ -170,12 +172,6 @@
           { name: "Pana cotta", desc: "", price: "" },
           { name: "Brownie", desc: "", price: "" },
           { name: "Dessert du moment", desc: "", price: "" }
-        ] },
-        { title: "Nos boissons", price: "2 €", note: "Format 33 cl, sauf les bières servies en 25 cl.", items: [
-          { name: "Coca-Cola, Coca Cherry, Coca Zéro", desc: "", price: "" },
-          { name: "Oasis, Ice Tea, Orangina", desc: "", price: "" },
-          { name: "Sprite, Perrier", desc: "", price: "" },
-          { name: "Bière 25 cl", desc: "", price: "" }
         ] },
         { title: "Menu enfant", price: "11,90 €", note: "Au choix, servi avec frites maison ou légumes du moment, et une boisson 33 cl. Le mardi soir et le mercredi midi, le menu enfant est offert pour tout achat d'un menu adulte.", items: [
           { name: "Cheeseburger", desc: "", price: "" },
@@ -1145,8 +1141,8 @@
 
     function getUpsellViande() { return getUpsellGroup("Menus & suppléments", "Suppléments viandes"); }
     function getUpsellFromage() { return getUpsellGroup("Menus & suppléments", "Suppléments fromages"); }
-    function getUpsellBoissons() { return getUpsellGroup("Desserts & boissons", "Nos boissons"); }
-    function getUpsellDesserts() { return getUpsellGroup("Desserts & boissons", "Nos desserts"); }
+    function getUpsellBoissons() { return getUpsellGroup("Dessert", "Nos boissons"); }
+    function getUpsellDesserts() { return getUpsellGroup("Dessert", "Nos desserts"); }
 
     const upsellBox = document.getElementById("upsell-box");
     const stepViande = document.getElementById("upsell-step-viande");
@@ -1168,6 +1164,7 @@
     let selectedBoissons = [];
     let selectedDesserts = [];
     let hasDesserts = false;
+    let hasBoissons = false;
 
     function renderItemRows(container, groups, selectedArr) {
       container.innerHTML = "";
@@ -1267,12 +1264,17 @@
       else showRecap();
     }
 
+    function goToBoissonDessertOrRecap() {
+      if (hasBoissons) showStep("boisson");
+      else goToDessertOrRecap();
+    }
+
     document.getElementById("upsell-close").addEventListener("click", closeUpsell);
     upsellBackdrop.addEventListener("click", (e) => { if (e.target === upsellBackdrop) closeUpsell(); });
     document.getElementById("upsell-viande-next").addEventListener("click", () => showStep("fromage"));
     document.getElementById("upsell-viande-skip").addEventListener("click", () => showStep("fromage"));
-    document.getElementById("upsell-fromage-next").addEventListener("click", () => showStep("boisson"));
-    document.getElementById("upsell-fromage-skip").addEventListener("click", () => showStep("boisson"));
+    document.getElementById("upsell-fromage-next").addEventListener("click", goToBoissonDessertOrRecap);
+    document.getElementById("upsell-fromage-skip").addEventListener("click", goToBoissonDessertOrRecap);
     boissonNextBtn.addEventListener("click", goToDessertOrRecap);
     document.getElementById("upsell-boisson-skip").addEventListener("click", goToDessertOrRecap);
     document.getElementById("upsell-dessert-next").addEventListener("click", showRecap);
@@ -1351,11 +1353,13 @@
       selectedBoissons = [];
       selectedDesserts = [];
       const desserts = getUpsellDesserts();
+      const boissons = getUpsellBoissons();
       hasDesserts = desserts.length > 0 && desserts[0].items.length > 0;
+      hasBoissons = boissons.length > 0 && boissons[0].items.length > 0;
       boissonNextBtn.textContent = hasDesserts ? "Continuer" : "Voir ma commande";
       renderItemRows(viandeList, getUpsellViande(), selectedViandes);
       renderItemRows(fromageList, getUpsellFromage(), selectedFromages);
-      renderItemRows(boissonList, getUpsellBoissons(), selectedBoissons);
+      renderItemRows(boissonList, boissons, selectedBoissons);
       renderItemRows(dessertList, desserts, selectedDesserts);
       showStep("viande");
       upsellBackdrop.hidden = false;
