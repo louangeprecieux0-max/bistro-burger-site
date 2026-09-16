@@ -108,33 +108,65 @@ button, input{font-family:inherit}
 .field-label:first-of-type{margin-top:0}
 
 /* ---------- Calendrier (plat du jour) ---------- */
-.pdj-cal{border:1px solid var(--border); border-radius:16px; padding:18px; margin-bottom:8px; background:#FFFFFF; box-shadow:var(--shadow-card)}
+.pdj-cal{
+  border-radius:16px; padding:18px; margin-bottom:8px;
+  background:linear-gradient(115deg,var(--green-900) 0%,var(--green-800) 45%,var(--green-700) 100%);
+  box-shadow:var(--shadow-card);
+}
+.pdj-cal-selected-box{
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  margin-bottom:16px; padding:13px 16px; border-radius:12px;
+  background:linear-gradient(135deg,var(--cream-500) 0%,var(--cream-400) 50%,#C9B6A2 100%);
+  color:var(--green-900); font-family:var(--font-heading); font-weight:700; font-size:14px; text-align:center;
+  box-shadow:0 3px 10px rgba(0,0,0,.2);
+}
+.pdj-cal-selected-check{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:18px; height:18px; border-radius:50%; background:var(--green-700); color:var(--cream-500); font-size:11px; flex:none;
+}
+.pdj-cal-selected-box.is-empty{
+  background:rgba(255,255,255,.08); color:rgba(237,224,211,.65); font-weight:600;
+  box-shadow:none; border:1px dashed rgba(237,224,211,.35);
+}
 .pdj-cal-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:14px}
-.pdj-cal-month{font-family:var(--font-heading); font-weight:700; font-size:14.5px; color:var(--ink); text-transform:capitalize}
+.pdj-cal-month{font-family:var(--font-heading); font-weight:700; font-size:14.5px; color:var(--cream-500); text-transform:capitalize}
 .pdj-cal-nav{
-  width:30px; height:30px; flex:none; border-radius:50%; border:1px solid var(--border);
-  background:#FFFFFF; color:var(--muted); font-size:15px; cursor:pointer;
+  width:30px; height:30px; flex:none; border-radius:50%; border:1px solid rgba(237,224,211,.35);
+  background:rgba(255,255,255,.06); color:var(--cream-500); font-size:15px; cursor:pointer;
   display:flex; align-items:center; justify-content:center;
 }
-.pdj-cal-nav:hover{border-color:var(--green-700); color:var(--green-700)}
+.pdj-cal-nav:hover{background:rgba(255,255,255,.16); border-color:var(--cream-500)}
 .pdj-cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:4px; text-align:center}
-.pdj-cal-dow{font-family:var(--font-heading); font-size:10px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--muted); padding-bottom:8px}
+.pdj-cal-dow{font-family:var(--font-heading); font-size:10px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:rgba(237,224,211,.6); padding-bottom:8px}
 .pdj-cal-day{
-  width:100%; aspect-ratio:1; border-radius:50%; border:none; background:transparent;
-  color:var(--ink); font-family:var(--font-body); font-size:13px; cursor:pointer; position:relative;
+  width:100%; aspect-ratio:1; border-radius:10px; border:none; background:transparent;
+  color:var(--cream-500); font-family:var(--font-body); font-size:13px; cursor:pointer; position:relative;
   display:flex; align-items:center; justify-content:center;
 }
-.pdj-cal-day:hover{background:rgba(27,109,95,.1)}
-.pdj-cal-day.is-today::after{content:""; position:absolute; bottom:4px; width:4px; height:4px; border-radius:50%; background:var(--green-700)}
+.pdj-cal-day:hover{background:rgba(255,255,255,.14)}
+.pdj-cal-day.is-today::after{content:""; position:absolute; bottom:4px; width:4px; height:4px; border-radius:50%; background:var(--cream-500)}
 .pdj-cal-day.is-selected{
-  color:var(--cream-500); font-weight:700;
+  color:var(--green-900); font-weight:700;
+  background:linear-gradient(135deg,var(--cream-500) 0%,var(--cream-400) 50%,#C9B6A2 100%);
+  box-shadow:0 3px 10px rgba(0,0,0,.25);
+}
+.pdj-cal-day.is-selected::after{background:var(--green-900)}
+
+.pdj-slot-list{display:flex; flex-direction:column; gap:8px; margin-bottom:4px}
+.pdj-slot-btn{
+  display:flex; align-items:center; gap:8px;
+  width:100%; text-align:left; padding:12px 16px; border-radius:12px; border:1px solid var(--border);
+  background:var(--page-bg); color:var(--ink); font-family:var(--font-body); font-weight:600; font-size:13.5px; cursor:pointer;
+}
+.pdj-slot-btn:hover{border-color:var(--green-700)}
+.pdj-slot-btn.is-selected{
+  border:none; color:var(--cream-500); font-weight:700;
   background:linear-gradient(115deg,#2E8F7C 0%,var(--green-700) 30%,var(--green-800) 62%,var(--green-900) 100%);
   box-shadow:inset 0 1px 0 rgba(237,224,211,.3), 0 3px 8px rgba(18,87,76,.35);
 }
-.pdj-cal-day.is-selected::after{background:var(--cream-500)}
-.pdj-cal-selected{
-  margin-top:14px; padding-top:12px; border-top:1px solid var(--border);
-  font-family:var(--font-heading); font-weight:600; font-size:13px; color:var(--green-800); text-align:center;
+.pdj-slot-check{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:16px; height:16px; border-radius:50%; background:rgba(237,224,211,.25); font-size:10px; flex:none;
 }
 
 .login-field-row{

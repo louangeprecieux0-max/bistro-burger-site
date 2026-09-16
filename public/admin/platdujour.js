@@ -76,10 +76,11 @@
   }
 
   function readPlatFromDom() {
+    const custom = document.getElementById("pdj-horaire-custom").value.trim();
     return {
       label: state.data.plat.label || "Plat du jour",
       date: state.data.plat.date || "",
-      horaire: document.getElementById("pdj-horaire").value.trim(),
+      horaire: custom || state.data.plat.horaire || "",
       title: document.getElementById("pdj-title").value.trim(),
       price: document.getElementById("pdj-price").value.trim(),
     };
@@ -108,6 +109,9 @@
 
     return (
       '<div class="pdj-cal">' +
+      (selected
+        ? '<div class="pdj-cal-selected-box"><span class="pdj-cal-selected-check">✓</span>' + esc(formatDisplayDate(selected)) + "</div>"
+        : '<div class="pdj-cal-selected-box is-empty">Choisissez une date ci-dessous</div>') +
       '<div class="pdj-cal-head">' +
       '<button type="button" class="pdj-cal-nav" id="pdj-cal-prev" aria-label="Mois précédent">‹</button>' +
       '<span class="pdj-cal-month">' + esc(monthLabelCap) + "</span>" +
@@ -117,7 +121,31 @@
       ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"].map((d) => '<span class="pdj-cal-dow">' + d + "</span>").join("") +
       cells +
       "</div>" +
-      (selected ? '<div class="pdj-cal-selected">' + esc(formatDisplayDate(selected)) + "</div>" : "") +
+      "</div>"
+    );
+  }
+
+  const HORAIRE_PRESETS = [
+    "Servi de 12h à 14h",
+    "Servi de 12h à 14h30",
+    "Servi de 19h à 21h",
+    "Servi de 19h à 21h30",
+    "Servi toute la journée",
+  ];
+
+  function horaireSlotsHtml() {
+    const current = state.data.plat.horaire || "";
+    return (
+      '<div class="pdj-slot-list">' +
+      HORAIRE_PRESETS.map((h) => {
+        const isSelected = h === current;
+        return (
+          '<button type="button" class="pdj-slot-btn' + (isSelected ? " is-selected" : "") + '" data-horaire="' + esc(h) + '">' +
+          (isSelected ? '<span class="pdj-slot-check">✓</span>' : "") +
+          esc(h) +
+          "</button>"
+        );
+      }).join("") +
       "</div>"
     );
   }
@@ -174,8 +202,10 @@
       "<h2>Plat du jour</h2>" +
       '<label class="field-label">Date</label>' +
       calendarHtml() +
-      '<label class="field-label" for="pdj-horaire">Horaire (optionnel)</label>' +
-      '<input class="field" id="pdj-horaire" placeholder="Servi de 12h à 14h" value="' + esc(plat.horaire) + '">' +
+      '<label class="field-label">Horaire</label>' +
+      horaireSlotsHtml() +
+      '<label class="field-label" for="pdj-horaire-custom">Autre horaire (optionnel)</label>' +
+      '<input class="field" id="pdj-horaire-custom" placeholder="Ex : Service continu" value="' + (HORAIRE_PRESETS.includes(plat.horaire) ? "" : esc(plat.horaire)) + '">' +
       '<label class="field-label" for="pdj-title">Nom du plat</label>' +
       '<input class="field" id="pdj-title" required value="' + esc(plat.title) + '">' +
       '<label class="field-label" for="pdj-price">Prix</label>' +
@@ -216,6 +246,15 @@
       btn.addEventListener("click", () => {
         const plat = readPlatFromDom();
         plat.date = btn.dataset.calDay;
+        state.data.plat = plat;
+        render();
+      });
+    });
+
+    container.querySelectorAll("[data-horaire]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const plat = readPlatFromDom();
+        plat.horaire = btn.dataset.horaire;
         state.data.plat = plat;
         render();
       });
