@@ -159,14 +159,19 @@
     }));
   }
 
-  function suggestionCardHtml(sug, i, canRemove) {
+  function suggestionCardHtml(sug, i, canRemove, hasRemoved) {
     return (
       '<div class="editor-block" style="border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:12px;">' +
       '<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">' +
       '<span style="font-family:var(--font-heading); font-weight:700; font-size:13px; color:var(--muted);">Suggestion ' + (i + 1) + "</span>" +
+      '<div style="display:flex; gap:6px;">' +
+      (hasRemoved
+        ? '<button type="button" class="icon-btn" data-undo-sug title="Restaurer les suggestions supprimées" aria-label="Restaurer les suggestions supprimées">↺</button>'
+        : "") +
       (canRemove
         ? '<button type="button" class="icon-btn icon-btn-danger" data-remove-sug="' + i + '" aria-label="Retirer cette suggestion" title="Retirer cette suggestion">✕</button>'
         : "") +
+      "</div>" +
       "</div>" +
       '<label class="field-label" for="sug-title-' + i + '">Nom du plat</label>' +
       '<input class="field" id="sug-title-' + i + '" value="' + esc(sug.title) + '">' +
@@ -218,15 +223,8 @@
       "</form>" +
       '<hr class="divider">' +
       '<form id="sug-form">' +
-      '<div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin:20px 0 10px;">' +
-      '<h2 style="margin:0;">Suggestions</h2>' +
-      (state.removedSuggestions.length
-        ? '<button type="button" class="icon-btn" id="sug-undo" title="' +
-          esc(state.removedSuggestions.length + (state.removedSuggestions.length > 1 ? " suggestions supprimées — Réinitialiser" : " suggestion supprimée — Réinitialiser")) +
-          '" aria-label="Réinitialiser les suggestions supprimées">↺</button>'
-        : "") +
-      "</div>" +
-      suggestions.map((sug, i) => suggestionCardHtml(sug, i, suggestions.length > 1)).join("") +
+      "<h2>Suggestions</h2>" +
+      suggestions.map((sug, i) => suggestionCardHtml(sug, i, suggestions.length > 1, state.removedSuggestions.length > 0)).join("") +
       '<button type="button" class="btn-secondary" id="sug-add" style="margin-bottom:16px;">+ Ajouter une suggestion</button>' +
       '<button type="submit" class="btn-primary" id="sug-save"' + (state.savingSug ? " disabled" : "") + ">" +
       (state.savingSug ? "Enregistrement…" : "Enregistrer les suggestions") +
@@ -305,15 +303,14 @@
       });
     });
 
-    const undoBtn = document.getElementById("sug-undo");
-    if (undoBtn) {
-      undoBtn.addEventListener("click", () => {
+    container.querySelectorAll("[data-undo-sug]").forEach((btn) => {
+      btn.addEventListener("click", () => {
         state.data.plat = readPlatFromDom();
         state.data.suggestions = readSuggestionsFromDom().concat(state.removedSuggestions);
         state.removedSuggestions = [];
         render();
       });
-    }
+    });
 
     document.getElementById("sug-form").addEventListener("submit", async (e) => {
       e.preventDefault();
