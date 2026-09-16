@@ -166,10 +166,10 @@
       '<span style="font-family:var(--font-heading); font-weight:700; font-size:13px; color:var(--muted);">Suggestion ' + (i + 1) + "</span>" +
       '<div style="display:flex; gap:6px;">' +
       (hasRemoved
-        ? '<button type="button" class="icon-btn" data-undo-sug title="Restaurer les suggestions supprimées" aria-label="Restaurer les suggestions supprimées">↺</button>'
+        ? '<button type="button" class="icon-btn icon-btn-restore" data-undo-sug title="Restaurer les suggestions supprimées" aria-label="Restaurer les suggestions supprimées">↺</button>'
         : "") +
       (canRemove
-        ? '<button type="button" class="icon-btn icon-btn-danger" data-remove-sug="' + i + '" aria-label="Retirer cette suggestion" title="Retirer cette suggestion">✕</button>'
+        ? '<button type="button" class="icon-btn icon-btn-beige" data-remove-sug="' + i + '" aria-label="Retirer cette suggestion" title="Retirer cette suggestion">✕</button>'
         : "") +
       "</div>" +
       "</div>" +
