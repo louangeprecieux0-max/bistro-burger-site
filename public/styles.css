@@ -68,7 +68,6 @@ a { color: var(--color-primary); text-decoration: none; }
 a:not(.btn):hover { color: var(--green-700); }
 
 @keyframes bbFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
-@keyframes bbMarquee { from { transform: translate3d(0,0,0); } to { transform: translate3d(-50%,0,0); } }
 @keyframes bbRide { 0%,100% { transform: scale(1.06) translate(0,0); } 25% { transform: scale(1.06) translate(-0.6%,-1%); } 50% { transform: scale(1.09) translate(0,-1.6%); } 75% { transform: scale(1.06) translate(0.6%,-1%); } }
 @keyframes bbPromoIn { from { opacity: 0; transform: translateY(14px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes bbPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(237,224,211,.45); } 70% { box-shadow: 0 0 0 18px rgba(237,224,211,0); } }
@@ -143,9 +142,8 @@ a:not(.btn):hover { color: var(--green-700); }
   [data-burger-arrow][data-dir="next"] { right: 50% !important; margin-right: -50px; }
 }
 
-[data-band-track] { will-change: transform; backface-visibility: hidden; -webkit-backface-visibility: hidden; transform: translate3d(0,0,0); }
-[data-band-card] { flex: 0 0 236px; backface-visibility: hidden; -webkit-backface-visibility: hidden; transform: translate3d(0,0,0); }
-[data-band-card] img { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+[data-band-track] { transform: translate3d(0,0,0); }
+[data-band-card] { flex: 0 0 236px; }
 @media (max-width: 760px) { [data-band-card] { flex: 0 0 168px; box-shadow: none !important; } [data-band-card] > div { height: 132px !important; } }
 
 [data-nav-toggle] { display: none; }

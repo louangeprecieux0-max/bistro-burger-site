@@ -1,4 +1,43 @@
 "use strict";
+
+/* Utilitaire partagé : brouillons auto-sauvegardés en localStorage pour   */
+/* les formulaires admin (burgers, burger du moment...). Indépendant de   */
+/* la config Supabase pour rester disponible même si celle-ci est absente. */
+window.AdminDrafts = (() => {
+  const PREFIX = "bb-admin-draft:";
+  function save(key, data) {
+    try {
+      localStorage.setItem(PREFIX + key, JSON.stringify({ data, savedAt: Date.now() }));
+    } catch {}
+  }
+  function load(key) {
+    try {
+      const raw = localStorage.getItem(PREFIX + key);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== "object" || !("data" in parsed)) return null;
+      return parsed;
+    } catch {
+      return null;
+    }
+  }
+  function clear(key) {
+    try { localStorage.removeItem(PREFIX + key); } catch {}
+  }
+  function timeAgo(ts) {
+    const s = Math.max(0, Math.floor((Date.now() - ts) / 1000));
+    if (s < 5) return "à l'instant";
+    if (s < 60) return "il y a " + s + " s";
+    const m = Math.floor(s / 60);
+    if (m < 60) return "il y a " + m + " min";
+    const h = Math.floor(m / 60);
+    if (h < 24) return "il y a " + h + " h";
+    const d = Math.floor(h / 24);
+    return "il y a " + d + " j";
+  }
+  return { save, load, clear, timeAgo };
+})();
+
 (() => {
   const cfg = window.SUPABASE_CONFIG;
   const errorBox = document.getElementById("login-error");
@@ -55,11 +94,13 @@
   const SECTIONS = [
     { key: "dashboard", title: "Accueil" },
     { key: "burgers", title: "Les burgers", editor: () => window.BurgersEditor },
+    { key: "burgerdumoment", title: "Burger du moment", editor: () => window.BurgerDuMomentEditor },
     { key: "carte", title: "La carte", editor: () => window.CarteEditor },
     { key: "platdujour", title: "Plat du jour", editor: () => window.PlatDuJourEditor },
     { key: "offres", title: "Offres", editor: () => window.OffresEditor },
     { key: "reservations", title: "Réservations", editor: () => window.ReservationsEditor },
     { key: "popup", title: "Pop-up promo", editor: () => window.PopupEditor },
+    { key: "annonces", title: "Annonces", editor: () => window.AnnoncesEditor },
     { key: "commandes", title: "Commandes", editor: () => window.CommandesEditor },
     { key: "reservations-clients", title: "Réservations reçues", editor: () => window.ReservationsClientsEditor },
   ];

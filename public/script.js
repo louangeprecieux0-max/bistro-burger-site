@@ -31,6 +31,8 @@
     ] }
   ];
 
+  const BURGER_DU_MOMENT = SITE_DATA.burger_du_moment && Array.isArray(SITE_DATA.burger_du_moment.items) ? SITE_DATA.burger_du_moment.items : [];
+
   const CARTES = SITE_DATA.cartes || {
     "Sur place": {
       "Apéro": [
@@ -43,18 +45,6 @@
           { name: "Camembert pané", desc: "Par 6", price: "6 €" },
           { name: "Onion Rings", desc: "Par 6", price: "6 €" },
           { name: "Planche mixte apéro", desc: "Un peu de tout", price: "40 €" }
-        ] },
-        { title: "Nos spritz", items: [
-          { name: "Apérol Spritz", desc: "Apérol, prosecco, eau gazeuse", price: "8 €" },
-          { name: "Campari Spritz", desc: "Campari, prosecco, eau gazeuse", price: "8 €" },
-          { name: "Capo Spritz", desc: "Cap Mattei, prosecco, eau gazeuse", price: "10 €" },
-          { name: "St Germain Spritz", desc: "St-Germain, prosecco, eau gazeuse", price: "12 €" }
-        ] },
-        { title: "Nos cocktails", items: [
-          { name: "Cuba libre", desc: "Rhum, coca-cola, citron vert", price: "8 €" },
-          { name: "Gin Tonic", desc: "Gin, citron, tonic", price: "10 €" },
-          { name: "Gin Fizz", desc: "Gin, citron, citron vert, sucre de canne, eau gazeuse", price: "12 €" },
-          { name: "Italicus Tonic", desc: "Italicus, gin, citron, tonic", price: "12 €" }
         ] }
       ],
       "Nos plats": [
@@ -85,7 +75,7 @@
           { name: "Une boule de glace", desc: "Fraise, vanille, chocolat", price: "" }
         ] }
       ],
-      "Pour (se) finir": [
+      "Dessert": [
         { title: "Nos desserts", items: [
           { name: "Assiette de fromages", desc: "", price: "4 €" },
           { name: "Tiramisu du moment", desc: "", price: "4 €" },
@@ -99,17 +89,6 @@
           { name: "Citron givré", desc: "", price: "4 €" },
           { name: "San Pellegrino 1 L", desc: "", price: "4 €" },
           { name: "Vittel 1 L", desc: "", price: "à confirmer" }
-        ] },
-        { title: "Digestifs & bière", note: "Café et boissons chaudes : tarifs à confirmer.", items: [
-          { name: "Ricard, 51, Casanis", desc: "", price: "3 €" },
-          { name: "Martini blanc ou rouge", desc: "", price: "3 €" },
-          { name: "Apéritif + soda", desc: "", price: "4 €" },
-          { name: "Rhum, whisky, vodka", desc: "", price: "4 €" },
-          { name: "Vin au verre", desc: "Blanc, rouge, rosé", price: "4 €" },
-          { name: "Pietra blonde pression", desc: "25 cl / 50 cl", price: "4 € / 8 €" },
-          { name: "Pietra ambrée pression", desc: "25 cl / 50 cl", price: "4,50 € / 9 €" },
-          { name: "Monaco", desc: "25 cl / 50 cl", price: "4,50 € / 9 €" },
-          { name: "Pietra Chjuca", desc: "15 cl", price: "2,50 €" }
         ] }
       ],
       "Notre cave": [
@@ -207,13 +186,6 @@
     }
   };
 
-  const PROMO_POPUP = SITE_DATA.promo_popup || {
-    badge: "Offre du moment",
-    title: "Le menu enfant offert",
-    description: "Le mardi soir et le mercredi midi, le menu enfant est offert pour tout menu adulte acheté. Réservez votre table pour en profiter.",
-    button_label: "Réserver",
-  };
-
   const PLAT_DU_JOUR = SITE_DATA.plat_du_jour || {
     plat: { label: "Plat du jour", meta: "Jeudi 7 août · servi de 12h à 14h", title: "Brochette de magret de canard aux abricots marinée, boulgour aux légumes croquants", price: "14,50 €" },
     suggestions: [{ label: "Suggestion du jour", title: "Burger du boucher, sauce poivre", description: "La suggestion que le chef ajoute à la carte, selon le marché du matin. Servie avec frites maison et salade.", price: "16,90 €" }],
@@ -222,8 +194,15 @@
   const OFFRES = SITE_DATA.offres || [
     { tag: "Menu étudiant", price: "11,90 €", title: "Burger smash, frites maison, boisson 33 cl", description: "Offre valable uniquement sur présentation de la carte étudiante, un menu par carte.", img: "assets/menu-etudiant.png" },
     { tag: "Menu enfant", price: "11,90 €", title: "Cheeseburger, tenders de poulet ou steak haché, boisson 33 cl", description: "Le mardi soir et le mercredi midi, le menu enfant est offert pour tout achat d'un menu adulte. Valable également pour tout repas sur place.", img: "assets/menu-enfant.png" },
-    { tag: "Carte de fidélité", price: "", title: "Une case par tranche de 15 € d'achat", description: "Dix cases complétées, quinze euros offerts. Passez récupérer votre carte au comptoir. Offre non cumulable, carte nominative.", img: "assets/carte-fidelite.png" },
+    { tag: "Carte de fidélité", price: "", title: "1 case = 15 € d'achat", description: "10 cases complètes = 15 € offerts\n• Offres cumulables\n• Carte nominative\nPassez récupérer votre carte au comptoir.", img: "assets/carte-fidelite.png" },
     { tag: "Carte cadeau", price: "", title: "Scannez le QR code en salle pour gagner des lots", description: "Tentez votre chance, gagnez, et venez récupérer vos cadeaux sur place.", img: "assets/carte-cadeau.png" },
+  ];
+
+  const ANNONCES = SITE_DATA.annonces && SITE_DATA.annonces.length ? SITE_DATA.annonces : [
+    "Livraison à Gardanne et communes voisines",
+    "Plat du jour du lundi au vendredi, 12h–14h",
+    "Burgers faits maison · produits frais",
+    "Diffusion des matchs de l'OM en direct",
   ];
 
   const RESERVATION_SETTINGS = SITE_DATA.reservation_settings || {
@@ -276,6 +255,7 @@
     return n;
   };
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const stripEuro = (s) => String(s || "").replace(/€/g, "").replace(/\s+/g, " ").trim();
   function parsePriceToNumber(str) {
     if (!str) return 0;
     const cleaned = String(str).replace(/[^\d,.\-]/g, "").replace(",", ".");
@@ -379,7 +359,7 @@
       jump("carte");
     });
   });
-  $$("[data-nav-item][href='#burgers']").forEach((a) => a.addEventListener("click", () => setMenuOpen(false)));
+  $$("[data-nav-item][href^='#']").forEach((a) => a.addEventListener("click", () => setMenuOpen(false)));
   document.querySelector("[data-call]").addEventListener("click", () => { window.location.href = "tel:+33465848918"; });
 
   /* ---------------------------------------------------------------- */
@@ -388,14 +368,10 @@
   (function renderMarquee() {
     const track = document.getElementById("marquee-track");
     if (!track) return;
-    const items = [
-      "Livraison à Gardanne et communes voisines",
-      "Plat du jour du lundi au vendredi, 12h–14h",
-      "Burgers faits maison · produits frais"
-    ];
+    const items = ANNONCES;
     const span = (text) => `<span style="font-family:var(--font-heading); font-weight:700; font-size:13px; letter-spacing:.16em; text-transform:uppercase; white-space:nowrap;">${esc(text)}</span><span style="color:var(--cream-500); font-size:15px; line-height:1;">✳</span>`;
     let html = "";
-    for (let i = 0; i < 8; i++) html += span(items[i % items.length]);
+    for (let i = 0; i < Math.max(8, items.length * 2); i++) html += span(items[i % items.length]);
     track.innerHTML = html;
   })();
 
@@ -432,6 +408,40 @@
     });
   }
   renderBurgers();
+
+  /* ---------------------------------------------------------------- */
+  /* Burger du moment — mis en avant avant la liste des burgers.       */
+  /* Ne touche rien si aucun burger actif : le contenu HTML par défaut */
+  /* reste affiché (et reste dans le HTML rendu, utile pour le SEO).   */
+  /* ---------------------------------------------------------------- */
+  (function renderBurgerDuMoment() {
+    const active = BURGER_DU_MOMENT.find((b) => b.active);
+    if (!active) return;
+    const setText = (id, val) => {
+      const t = document.getElementById(id);
+      if (t && val != null) t.textContent = val;
+    };
+    setText("bdm-name", active.name);
+    setText("bdm-desc", active.description);
+    setText("bdm-ingredients", active.ingredients);
+    setText("bdm-price", active.price);
+    const imgEl = document.getElementById("bdm-img");
+    if (imgEl && active.img) {
+      imgEl.src = active.img;
+      imgEl.alt = active.name ? "Burger du moment : " + active.name : "Burger du moment";
+    }
+    const allergensEl = document.getElementById("bdm-allergens");
+    if (allergensEl) {
+      if (active.allergens) {
+        allergensEl.textContent = "Allergènes : " + active.allergens;
+        allergensEl.hidden = false;
+      } else {
+        allergensEl.hidden = true;
+      }
+    }
+    const statusEl = document.getElementById("bdm-status");
+    if (statusEl) statusEl.hidden = active.available !== false;
+  })();
 
   /* ---------------------------------------------------------------- */
   /* Plat du jour / suggestion                                         */
@@ -510,7 +520,7 @@
       if (offer.price) head.appendChild(el("span", { "data-offer-price": "", style: "font-family:var(--font-heading); font-weight:700; font-size:17px;" }, esc(offer.price)));
       body.appendChild(head);
       body.appendChild(el("h3", { style: "font-family:var(--font-heading); font-weight:600; font-size:17.5px; line-height:1.3; margin:16px 0 0;" }, esc(offer.title || "")));
-      body.appendChild(el("p", { style: "font-size:13.5px; line-height:1.6; margin:10px 0 0; flex:1;" }, esc(offer.description || "")));
+      body.appendChild(el("p", { style: "font-size:13.5px; line-height:1.6; margin:10px 0 0; flex:1; white-space:pre-line;" }, esc(offer.description || "")));
       card.appendChild(body);
       grid.appendChild(card);
     });
@@ -770,7 +780,7 @@
       const head = el("div", { style: "display:flex; align-items:center; gap:18px; flex-wrap:wrap;" });
       head.appendChild(el("h3", { style: "font-family:var(--font-heading); font-weight:700; font-size:12.5px; letter-spacing:.16em; text-transform:uppercase; margin:0; color:var(--color-primary); background:linear-gradient(115deg,#FFFBF6 0%,var(--cream-500) 45%,#D9C7B3 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,.7), 0 6px 18px rgba(14,70,61,.3); padding:9px 20px; border-radius:var(--radius-badge);" }, esc(group.title)));
       head.appendChild(el("div", { style: "flex:1; height:1px; background:linear-gradient(90deg,rgba(237,224,211,.45),transparent); min-width:40px;" }));
-      if (group.price) head.appendChild(el("span", { style: "font-family:var(--font-heading); font-weight:700; font-size:17px; color:var(--color-primary); background:linear-gradient(115deg,#FFFBF6 0%,var(--cream-500) 45%,#D9C7B3 100%); padding:8px 18px; border-radius:var(--radius-badge);" }, esc(group.price)));
+      if (group.price) head.appendChild(el("span", { style: "font-family:var(--font-heading); font-weight:700; font-size:17px; color:var(--color-primary); background:linear-gradient(115deg,#FFFBF6 0%,var(--cream-500) 45%,#D9C7B3 100%); padding:8px 18px; border-radius:var(--radius-badge);" }, esc(stripEuro(group.price))));
       wrap.appendChild(head);
       if (group.note) wrap.appendChild(el("p", { style: "font-size:13.5px; line-height:1.6; color:rgba(237,224,211,.8); margin:16px 0 0; max-width:640px;" }, esc(group.note)));
       const grid = el("div", { style: "display:grid; grid-template-columns:1fr 1fr; gap:14px 24px; margin-top:24px;" });
@@ -779,7 +789,7 @@
         const line = el("div", { style: "display:flex; align-items:baseline; gap:12px;" });
         line.appendChild(el("span", { style: "font-family:var(--font-heading); font-weight:700; font-size:17.5px; line-height:1.25; letter-spacing:.01em; text-transform:uppercase; color:var(--color-primary);" }, esc(item.name)));
         line.appendChild(el("span", { style: "flex:1; min-width:16px; border-bottom:2px dotted var(--border-default); transform:translateY(-4px);" }));
-        if (item.price) line.appendChild(el("span", { style: "font-family:var(--font-heading); font-weight:700; font-size:15px; color:var(--color-accent); background:rgba(181,101,29,.1); padding:5px 13px; border-radius:var(--radius-badge); white-space:nowrap;" }, esc(item.price)));
+        if (item.price) line.appendChild(el("span", { style: "font-family:var(--font-heading); font-weight:700; font-size:15px; color:var(--color-accent); background:rgba(181,101,29,.1); padding:5px 13px; border-radius:var(--radius-badge); white-space:nowrap;" }, esc(stripEuro(item.price))));
         row.appendChild(line);
         row.appendChild(el("div", { style: "font-size:14px; line-height:1.55; color:var(--text-muted); margin-top:9px; min-height:22px;" }, esc(item.desc || "")));
         grid.appendChild(row);
@@ -872,9 +882,14 @@
 
   /* ---------------------------------------------------------------- */
   /* Band of photos (bottom marquee) — bande-5/6 use placeholders       */
+  /* Défilement piloté en JS (requestAnimationFrame) plutôt qu'une      */
+  /* animation CSS en boucle : évite le blocage/la disparition d'images */
+  /* observés sur mobile (dérive du % CSS vs largeur réelle mesurée,    */
+  /* et animation qui continue de tourner hors écran / onglet masqué). */
   /* ---------------------------------------------------------------- */
   (function renderBand() {
-    if (!document.getElementById("band-track")) return;
+    const track = document.getElementById("band-track");
+    if (!track) return;
     const sequence = [
       { img: "assets/bande-5.png", alt: "Cheeseburger et frites maison servis sur assiette" },
       { img: "assets/bande-1.webp", alt: "Bowl de poulet grillé, poivrons confits et riz" },
@@ -883,22 +898,87 @@
       { img: "assets/bande-4.webp", alt: "Entrecôte, gratin de pommes de terre et salade" },
       { img: "assets/bande-3.webp", alt: "Café, jus d'orange et viennoiserie en salle le matin" }
     ];
-    const track = document.getElementById("band-track");
+    const GAP = 16;
+
     function group(hidden) {
-      const wrap = el("div", { style: "display:flex; gap:16px; padding:0 8px;" + (hidden ? "" : "") });
+      const wrap = el("div", { style: "display:flex; gap:" + GAP + "px; padding:0 8px; flex:none;" });
       if (hidden) wrap.setAttribute("aria-hidden", "true");
       sequence.forEach((item) => {
         const card = el("div", { "data-band-card": "", style: "padding:9px; border-radius:18px; background:linear-gradient(135deg,#3AA48E,var(--green-700) 55%,var(--green-900)); box-shadow:0 12px 30px rgba(14,70,61,.3);" });
         const box = el("div", { style: "height:170px; border-radius:12px; overflow:hidden;" });
-        if (item.img) box.innerHTML = `<img src="${esc(item.img)}" alt="${esc(item.alt)}" style="width:100%; height:100%; object-fit:cover; display:block;">`;
-        else box.innerHTML = `<div class="ph ${item.ph}" style="width:100%; height:100%;">${esc(item.label)}</div>`;
+        box.innerHTML = `<img src="${esc(item.img)}" alt="${esc(item.alt)}" loading="lazy" style="width:100%; height:100%; object-fit:cover; display:block;">`;
         card.appendChild(box);
         wrap.appendChild(card);
       });
       return wrap;
     }
-    track.appendChild(group(false));
-    track.appendChild(group(true));
+
+    track.style.animation = "none";
+    track.style.display = "flex";
+    track.style.gap = GAP + "px";
+    track.innerHTML = "";
+    const groupA = group(false);
+    const groupB = group(true);
+    track.appendChild(groupA);
+    track.appendChild(groupB);
+
+    let groupSpan = 0;
+    function measure() {
+      const w = groupA.getBoundingClientRect().width;
+      if (w > 0) groupSpan = w + GAP;
+    }
+    measure();
+    window.addEventListener("resize", measure);
+    groupA.querySelectorAll("img").forEach((img) => {
+      if (!img.complete) img.addEventListener("load", measure, { once: true });
+    });
+
+    const DURATION = 20; // secondes pour parcourir une largeur de groupe (même cadence qu'avant)
+    let x = 0;
+    let lastTs = null;
+    let rafId = null;
+    let paused = false;
+
+    function tick(ts) {
+      if (paused) { rafId = null; return; }
+      if (lastTs == null) lastTs = ts;
+      const dt = Math.min((ts - lastTs) / 1000, 0.25); // ignore les gros écarts (tab remis au premier plan)
+      lastTs = ts;
+      if (groupSpan > 0) {
+        x -= (groupSpan / DURATION) * dt;
+        if (x <= -groupSpan) x += groupSpan;
+        track.style.transform = "translate3d(" + x.toFixed(2) + "px,0,0)";
+      }
+      rafId = requestAnimationFrame(tick);
+    }
+
+    function play() {
+      if (rafId != null) return;
+      paused = false;
+      lastTs = null;
+      track.style.willChange = "transform";
+      rafId = requestAnimationFrame(tick);
+    }
+    function pause() {
+      paused = true;
+      track.style.willChange = "auto";
+      if (rafId != null) { cancelAnimationFrame(rafId); rafId = null; }
+    }
+
+    let inView = true;
+    if ("IntersectionObserver" in window) {
+      const io = new IntersectionObserver((entries) => {
+        inView = entries[0].isIntersecting;
+        if (inView && !document.hidden) play(); else pause();
+      }, { threshold: 0 });
+      io.observe(track);
+    }
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) pause();
+      else if (inView) play();
+    });
+
+    play();
   })();
 
   /* ---------------------------------------------------------------- */
@@ -989,15 +1069,30 @@
   /* Promo popup                                                        */
   /* ---------------------------------------------------------------- */
   const promoBackdrop = document.getElementById("promo-backdrop");
-  if (promoBackdrop) {
+  if (promoBackdrop && OFFRES.length) {
     const promoBadgeEl = document.getElementById("promo-badge");
     const promoTitleEl = document.getElementById("promo-title");
     const promoDescEl = document.getElementById("promo-desc");
-    const promoReserveEl = document.getElementById("promo-reserve");
-    if (promoBadgeEl) promoBadgeEl.textContent = PROMO_POPUP.badge;
-    if (promoTitleEl) promoTitleEl.textContent = PROMO_POPUP.title;
-    if (promoDescEl) promoDescEl.textContent = PROMO_POPUP.description;
-    if (promoReserveEl) promoReserveEl.textContent = PROMO_POPUP.button_label;
+    const promoPriceEl = document.getElementById("promo-price");
+    const promoNavEl = document.getElementById("promo-nav");
+    const promoCounterEl = document.getElementById("promo-counter");
+    let promoIndex = 0;
+    function renderPromoOffer() {
+      const offer = OFFRES[promoIndex] || {};
+      if (promoBadgeEl) promoBadgeEl.textContent = offer.tag || "Offre du moment";
+      if (promoTitleEl) promoTitleEl.textContent = offer.title || "";
+      if (promoDescEl) promoDescEl.textContent = offer.description || "";
+      if (promoPriceEl) promoPriceEl.textContent = offer.price || "";
+      if (promoCounterEl) promoCounterEl.textContent = (promoIndex + 1) + " / " + OFFRES.length;
+    }
+    renderPromoOffer();
+    if (OFFRES.length > 1 && promoNavEl) {
+      promoNavEl.hidden = false;
+      const promoPrevEl = document.getElementById("promo-prev");
+      const promoNextEl = document.getElementById("promo-next");
+      if (promoPrevEl) promoPrevEl.addEventListener("click", () => { promoIndex = (promoIndex - 1 + OFFRES.length) % OFFRES.length; renderPromoOffer(); });
+      if (promoNextEl) promoNextEl.addEventListener("click", () => { promoIndex = (promoIndex + 1) % OFFRES.length; renderPromoOffer(); });
+    }
     function openPromo() { promoBackdrop.hidden = false; document.getElementById("promo-box").style.animation = "bbPromoIn .55s cubic-bezier(.22,.9,.3,1) both"; }
     function closePromo() { promoBackdrop.hidden = true; }
     function reservationInView() {
@@ -1016,7 +1111,7 @@
       if (reservationInView() || otherModalOpen()) { setTimeout(tryOpenPromo, 2000); return; }
       openPromo();
     }
-    setTimeout(tryOpenPromo, 5500);
+    setTimeout(tryOpenPromo, 60000);
     setInterval(() => { if (promoBackdrop.hidden) tryOpenPromo(); }, 180000);
     document.getElementById("promo-close").addEventListener("click", closePromo);
     promoBackdrop.addEventListener("click", (e) => { if (e.target === promoBackdrop) closePromo(); });

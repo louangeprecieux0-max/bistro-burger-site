@@ -4,6 +4,12 @@
   const container = document.getElementById("burgers-view");
 
   let state = null;
+  let draftSaveTimer = null;
+  let draftTickTimer = null;
+
+  function stopDraftTicker() {
+    if (draftTickTimer) { clearInterval(draftTickTimer); draftTickTimer = null; }
+  }
 
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({
@@ -133,6 +139,7 @@
     document.getElementById("b-add-item").addEventListener("click", () => {
       state.itemIndex = null;
       state.editImgUrl = undefined;
+      state.draftChecked = false;
       state.screen = "edit";
       render();
     });
@@ -140,6 +147,7 @@
       btn.addEventListener("click", () => {
         state.itemIndex = Number(btn.dataset.item);
         state.editImgUrl = undefined;
+        state.draftChecked = false;
         state.screen = "edit";
         render();
       });
@@ -229,11 +237,39 @@
     }
   }
 
+  function burgerDraftKey() {
+    return "burger:" + state.catIndex + ":" + (state.itemIndex === null ? "new" : state.itemIndex);
+  }
+
+  function readEditFields() {
+    return {
+      name: document.getElementById("b-name").value,
+      desc: document.getElementById("b-desc").value,
+      sur: document.getElementById("b-sur").value,
+      emp: document.getElementById("b-emp").value,
+      img: state.editImgUrl || "",
+    };
+  }
+
+  function scheduleDraftSave() {
+    if (draftSaveTimer) clearTimeout(draftSaveTimer);
+    draftSaveTimer = setTimeout(() => {
+      window.AdminDrafts.save(burgerDraftKey(), readEditFields());
+      const statusEl = document.getElementById("b-draft-status");
+      if (statusEl) statusEl.textContent = "Brouillon enregistré automatiquement — à l'instant";
+    }, 800);
+  }
+
   function renderEdit() {
     const cat = state.data[state.catIndex];
     const isNew = state.itemIndex === null;
     const item = isNew ? { name: "", desc: "", sur: "", emp: "", img: "" } : cat.items[state.itemIndex];
     if (state.editImgUrl === undefined) state.editImgUrl = item.img || "";
+
+    if (!state.draftChecked) {
+      state.draftChecked = true;
+      state.pendingDraft = window.AdminDrafts.load(burgerDraftKey());
+    }
 
     const imgPreview = state.editImgUrl
       ? '<img class="edit-hero-img" src="' + esc(state.editImgUrl) + '" alt="">'
@@ -242,6 +278,13 @@
     container.innerHTML =
       '<button type="button" class="back-btn" id="b-back-items">‹ ' + esc(cat.title) + "</button>" +
       "<h1>" + (isNew ? "Nouveau burger" : "Modifier le burger") + "</h1>" +
+      (state.pendingDraft
+        ? '<div class="draft-banner">Un brouillon non enregistré existe pour ce formulaire (' + window.AdminDrafts.timeAgo(state.pendingDraft.savedAt) + ').' +
+          '<div class="draft-banner-actions">' +
+          '<button type="button" class="draft-banner-btn" id="b-draft-restore">Restaurer le brouillon</button>' +
+          '<button type="button" class="draft-banner-btn draft-banner-btn-ghost" id="b-draft-ignore">Ignorer</button>' +
+          "</div></div>"
+        : "") +
       '<div class="edit-hero">' +
       imgPreview +
       '<div class="edit-hero-body">' +
@@ -253,6 +296,7 @@
         ? '<button type="button" class="edit-hero-remove" id="b-img-remove">Retirer l\'image</button>'
         : "") +
       (state.uploadError ? '<div class="login-error">' + esc(state.uploadError) + "</div>" : "") +
+      '<p class="edit-hero-hint">Image du burger<br>Format recommandé : <strong>JPG ou WebP</strong><br>Dimensions recommandées : <strong>1200 × 900&nbsp;px</strong> (format 4:3)<br>Poids maximal : 8 Mo</p>' +
       "</div>" +
       "</div>" +
       '<form id="b-item-form">' +
@@ -272,6 +316,7 @@
         ? '<button type="button" class="btn-danger" id="b-delete-item"' + (state.saving ? " disabled" : "") + ">Supprimer ce burger</button>"
         : "") +
       (state.saveError ? '<div class="login-error">' + esc(state.saveError) + "</div>" : "") +
+      '<div id="b-draft-status" class="dashboard-note" style="margin-top:10px;"></div>' +
       "</form>";
 
     document.getElementById("b-img-pick").addEventListener("click", () => {
@@ -285,10 +330,39 @@
       document.getElementById("b-img-remove").addEventListener("click", () => {
         state.editImgUrl = "";
         render();
+        scheduleDraftSave();
       });
     }
 
+    if (state.pendingDraft) {
+      document.getElementById("b-draft-restore").addEventListener("click", () => {
+        const d = state.pendingDraft.data;
+        document.getElementById("b-name").value = d.name || "";
+        document.getElementById("b-desc").value = d.desc || "";
+        document.getElementById("b-sur").value = d.sur || "";
+        document.getElementById("b-emp").value = d.emp || "";
+        if (d.img) state.editImgUrl = d.img;
+        state.pendingDraft = null;
+        render();
+      });
+      document.getElementById("b-draft-ignore").addEventListener("click", () => {
+        window.AdminDrafts.clear(burgerDraftKey());
+        state.pendingDraft = null;
+        render();
+      });
+    }
+
+    document.getElementById("b-item-form").addEventListener("input", scheduleDraftSave);
+
+    stopDraftTicker();
+    draftTickTimer = setInterval(() => {
+      const draft = window.AdminDrafts.load(burgerDraftKey());
+      const statusEl = document.getElementById("b-draft-status");
+      if (draft && statusEl) statusEl.textContent = "Brouillon enregistré automatiquement — " + window.AdminDrafts.timeAgo(draft.savedAt);
+    }, 5000);
+
     document.getElementById("b-back-items").addEventListener("click", () => {
+      stopDraftTicker();
       state.screen = "items";
       state.saveError = null;
       state.editImgUrl = undefined;
@@ -309,6 +383,8 @@
       else cat.items[state.itemIndex] = newItem;
 
       state.editImgUrl = undefined;
+      window.AdminDrafts.clear(burgerDraftKey());
+      stopDraftTicker();
       await persist("items");
     });
 
@@ -316,6 +392,8 @@
       document.getElementById("b-delete-item").addEventListener("click", async () => {
         if (!confirm("Supprimer ce burger ?")) return;
         cat.items.splice(state.itemIndex, 1);
+        window.AdminDrafts.clear(burgerDraftKey());
+        stopDraftTicker();
         await persist("items");
       });
     }
