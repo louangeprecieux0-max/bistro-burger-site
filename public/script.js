@@ -436,42 +436,50 @@
   /* ---------------------------------------------------------------- */
   /* Plat du jour / suggestion                                         */
   /* ---------------------------------------------------------------- */
-  function renderPlatDuJour() {
-    const plat = PLAT_DU_JOUR.plat || {};
-    const suggestions = Array.isArray(PLAT_DU_JOUR.suggestions)
-      ? PLAT_DU_JOUR.suggestions
-      : PLAT_DU_JOUR.suggestion
-      ? [PLAT_DU_JOUR.suggestion]
-      : [];
-    const setText = (id, val) => {
-      const target = document.getElementById(id);
-      if (target && val) target.textContent = val;
-    };
-    setText("pdj-meta", plat.meta);
-    setText("pdj-title", plat.title);
-    setText("pdj-price", plat.price);
-
-    if (!suggestions.length) return;
-    let sugIndex = 0;
-    const navEl = document.getElementById("sug-nav");
+  let pdjSuggestions = [];
+  let pdjSugIndex = 0;
+  const pdjSetText = (id, val) => {
+    const target = document.getElementById(id);
+    if (target && val) target.textContent = val;
+  };
+  function renderPdjSuggestion() {
     const counterEl = document.getElementById("sug-counter");
-    function renderSuggestion() {
-      const sug = suggestions[sugIndex] || {};
-      setText("sug-title", sug.title || "");
-      setText("sug-desc", sug.description || "");
-      setText("sug-price", sug.price || "");
-      if (counterEl) counterEl.textContent = (sugIndex + 1) + " / " + suggestions.length;
-    }
-    renderSuggestion();
-    if (suggestions.length > 1 && navEl) {
-      navEl.hidden = false;
-      const prevBtn = document.getElementById("sug-prev");
-      const nextBtn = document.getElementById("sug-next");
-      if (prevBtn) prevBtn.addEventListener("click", () => { sugIndex = (sugIndex - 1 + suggestions.length) % suggestions.length; renderSuggestion(); });
-      if (nextBtn) nextBtn.addEventListener("click", () => { sugIndex = (sugIndex + 1) % suggestions.length; renderSuggestion(); });
-    }
+    if (!pdjSuggestions.length) return;
+    const sug = pdjSuggestions[pdjSugIndex] || {};
+    pdjSetText("sug-title", sug.title || "");
+    pdjSetText("sug-desc", sug.description || "");
+    pdjSetText("sug-price", sug.price || "");
+    if (counterEl) counterEl.textContent = (pdjSugIndex + 1) + " / " + pdjSuggestions.length;
   }
-  renderPlatDuJour();
+  function renderPlatDuJour(data) {
+    const plat = (data && data.plat) || {};
+    pdjSuggestions = Array.isArray(data && data.suggestions)
+      ? data.suggestions
+      : data && data.suggestion
+      ? [data.suggestion]
+      : [];
+    pdjSugIndex = 0;
+    pdjSetText("pdj-meta", plat.meta);
+    pdjSetText("pdj-title", plat.title);
+    pdjSetText("pdj-price", plat.price);
+    if (!pdjSuggestions.length) return;
+    renderPdjSuggestion();
+    const navEl = document.getElementById("sug-nav");
+    if (navEl) navEl.hidden = pdjSuggestions.length <= 1;
+  }
+  renderPlatDuJour(PLAT_DU_JOUR);
+  (function bindPdjNav() {
+    const prevBtn = document.getElementById("sug-prev");
+    const nextBtn = document.getElementById("sug-next");
+    if (prevBtn) prevBtn.addEventListener("click", () => { if (!pdjSuggestions.length) return; pdjSugIndex = (pdjSugIndex - 1 + pdjSuggestions.length) % pdjSuggestions.length; renderPdjSuggestion(); });
+    if (nextBtn) nextBtn.addEventListener("click", () => { if (!pdjSuggestions.length) return; pdjSugIndex = (pdjSugIndex + 1) % pdjSuggestions.length; renderPdjSuggestion(); });
+  })();
+  /* Rafraîchit plat du jour / suggestions en tâche de fond, sans attendre */
+  /* le prochain déploiement complet du site (jusqu'à 60s sinon).          */
+  fetch("/api/plat-du-jour")
+    .then((r) => (r.ok ? r.json() : null))
+    .then((json) => { if (json && json.value) renderPlatDuJour(json.value); })
+    .catch(() => {});
 
   /* ---------------------------------------------------------------- */
   /* Offres du moment                                                   */
