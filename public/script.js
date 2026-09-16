@@ -1090,8 +1090,9 @@
       if (promoPrevEl) promoPrevEl.addEventListener("click", () => { promoIndex = (promoIndex - 1 + OFFRES.length) % OFFRES.length; renderPromoOffer(); });
       if (promoNextEl) promoNextEl.addEventListener("click", () => { promoIndex = (promoIndex + 1) % OFFRES.length; renderPromoOffer(); });
     }
+    let promoDismissed = false;
     function openPromo() { promoBackdrop.hidden = false; document.getElementById("promo-box").style.animation = "bbPromoIn .55s cubic-bezier(.22,.9,.3,1) both"; }
-    function closePromo() { promoBackdrop.hidden = true; }
+    function closePromo() { promoBackdrop.hidden = true; promoDismissed = true; }
     function reservationInView() {
       const form = document.getElementById("reservation-form");
       if (!form) return false;
@@ -1108,8 +1109,8 @@
       if (reservationInView() || otherModalOpen()) { setTimeout(tryOpenPromo, 2000); return; }
       openPromo();
     }
-    setTimeout(tryOpenPromo, 60000);
-    setInterval(() => { if (promoBackdrop.hidden) tryOpenPromo(); }, 60000);
+    setTimeout(tryOpenPromo, 90000);
+    setInterval(() => { if (promoBackdrop.hidden && !promoDismissed) tryOpenPromo(); }, 120000);
     document.getElementById("promo-close").addEventListener("click", closePromo);
     promoBackdrop.addEventListener("click", (e) => { if (e.target === promoBackdrop) closePromo(); });
     document.getElementById("promo-reserve").addEventListener("click", () => { closePromo(); jump("reservation"); });
