@@ -220,6 +220,15 @@
         notifBellBtn.classList.add("has-alert");
       }
       lastKnownAlertTotal = total;
+
+      const commandesView = document.getElementById("commandes-view");
+      if (commandesView && !commandesView.hidden && window.CommandesEditor && window.CommandesEditor.reload) {
+        window.CommandesEditor.reload();
+      }
+      const reservationsClientsView = document.getElementById("reservations-clients-view");
+      if (reservationsClientsView && !reservationsClientsView.hidden && window.ReservationsClientsEditor && window.ReservationsClientsEditor.reload) {
+        window.ReservationsClientsEditor.reload();
+      }
     } catch {}
   }
   window.refreshAdminAlerts = refreshAdminAlerts;

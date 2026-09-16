@@ -299,5 +299,12 @@
       }
       render();
     },
+    async reload() {
+      if (!state || state.screen !== "ready") return;
+      try {
+        state.items = await apiList();
+        render();
+      } catch {}
+    },
   };
 })();

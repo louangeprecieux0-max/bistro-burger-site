@@ -216,7 +216,7 @@
 
   const PLAT_DU_JOUR = SITE_DATA.plat_du_jour || {
     plat: { label: "Plat du jour", meta: "Jeudi 7 août · servi de 12h à 14h", title: "Brochette de magret de canard aux abricots marinée, boulgour aux légumes croquants", price: "14,50 €" },
-    suggestion: { label: "Suggestion du jour", title: "Burger du boucher, sauce poivre", description: "La suggestion que le chef ajoute à la carte, selon le marché du matin. Servie avec frites maison et salade.", price: "16,90 €" },
+    suggestions: [{ label: "Suggestion du jour", title: "Burger du boucher, sauce poivre", description: "La suggestion que le chef ajoute à la carte, selon le marché du matin. Servie avec frites maison et salade.", price: "16,90 €" }],
   };
 
   const OFFRES = SITE_DATA.offres || [
@@ -228,7 +228,7 @@
 
   const RESERVATION_SETTINGS = SITE_DATA.reservation_settings || {
     heures: ["12h00", "12h30", "13h00", "13h30", "14h00", "19h00", "19h30", "20h00", "20h30", "21h00"],
-    couverts: ["2 personnes", "3 personnes", "4 personnes", "5 personnes", "6 personnes et plus"],
+    couverts: ["2 personnes", "3 personnes", "4 personnes", "5 personnes", "6 personnes"],
     horaires_text: ["Du lundi au vendredi · midi et soir", "Samedi · soir uniquement", "Fermé samedi midi et dimanche toute la journée", "Parking gratuit devant le restaurant"],
   };
 
@@ -438,7 +438,11 @@
   /* ---------------------------------------------------------------- */
   function renderPlatDuJour() {
     const plat = PLAT_DU_JOUR.plat || {};
-    const sug = PLAT_DU_JOUR.suggestion || {};
+    const suggestions = Array.isArray(PLAT_DU_JOUR.suggestions)
+      ? PLAT_DU_JOUR.suggestions
+      : PLAT_DU_JOUR.suggestion
+      ? [PLAT_DU_JOUR.suggestion]
+      : [];
     const setText = (id, val) => {
       const target = document.getElementById(id);
       if (target && val) target.textContent = val;
@@ -446,9 +450,26 @@
     setText("pdj-meta", plat.meta);
     setText("pdj-title", plat.title);
     setText("pdj-price", plat.price);
-    setText("sug-title", sug.title);
-    setText("sug-desc", sug.description);
-    setText("sug-price", sug.price);
+
+    if (!suggestions.length) return;
+    let sugIndex = 0;
+    const navEl = document.getElementById("sug-nav");
+    const counterEl = document.getElementById("sug-counter");
+    function renderSuggestion() {
+      const sug = suggestions[sugIndex] || {};
+      setText("sug-title", sug.title || "");
+      setText("sug-desc", sug.description || "");
+      setText("sug-price", sug.price || "");
+      if (counterEl) counterEl.textContent = (sugIndex + 1) + " / " + suggestions.length;
+    }
+    renderSuggestion();
+    if (suggestions.length > 1 && navEl) {
+      navEl.hidden = false;
+      const prevBtn = document.getElementById("sug-prev");
+      const nextBtn = document.getElementById("sug-next");
+      if (prevBtn) prevBtn.addEventListener("click", () => { sugIndex = (sugIndex - 1 + suggestions.length) % suggestions.length; renderSuggestion(); });
+      if (nextBtn) nextBtn.addEventListener("click", () => { sugIndex = (sugIndex + 1) % suggestions.length; renderSuggestion(); });
+    }
   }
   renderPlatDuJour();
 
@@ -928,8 +949,10 @@
         if (!res.ok) throw new Error("request failed");
         sentBox.hidden = false;
         form.reset();
+        sentBox.scrollIntoView({ behavior: "smooth", block: "center" });
       } catch (err) {
         errorBox.hidden = false;
+        errorBox.scrollIntoView({ behavior: "smooth", block: "center" });
       } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = originalLabel;
