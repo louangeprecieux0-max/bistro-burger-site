@@ -424,7 +424,8 @@
     setText("bdm-name", active.name);
     setText("bdm-desc", active.description);
     setText("bdm-ingredients", active.ingredients);
-    setText("bdm-price", active.price);
+    if (active.sur) setText("bdm-price-sur", active.sur + " sur place");
+    if (active.emp) setText("bdm-price-emp", active.emp + " à emporter");
     const imgEl = document.getElementById("bdm-img");
     if (imgEl && active.img) {
       imgEl.src = active.img;

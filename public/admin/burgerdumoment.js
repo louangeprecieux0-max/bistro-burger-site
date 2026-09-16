@@ -94,7 +94,7 @@
         '<button type="button" class="list-row" data-item="' + i + '">' +
         '<span class="list-row-main">' +
         '<span class="list-row-title">' + esc(item.name || "Sans nom") + (item.active ? ' <span class="list-row-active-tag">Actif</span>' : "") + "</span>" +
-        '<span class="list-row-sub">' + esc(item.price || "") + "</span>" +
+        '<span class="list-row-sub">' + esc([item.sur, item.emp].filter(Boolean).join(" · ")) + "</span>" +
         "</span>" +
         '<span class="list-row-arrow">›</span>' +
         "</button>"
@@ -137,7 +137,8 @@
       name: document.getElementById("bdm-f-name").value,
       description: document.getElementById("bdm-f-desc").value,
       ingredients: document.getElementById("bdm-f-ingredients").value,
-      price: document.getElementById("bdm-f-price").value,
+      sur: document.getElementById("bdm-f-sur").value,
+      emp: document.getElementById("bdm-f-emp").value,
       allergens: document.getElementById("bdm-f-allergens").value,
       available: document.getElementById("bdm-f-available").checked,
       active: document.getElementById("bdm-f-active").checked,
@@ -157,7 +158,7 @@
   function renderEdit() {
     const isNew = state.itemIndex === null;
     const item = isNew
-      ? { name: "", description: "", ingredients: "", price: "", allergens: "", available: true, active: false, img: "" }
+      ? { name: "", description: "", ingredients: "", sur: "", emp: "", allergens: "", available: true, active: false, img: "" }
       : state.data[state.itemIndex];
     if (state.editImgUrl === undefined) state.editImgUrl = item.img || "";
 
@@ -201,8 +202,10 @@
       '<input class="field" id="bdm-f-desc" value="' + esc(item.description) + '">' +
       '<label class="field-label" for="bdm-f-ingredients">Ingrédients / composition</label>' +
       '<input class="field" id="bdm-f-ingredients" placeholder="Bun\'s², steak, cheddar..." value="' + esc(item.ingredients) + '">' +
-      '<label class="field-label" for="bdm-f-price">Prix</label>' +
-      '<input class="field" id="bdm-f-price" placeholder="17 €" value="' + esc(item.price) + '">' +
+      '<label class="field-label" for="bdm-f-sur">Prix sur place</label>' +
+      '<input class="field" id="bdm-f-sur" placeholder="16 €" value="' + esc(item.sur) + '">' +
+      '<label class="field-label" for="bdm-f-emp">Prix à emporter</label>' +
+      '<input class="field" id="bdm-f-emp" placeholder="14 €" value="' + esc(item.emp) + '">' +
       '<label class="field-label" for="bdm-f-allergens">Allergènes (optionnel)</label>' +
       '<input class="field" id="bdm-f-allergens" placeholder="Ex : gluten, lait, œuf" value="' + esc(item.allergens) + '">' +
       '<p class="dashboard-note" style="margin-top:-4px;">Laissez vide tant que les allergènes n\'ont pas été validés : rien ne s\'affichera sur le site plutôt qu\'une information incorrecte.</p>' +
@@ -240,7 +243,8 @@
         document.getElementById("bdm-f-name").value = d.name || "";
         document.getElementById("bdm-f-desc").value = d.description || "";
         document.getElementById("bdm-f-ingredients").value = d.ingredients || "";
-        document.getElementById("bdm-f-price").value = d.price || "";
+        document.getElementById("bdm-f-sur").value = d.sur || "";
+        document.getElementById("bdm-f-emp").value = d.emp || "";
         document.getElementById("bdm-f-allergens").value = d.allergens || "";
         document.getElementById("bdm-f-available").checked = d.available !== false;
         document.getElementById("bdm-f-active").checked = !!d.active;
@@ -280,7 +284,8 @@
         name: document.getElementById("bdm-f-name").value.trim(),
         description: document.getElementById("bdm-f-desc").value.trim(),
         ingredients: document.getElementById("bdm-f-ingredients").value.trim(),
-        price: document.getElementById("bdm-f-price").value.trim(),
+        sur: document.getElementById("bdm-f-sur").value.trim(),
+        emp: document.getElementById("bdm-f-emp").value.trim(),
         allergens: document.getElementById("bdm-f-allergens").value.trim(),
         available: document.getElementById("bdm-f-available").checked,
         active,
