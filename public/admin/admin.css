@@ -263,18 +263,6 @@ button, input{font-family:inherit}
   text-align:center;
 }
 
-.pdj-undo-bar{
-  display:flex; align-items:center; justify-content:space-between; gap:12px;
-  margin:-8px 0 16px; padding:10px 14px; border-radius:10px;
-  background:rgba(181,101,29,.1); border:1px solid rgba(181,101,29,.35);
-  color:var(--error); font-size:13px;
-}
-.pdj-undo-bar button{
-  flex:none; border:none; background:none; cursor:pointer;
-  font-family:var(--font-heading); font-weight:700; font-size:13px; color:var(--green-700); text-decoration:underline;
-}
-.pdj-undo-bar button:hover{color:var(--green-900)}
-
 .back-btn{
   display:inline-block;
   background:transparent;

@@ -218,15 +218,16 @@
       "</form>" +
       '<hr class="divider">' +
       '<form id="sug-form">' +
-      "<h2>Suggestions</h2>" +
+      '<div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin:20px 0 10px;">' +
+      '<h2 style="margin:0;">Suggestions</h2>' +
+      (state.removedSuggestions.length
+        ? '<button type="button" class="icon-btn" id="sug-undo" title="' +
+          esc(state.removedSuggestions.length + (state.removedSuggestions.length > 1 ? " suggestions supprimées — Réinitialiser" : " suggestion supprimée — Réinitialiser")) +
+          '" aria-label="Réinitialiser les suggestions supprimées">↺</button>'
+        : "") +
+      "</div>" +
       suggestions.map((sug, i) => suggestionCardHtml(sug, i, suggestions.length > 1)).join("") +
       '<button type="button" class="btn-secondary" id="sug-add" style="margin-bottom:16px;">+ Ajouter une suggestion</button>' +
-      (state.removedSuggestions.length
-        ? '<div class="pdj-undo-bar">' +
-          "<span>" + state.removedSuggestions.length + (state.removedSuggestions.length > 1 ? " suggestions supprimées" : " suggestion supprimée") + "</span>" +
-          '<button type="button" id="sug-undo">↺ Réinitialiser</button>' +
-          "</div>"
-        : "") +
       '<button type="submit" class="btn-primary" id="sug-save"' + (state.savingSug ? " disabled" : "") + ">" +
       (state.savingSug ? "Enregistrement…" : "Enregistrer les suggestions") +
       "</button>" +
