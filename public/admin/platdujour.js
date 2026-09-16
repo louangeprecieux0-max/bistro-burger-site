@@ -221,6 +221,12 @@
       "<h2>Suggestions</h2>" +
       suggestions.map((sug, i) => suggestionCardHtml(sug, i, suggestions.length > 1)).join("") +
       '<button type="button" class="btn-secondary" id="sug-add" style="margin-bottom:16px;">+ Ajouter une suggestion</button>' +
+      (state.removedSuggestions.length
+        ? '<div class="pdj-undo-bar">' +
+          "<span>" + state.removedSuggestions.length + (state.removedSuggestions.length > 1 ? " suggestions supprimées" : " suggestion supprimée") + "</span>" +
+          '<button type="button" id="sug-undo">↺ Réinitialiser</button>' +
+          "</div>"
+        : "") +
       '<button type="submit" class="btn-primary" id="sug-save"' + (state.savingSug ? " disabled" : "") + ">" +
       (state.savingSug ? "Enregistrement…" : "Enregistrer les suggestions") +
       "</button>" +
@@ -292,10 +298,21 @@
         const i = Number(btn.dataset.removeSug);
         state.data.plat = readPlatFromDom();
         state.data.suggestions = readSuggestionsFromDom();
-        state.data.suggestions.splice(i, 1);
+        const [removed] = state.data.suggestions.splice(i, 1);
+        if (removed) state.removedSuggestions.push(removed);
         render();
       });
     });
+
+    const undoBtn = document.getElementById("sug-undo");
+    if (undoBtn) {
+      undoBtn.addEventListener("click", () => {
+        state.data.plat = readPlatFromDom();
+        state.data.suggestions = readSuggestionsFromDom().concat(state.removedSuggestions);
+        state.removedSuggestions = [];
+        render();
+      });
+    }
 
     document.getElementById("sug-form").addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -308,6 +325,7 @@
       render();
       try {
         await apiSave(state.data);
+        state.removedSuggestions = [];
         state.sugSaveSuccess = true;
       } catch (err) {
         state.sugSaveError = err.message;
@@ -329,6 +347,7 @@
         savingSug: false,
         sugSaveError: null,
         sugSaveSuccess: false,
+        removedSuggestions: [],
       };
       render();
       try {
