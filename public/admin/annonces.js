@@ -15,12 +15,19 @@
     })[c]);
   }
 
+  const DEFAULT_ANNONCES = [
+    "Livraison à Gardanne et communes voisines",
+    "Plat du jour du lundi au vendredi, 12h–14h",
+    "Burgers faits maison · produits frais",
+    "Diffusion des matchs de l'OM en direct",
+  ];
+
   async function apiGet() {
     const headers = await window.adminAuth.authHeader();
     const res = await fetch(API_URL + "?key=annonces", { headers });
     if (!res.ok) throw new Error("Échec du chargement.");
     const json = await res.json();
-    return Array.isArray(json.value) ? json.value : [];
+    return Array.isArray(json.value) && json.value.length ? json.value : DEFAULT_ANNONCES.slice();
   }
 
   async function apiSave(data) {

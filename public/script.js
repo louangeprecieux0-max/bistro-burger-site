@@ -402,11 +402,20 @@
     dotsEl.innerHTML = OFFRES.map((_, i) =>
       `<button type="button" data-dot="${i}" aria-label="Offre ${i + 1}" style="width:8px; height:8px; padding:0; border:none; border-radius:50%; cursor:pointer;"></button>`
     ).join("");
+
+    let autoTimer = null;
+    function startAuto() {
+      if (autoTimer) clearInterval(autoTimer);
+      if (OFFRES.length < 2) return;
+      autoTimer = setInterval(() => show((index + 1) % OFFRES.length), 5000);
+    }
+
     dotsEl.querySelectorAll("[data-dot]").forEach((d) => {
-      d.addEventListener("click", () => show(Number(d.dataset.dot)));
+      d.addEventListener("click", () => { show(Number(d.dataset.dot)); startAuto(); });
     });
 
     show(0);
+    startAuto();
   })();
 
   /* ---------------------------------------------------------------- */
