@@ -972,7 +972,13 @@
       if (w > 0) groupSpan = w + GAP;
     }
     measure();
-    window.addEventListener("resize", measure);
+    let resizeTimer = null;
+    window.addEventListener("resize", () => {
+      // iOS Safari déclenche "resize" quand la barre d'adresse se rétracte pendant le scroll :
+      // on limite les remesures pour ne pas faire varier la vitesse en plein défilement.
+      if (resizeTimer) clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(measure, 200);
+    });
     groupA.querySelectorAll("img").forEach((img) => {
       if (!img.complete) img.addEventListener("load", measure, { once: true });
     });
@@ -981,10 +987,8 @@
     let x = 0;
     let lastTs = null;
     let rafId = null;
-    let paused = false;
 
     function tick(ts) {
-      if (paused) { rafId = null; return; }
       if (lastTs == null) lastTs = ts;
       const dt = Math.min((ts - lastTs) / 1000, 0.25); // ignore les gros écarts (tab remis au premier plan)
       lastTs = ts;
@@ -998,28 +1002,20 @@
 
     function play() {
       if (rafId != null) return;
-      paused = false;
       lastTs = null;
-      track.style.willChange = "transform";
       rafId = requestAnimationFrame(tick);
     }
     function pause() {
-      paused = true;
-      track.style.willChange = "auto";
       if (rafId != null) { cancelAnimationFrame(rafId); rafId = null; }
     }
 
-    let inView = true;
-    if ("IntersectionObserver" in window) {
-      const io = new IntersectionObserver((entries) => {
-        inView = entries[0].isIntersecting;
-        if (inView && !document.hidden) play(); else pause();
-      }, { threshold: 0 });
-      io.observe(track);
-    }
+    // Reste en mouvement continu tant que l'onglet est actif : seul le passage
+    // en arrière-plan met en pause (le va-et-vient hors-écran/à l'écran déclenchait
+    // un bug de rendu sur Safari iOS qui faisait disparaître les images).
+    track.style.willChange = "transform";
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) pause();
-      else if (inView) play();
+      else play();
     });
 
     play();
@@ -1116,7 +1112,7 @@
   if (promoBackdrop && OFFRES.length) {
     const PROMO_INDEX_KEY = "bb-promo-offer-index";
     const PROMO_FIRST_DELAY_MS = 10000;
-    const PROMO_REPEAT_MS = 60000;
+    const PROMO_REPEAT_MS = 30000;
 
     const promoImgWrapEl = document.getElementById("promo-img-wrap");
     const promoImgEl = document.getElementById("promo-img");
