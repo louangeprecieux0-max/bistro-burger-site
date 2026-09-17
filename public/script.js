@@ -362,15 +362,17 @@
   /* ---------------------------------------------------------------- */
   /* Marquee ticker (top strip)                                        */
   /* ---------------------------------------------------------------- */
-  (function renderMarquee() {
-    const track = document.getElementById("marquee-track");
+  function renderMarqueeInto(trackId) {
+    const track = document.getElementById(trackId);
     if (!track) return;
     const items = ANNONCES;
     const span = (text) => `<span style="font-family:var(--font-heading); font-weight:700; font-size:13px; letter-spacing:.16em; text-transform:uppercase; white-space:nowrap;">${esc(text)}</span><span style="color:var(--cream-500); font-size:15px; line-height:1;">✳</span>`;
     let html = "";
     for (let i = 0; i < Math.max(8, items.length * 2); i++) html += span(items[i % items.length]);
     track.innerHTML = html;
-  })();
+  }
+  renderMarqueeInto("marquee-track");
+  renderMarqueeInto("cart-marquee-track");
 
   /* ---------------------------------------------------------------- */
   /* Burgers carousel                                                   */

@@ -176,9 +176,9 @@
     if (!Array.isArray(items) || !items.length) return "";
     return (
       '<div class="rec-items">' +
-      '<div class="rec-items-head"><span>Article</span><span>Total</span></div>' +
+      '<div class="rec-items-head"><span>Article</span><span>Qté</span><span>Total</span></div>' +
       items.map((it) =>
-        '<div class="rec-items-row"><span>' + esc((it.qty || 1) + " × " + it.name) + '</span><span>' + esc(formatPrice((it.price || 0) * (it.qty || 1))) + "</span></div>"
+        '<div class="rec-items-row"><span>' + esc(it.name) + '</span><span>' + esc(it.qty || 1) + '</span><span>' + esc(formatPrice((it.price || 0) * (it.qty || 1))) + "</span></div>"
       ).join("") +
       "</div>"
     );
