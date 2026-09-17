@@ -125,6 +125,7 @@
       state.itemIndex = null;
       state.editImgUrl = undefined;
       state.draftChecked = false;
+      state.restoredFields = null;
       state.screen = "edit";
       render();
     });
@@ -136,6 +137,7 @@
         state.itemIndex = Number(btn.dataset.item);
         state.editImgUrl = undefined;
         state.draftChecked = false;
+        state.restoredFields = null;
         state.screen = "edit";
         render();
       });
@@ -171,9 +173,9 @@
 
   function renderEdit() {
     const isNew = state.itemIndex === null;
-    const item = isNew
+    const item = state.restoredFields || (isNew
       ? { name: "", description: "", ingredients: "", sur: "", emp: "", allergens: "", available: true, active: false, img: "" }
-      : state.data[state.itemIndex];
+      : state.data[state.itemIndex]);
     if (state.editImgUrl === undefined) state.editImgUrl = item.img || "";
 
     if (!state.draftChecked) {
@@ -254,14 +256,11 @@
     if (state.pendingDraft) {
       document.getElementById("bdm-draft-restore").addEventListener("click", () => {
         const d = state.pendingDraft.data;
-        document.getElementById("bdm-f-name").value = d.name || "";
-        document.getElementById("bdm-f-desc").value = d.description || "";
-        document.getElementById("bdm-f-ingredients").value = d.ingredients || "";
-        document.getElementById("bdm-f-sur").value = d.sur || "";
-        document.getElementById("bdm-f-emp").value = d.emp || "";
-        document.getElementById("bdm-f-allergens").value = d.allergens || "";
-        document.getElementById("bdm-f-available").checked = d.available !== false;
-        document.getElementById("bdm-f-active").checked = !!d.active;
+        state.restoredFields = {
+          name: d.name || "", description: d.description || "", ingredients: d.ingredients || "",
+          sur: d.sur || "", emp: d.emp || "", allergens: d.allergens || "",
+          available: d.available !== false, active: !!d.active, img: d.img || item.img || "",
+        };
         if (d.img) state.editImgUrl = d.img;
         state.pendingDraft = null;
         render();

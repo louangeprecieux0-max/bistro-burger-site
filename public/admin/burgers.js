@@ -169,6 +169,7 @@
       state.itemIndex = null;
       state.editImgUrl = undefined;
       state.draftChecked = false;
+      state.restoredFields = null;
       state.screen = "edit";
       render();
     });
@@ -177,6 +178,7 @@
         state.itemIndex = Number(btn.dataset.item);
         state.editImgUrl = undefined;
         state.draftChecked = false;
+        state.restoredFields = null;
         state.screen = "edit";
         render();
       });
@@ -292,7 +294,7 @@
   function renderEdit() {
     const cat = state.data[state.catIndex];
     const isNew = state.itemIndex === null;
-    const item = isNew ? { name: "", desc: "", sur: "", emp: "", img: "" } : cat.items[state.itemIndex];
+    const item = state.restoredFields || (isNew ? { name: "", desc: "", sur: "", emp: "", img: "" } : cat.items[state.itemIndex]);
     if (state.editImgUrl === undefined) state.editImgUrl = item.img || "";
 
     if (!state.draftChecked) {
@@ -366,10 +368,7 @@
     if (state.pendingDraft) {
       document.getElementById("b-draft-restore").addEventListener("click", () => {
         const d = state.pendingDraft.data;
-        document.getElementById("b-name").value = d.name || "";
-        document.getElementById("b-desc").value = d.desc || "";
-        document.getElementById("b-sur").value = d.sur || "";
-        document.getElementById("b-emp").value = d.emp || "";
+        state.restoredFields = { name: d.name || "", desc: d.desc || "", sur: d.sur || "", emp: d.emp || "", img: d.img || item.img || "" };
         if (d.img) state.editImgUrl = d.img;
         state.pendingDraft = null;
         render();

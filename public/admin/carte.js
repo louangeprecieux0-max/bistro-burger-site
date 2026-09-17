@@ -5,6 +5,12 @@
   const MODES = ["Sur place", "À emporter"];
 
   let state = null;
+  let draftSaveTimer = null;
+  let draftTickTimer = null;
+
+  function stopDraftTicker() {
+    if (draftTickTimer) { clearInterval(draftTickTimer); draftTickTimer = null; }
+  }
 
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({
@@ -203,6 +209,8 @@
     }
     document.getElementById("c-add-group").addEventListener("click", () => {
       state.groupIndex = null;
+      state.draftChecked = false;
+      state.restoredFields = null;
       state.screen = "edit-group";
       render();
     });
@@ -292,6 +300,8 @@
       render();
     });
     document.getElementById("c-edit-group").addEventListener("click", () => {
+      state.draftChecked = false;
+      state.restoredFields = null;
       state.screen = "edit-group";
       render();
     });
@@ -307,12 +317,16 @@
     });
     document.getElementById("c-add-item").addEventListener("click", () => {
       state.itemIndex = null;
+      state.draftChecked = false;
+      state.restoredFields = null;
       state.screen = "edit-item";
       render();
     });
     container.querySelectorAll("[data-item]").forEach((btn) => {
       btn.addEventListener("click", () => {
         state.itemIndex = Number(btn.dataset.item);
+        state.draftChecked = false;
+        state.restoredFields = null;
         state.screen = "edit-item";
         render();
       });
@@ -357,32 +371,91 @@
     });
   }
 
+  function groupDraftKey() {
+    return "carte-group:" + state.mode + ":" + state.catName + ":" + (state.groupIndex === null ? "new" : state.groupIndex);
+  }
+
+  function readGroupFields() {
+    return {
+      title: document.getElementById("cg-title").value,
+      note: document.getElementById("cg-note").value,
+      price: document.getElementById("cg-price").value,
+    };
+  }
+
+  function scheduleGroupDraftSave() {
+    if (draftSaveTimer) clearTimeout(draftSaveTimer);
+    draftSaveTimer = setTimeout(() => {
+      window.AdminDrafts.save(groupDraftKey(), readGroupFields());
+      const statusEl = document.getElementById("cg-draft-status");
+      if (statusEl) statusEl.textContent = "Brouillon enregistré automatiquement — à l'instant";
+    }, 800);
+  }
+
   function renderEditGroup() {
     const groups = currentGroups();
     const isNew = state.groupIndex === null;
     const group = isNew ? { title: "", note: "", price: "", items: [] } : groups[state.groupIndex];
+    const formFields = state.restoredFields || group;
+
+    if (!state.draftChecked) {
+      state.draftChecked = true;
+      state.pendingDraft = window.AdminDrafts.load(groupDraftKey());
+    }
 
     container.innerHTML =
       '<button type="button" class="back-btn" id="cg-back">‹ Retour</button>' +
       "<h1>" + (isNew ? "Nouveau groupe" : "Modifier le groupe") + "</h1>" +
+      (state.pendingDraft
+        ? '<div class="draft-banner">Un brouillon non enregistré existe pour ce formulaire (' + window.AdminDrafts.timeAgo(state.pendingDraft.savedAt) + ').' +
+          '<div class="draft-banner-actions">' +
+          '<button type="button" class="draft-banner-btn" id="cg-draft-restore">Restaurer le brouillon</button>' +
+          '<button type="button" class="draft-banner-btn draft-banner-btn-ghost" id="cg-draft-ignore">Ignorer</button>' +
+          "</div></div>"
+        : "") +
       '<form id="cg-form">' +
       '<label class="field-label" for="cg-title">Titre</label>' +
-      '<input class="field" id="cg-title" required value="' + esc(group.title) + '">' +
+      '<input class="field" id="cg-title" required value="' + esc(formFields.title) + '">' +
       '<label class="field-label" for="cg-note">Note (optionnelle)</label>' +
-      '<input class="field" id="cg-note" placeholder="Servi avec frites maison et salade." value="' + esc(group.note || "") + '">' +
+      '<input class="field" id="cg-note" placeholder="Servi avec frites maison et salade." value="' + esc(formFields.note || "") + '">' +
       '<label class="field-label" for="cg-price">Prix du groupe (optionnel)</label>' +
-      '<input class="field" id="cg-price" placeholder="12,90 €" value="' + esc(group.price || "") + '">' +
+      '<input class="field" id="cg-price" placeholder="12,90 €" value="' + esc(formFields.price || "") + '">' +
       '<button type="submit" class="btn-primary" id="cg-save"' + (state.saving ? " disabled" : "") + ">" +
       (state.saving ? "Enregistrement…" : "Enregistrer") +
       "</button>" +
       (state.saveError ? '<div class="login-error">' + esc(state.saveError) + "</div>" : "") +
+      '<div id="cg-draft-status" class="dashboard-note" style="margin-top:10px;"></div>' +
       "</form>";
 
     document.getElementById("cg-back").addEventListener("click", () => {
+      stopDraftTicker();
       state.screen = isNew ? "groups" : "items";
       state.saveError = null;
       render();
     });
+
+    if (state.pendingDraft) {
+      document.getElementById("cg-draft-restore").addEventListener("click", () => {
+        const d = state.pendingDraft.data;
+        state.restoredFields = { title: d.title || "", note: d.note || "", price: d.price || "" };
+        state.pendingDraft = null;
+        render();
+      });
+      document.getElementById("cg-draft-ignore").addEventListener("click", () => {
+        window.AdminDrafts.clear(groupDraftKey());
+        state.pendingDraft = null;
+        render();
+      });
+    }
+
+    document.getElementById("cg-form").addEventListener("input", scheduleGroupDraftSave);
+
+    stopDraftTicker();
+    draftTickTimer = setInterval(() => {
+      const draft = window.AdminDrafts.load(groupDraftKey());
+      const statusEl = document.getElementById("cg-draft-status");
+      if (draft && statusEl) statusEl.textContent = "Brouillon enregistré automatiquement — " + window.AdminDrafts.timeAgo(draft.savedAt);
+    }, 5000);
 
     document.getElementById("cg-form").addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -400,19 +473,54 @@
       } else {
         groups[state.groupIndex] = newGroup;
       }
+      window.AdminDrafts.clear(groupDraftKey());
+      stopDraftTicker();
       await persist("items");
     });
+  }
+
+  function itemDraftKey() {
+    return "carte-item:" + state.mode + ":" + state.catName + ":" + state.groupIndex + ":" + (state.itemIndex === null ? "new" : state.itemIndex);
+  }
+
+  function readItemFields() {
+    return {
+      name: document.getElementById("ci-name").value,
+      desc: document.getElementById("ci-desc").value,
+      price: document.getElementById("ci-price").value,
+    };
+  }
+
+  function scheduleItemDraftSave() {
+    if (draftSaveTimer) clearTimeout(draftSaveTimer);
+    draftSaveTimer = setTimeout(() => {
+      window.AdminDrafts.save(itemDraftKey(), readItemFields());
+      const statusEl = document.getElementById("ci-draft-status");
+      if (statusEl) statusEl.textContent = "Brouillon enregistré automatiquement — à l'instant";
+    }, 800);
   }
 
   function renderEditItem() {
     const groups = currentGroups();
     const group = groups[state.groupIndex];
     const isNew = state.itemIndex === null;
-    const item = isNew ? { name: "", desc: "", price: "" } : group.items[state.itemIndex];
+    const item = state.restoredFields || (isNew ? { name: "", desc: "", price: "" } : group.items[state.itemIndex]);
+
+    if (!state.draftChecked) {
+      state.draftChecked = true;
+      state.pendingDraft = window.AdminDrafts.load(itemDraftKey());
+    }
 
     container.innerHTML =
       '<button type="button" class="back-btn" id="ci-back">‹ ' + esc(group.title) + "</button>" +
       "<h1>" + (isNew ? "Nouveau plat" : "Modifier le plat") + "</h1>" +
+      (state.pendingDraft
+        ? '<div class="draft-banner">Un brouillon non enregistré existe pour ce formulaire (' + window.AdminDrafts.timeAgo(state.pendingDraft.savedAt) + ').' +
+          '<div class="draft-banner-actions">' +
+          '<button type="button" class="draft-banner-btn" id="ci-draft-restore">Restaurer le brouillon</button>' +
+          '<button type="button" class="draft-banner-btn draft-banner-btn-ghost" id="ci-draft-ignore">Ignorer</button>' +
+          "</div></div>"
+        : "") +
       '<form id="ci-form">' +
       '<label class="field-label" for="ci-name">Nom</label>' +
       '<input class="field" id="ci-name" required value="' + esc(item.name) + '">' +
@@ -427,13 +535,38 @@
         ? '<button type="button" class="btn-danger" id="ci-delete"' + (state.saving ? " disabled" : "") + ">Supprimer ce plat</button>"
         : "") +
       (state.saveError ? '<div class="login-error">' + esc(state.saveError) + "</div>" : "") +
+      '<div id="ci-draft-status" class="dashboard-note" style="margin-top:10px;"></div>' +
       "</form>";
 
     document.getElementById("ci-back").addEventListener("click", () => {
+      stopDraftTicker();
       state.screen = "items";
       state.saveError = null;
       render();
     });
+
+    if (state.pendingDraft) {
+      document.getElementById("ci-draft-restore").addEventListener("click", () => {
+        const d = state.pendingDraft.data;
+        state.restoredFields = { name: d.name || "", desc: d.desc || "", price: d.price || "" };
+        state.pendingDraft = null;
+        render();
+      });
+      document.getElementById("ci-draft-ignore").addEventListener("click", () => {
+        window.AdminDrafts.clear(itemDraftKey());
+        state.pendingDraft = null;
+        render();
+      });
+    }
+
+    document.getElementById("ci-form").addEventListener("input", scheduleItemDraftSave);
+
+    stopDraftTicker();
+    draftTickTimer = setInterval(() => {
+      const draft = window.AdminDrafts.load(itemDraftKey());
+      const statusEl = document.getElementById("ci-draft-status");
+      if (draft && statusEl) statusEl.textContent = "Brouillon enregistré automatiquement — " + window.AdminDrafts.timeAgo(draft.savedAt);
+    }, 5000);
 
     document.getElementById("ci-form").addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -444,6 +577,8 @@
       };
       if (isNew) group.items.push(newItem);
       else group.items[state.itemIndex] = newItem;
+      window.AdminDrafts.clear(itemDraftKey());
+      stopDraftTicker();
       await persist("items");
     });
 
@@ -452,6 +587,8 @@
         if (!confirm("Supprimer ce plat ?")) return;
         state.deletedItems.push({ mode: state.mode, catName: state.catName, groupIndex: state.groupIndex, index: state.itemIndex, item: group.items[state.itemIndex] });
         group.items.splice(state.itemIndex, 1);
+        window.AdminDrafts.clear(itemDraftKey());
+        stopDraftTicker();
         await persist("items");
       });
     }
