@@ -994,7 +994,10 @@
       lastTs = ts;
       if (groupSpan > 0) {
         x -= (groupSpan / DURATION) * dt;
-        if (x <= -groupSpan) x += groupSpan;
+        // Modulo (pas juste une soustraction) : reste valide même si groupSpan change
+        // en plein vol (ex. une image en lazy-load qui finit de charger et redéclenche measure()),
+        // ce qui pouvait faire défiler la bande au-delà du contenu réellement affiché.
+        x = x % groupSpan;
         track.style.transform = "translate3d(" + x.toFixed(2) + "px,0,0)";
       }
       rafId = requestAnimationFrame(tick);
@@ -1112,7 +1115,7 @@
   if (promoBackdrop && OFFRES.length) {
     const PROMO_INDEX_KEY = "bb-promo-offer-index";
     const PROMO_FIRST_DELAY_MS = 10000;
-    const PROMO_REPEAT_MS = 30000;
+    const PROMO_REPEAT_MS = 60000;
 
     const promoImgWrapEl = document.getElementById("promo-img-wrap");
     const promoImgEl = document.getElementById("promo-img");
