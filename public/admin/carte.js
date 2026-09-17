@@ -79,9 +79,18 @@
     );
   }
 
+  function restoreCategories() {
+    const cats = currentCategories();
+    const restorable = state.deletedCategories.filter((d) => d.mode === state.mode);
+    restorable.slice().reverse().forEach((d) => { if (!cats[d.catName]) cats[d.catName] = d.groups; });
+    state.deletedCategories = state.deletedCategories.filter((d) => d.mode !== state.mode);
+    persist("categories");
+  }
+
   function renderCategories() {
     const cats = currentCategories();
     const names = Object.keys(cats);
+    const restorableCatsCount = state.deletedCategories.filter((d) => d.mode === state.mode).length;
     const rows = names
       .map((name) => {
         const count = cats[name].length;
@@ -102,7 +111,12 @@
       "<h1>La carte</h1>" +
       modeToggleHtml() +
       '<div class="list">' + (rows || '<p class="dashboard-note">Aucune catégorie.</p>') + "</div>" +
+      '<div style="display:flex; gap:10px; align-items:center;">' +
       '<button type="button" class="btn-secondary" id="c-add-cat">+ Nouvelle catégorie</button>' +
+      (restorableCatsCount > 0
+        ? '<button type="button" class="icon-btn icon-btn-restore" id="c-restore-cats" title="Restaurer les catégories supprimées" aria-label="Restaurer les catégories supprimées">↺</button>'
+        : "") +
+      "</div>" +
       saveStatusHtml();
 
     document.getElementById("c-back-menu").addEventListener("click", () => window.adminShowDashboard());
@@ -113,6 +127,9 @@
       });
     });
     document.getElementById("c-add-cat").addEventListener("click", addCategory);
+    if (restorableCatsCount > 0) {
+      document.getElementById("c-restore-cats").addEventListener("click", restoreCategories);
+    }
     container.querySelectorAll("[data-cat]").forEach((btn) => {
       btn.addEventListener("click", () => {
         state.catName = btn.dataset.cat;
@@ -131,8 +148,21 @@
     persist("categories");
   }
 
+  function matchesCurrentCategory(d) {
+    return d.mode === state.mode && d.catName === state.catName;
+  }
+
+  function restoreGroups() {
+    const groups = currentGroups();
+    const restorable = state.deletedGroups.filter(matchesCurrentCategory);
+    restorable.slice().reverse().forEach((d) => { groups.splice(Math.min(d.index, groups.length), 0, d.group); });
+    state.deletedGroups = state.deletedGroups.filter((d) => !matchesCurrentCategory(d));
+    persist("groups");
+  }
+
   function renderGroups() {
     const groups = currentGroups();
+    const restorableGroupsCount = state.deletedGroups.filter(matchesCurrentCategory).length;
     const rows = groups
       .map((g, i) => {
         const count = g.items.length;
@@ -153,6 +183,9 @@
       '<div class="editor-header-row">' +
       "<h1>" + esc(state.catName) + "</h1>" +
       '<button type="button" class="icon-btn" id="c-rename-cat" aria-label="Renommer la catégorie">✎</button>' +
+      (restorableGroupsCount > 0
+        ? '<button type="button" class="icon-btn icon-btn-restore" id="c-restore-groups" title="Restaurer les groupes supprimés" aria-label="Restaurer les groupes supprimés">↺</button>'
+        : "") +
       '<button type="button" class="icon-btn icon-btn-danger" id="c-delete-cat" aria-label="Supprimer la catégorie">🗑</button>' +
       "</div>" +
       '<div class="list">' + (rows || '<p class="dashboard-note">Aucun groupe dans cette catégorie.</p>') + "</div>" +
@@ -165,6 +198,9 @@
     });
     document.getElementById("c-rename-cat").addEventListener("click", renameCategory);
     document.getElementById("c-delete-cat").addEventListener("click", deleteCategory);
+    if (restorableGroupsCount > 0) {
+      document.getElementById("c-restore-groups").addEventListener("click", restoreGroups);
+    }
     document.getElementById("c-add-group").addEventListener("click", () => {
       state.groupIndex = null;
       state.screen = "edit-group";
@@ -197,6 +233,7 @@
     const cats = currentCategories();
     const count = cats[state.catName].length;
     if (!confirm('Supprimer la catégorie "' + state.catName + '" et ses ' + count + " groupe(s) ?")) return;
+    state.deletedCategories.push({ mode: state.mode, catName: state.catName, groups: cats[state.catName] });
     delete cats[state.catName];
     persist("categories");
   }
@@ -263,6 +300,7 @@
     }
     document.getElementById("c-delete-group").addEventListener("click", () => {
       if (!confirm('Supprimer le groupe "' + group.title + '" et ses ' + group.items.length + " plat(s) ?")) return;
+      state.deletedGroups.push({ mode: state.mode, catName: state.catName, index: state.groupIndex, group });
       groups.splice(state.groupIndex, 1);
       state.groupIndex = null;
       persist("groups");
@@ -453,6 +491,8 @@
         saving: false,
         saveError: null,
         deletedItems: [],
+        deletedGroups: [],
+        deletedCategories: [],
       };
       render();
       try {

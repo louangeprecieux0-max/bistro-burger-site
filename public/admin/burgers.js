@@ -62,6 +62,12 @@
     else if (state.screen === "edit") renderEdit();
   }
 
+  function restoreCategories() {
+    state.deletedCategories.slice().reverse().forEach((d) => { state.data.splice(Math.min(d.index, state.data.length), 0, d.category); });
+    state.deletedCategories = [];
+    persist("categories");
+  }
+
   function renderCategories() {
     const rows = state.data
       .map((cat, i) => {
@@ -83,11 +89,19 @@
       "<h1>Les burgers</h1>" +
       '<p class="dashboard-note">Catégories de la carte des burgers.</p>' +
       '<div class="list">' + (rows || '<p class="dashboard-note">Aucune catégorie.</p>') + "</div>" +
+      '<div style="display:flex; gap:10px; align-items:center;">' +
       '<button type="button" class="btn-secondary" id="b-add-cat">+ Nouvelle catégorie</button>' +
+      (state.deletedCategories.length > 0
+        ? '<button type="button" class="icon-btn icon-btn-restore" id="b-restore-cats" title="Restaurer les catégories supprimées" aria-label="Restaurer les catégories supprimées">↺</button>'
+        : "") +
+      "</div>" +
       saveStatusHtml();
 
     document.getElementById("b-back-menu").addEventListener("click", () => window.adminShowDashboard());
     document.getElementById("b-add-cat").addEventListener("click", addCategory);
+    if (state.deletedCategories.length > 0) {
+      document.getElementById("b-restore-cats").addEventListener("click", restoreCategories);
+    }
     container.querySelectorAll("[data-cat]").forEach((btn) => {
       btn.addEventListener("click", () => {
         state.catIndex = Number(btn.dataset.cat);
@@ -455,13 +469,14 @@
   function deleteCategory() {
     const cat = state.data[state.catIndex];
     if (!confirm('Supprimer la catégorie "' + cat.title + '" et ses ' + cat.items.length + " burger(s) ?")) return;
+    state.deletedCategories.push({ index: state.catIndex, category: cat });
     state.data.splice(state.catIndex, 1);
     persist("categories");
   }
 
   window.BurgersEditor = {
     async open() {
-      state = { screen: "loading", data: [], catIndex: null, itemIndex: null, saving: false, saveError: null, deletedItems: [] };
+      state = { screen: "loading", data: [], catIndex: null, itemIndex: null, saving: false, saveError: null, deletedItems: [], deletedCategories: [] };
       render();
       try {
         state.data = await apiGet();
