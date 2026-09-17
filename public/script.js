@@ -1072,12 +1072,23 @@
   (function reservationSubmit() {
     const form = document.getElementById("reservation-form");
     if (!form) return;
+    form.setAttribute("novalidate", "novalidate");
     const sentBox = document.getElementById("reservation-sent");
     const errorBox = document.getElementById("reservation-error");
+    const sendFailedMessage = errorBox.textContent;
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       sentBox.hidden = true;
       errorBox.hidden = true;
+      if (!form.checkValidity()) {
+        errorBox.textContent = "Merci de remplir tous les champs et d'accepter les conditions avant d'envoyer votre demande.";
+        errorBox.hidden = false;
+        errorBox.scrollIntoView({ behavior: "smooth", block: "center" });
+        const firstInvalid = form.querySelector(":invalid");
+        if (firstInvalid) firstInvalid.focus();
+        return;
+      }
+      errorBox.textContent = sendFailedMessage;
       const submitBtn = form.querySelector("button[type=submit]");
       const originalLabel = submitBtn.textContent;
       submitBtn.disabled = true;
