@@ -253,6 +253,14 @@
   };
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const stripEuro = (s) => String(s || "").replace(/€/g, "").replace(/\s+/g, " ").trim();
+  // PostgreSQL (jsonb) ne garantit pas l'ordre des clés d'un objet une fois stocké :
+  // l'ordre des catégories de la carte est donc mémorisé explicitement dans _order
+  // plutôt que déduit de Object.keys(), qui peut revenir dans un ordre différent.
+  function orderedCategoryNames(catsObj) {
+    const order = Array.isArray(catsObj._order) ? catsObj._order.filter((n) => Object.prototype.hasOwnProperty.call(catsObj, n)) : [];
+    const rest = Object.keys(catsObj).filter((n) => n !== "_order" && !order.includes(n));
+    return order.concat(rest);
+  }
   function parsePriceToNumber(str) {
     if (!str) return 0;
     const cleaned = String(str).replace(/[^\d,.\-]/g, "").replace(",", ".");
@@ -348,7 +356,7 @@
       const mode = btn.getAttribute("data-go-carte");
       if (document.getElementById("mode-toggle")) {
         state.mode = mode;
-        state.tab = Object.keys(CARTES[mode])[0];
+        state.tab = orderedCategoryNames(CARTES[mode])[0];
         renderCarte();
       }
       setMenuOpen(false);
@@ -795,7 +803,7 @@
     const modeToggle = document.getElementById("mode-toggle");
     if (!modeToggle) return;
     const carte = CARTES[state.mode];
-    const tabItems = Object.keys(carte);
+    const tabItems = orderedCategoryNames(carte);
     if (!carte[state.tab]) state.tab = tabItems[0];
 
     modeToggle.innerHTML = "";
@@ -804,7 +812,7 @@
       const btn = el("button", { type: "button", style: "font-family:var(--font-heading); font-weight:600; font-size:14px; padding:11px 22px; border:none; cursor:pointer; white-space:nowrap; border-radius:var(--radius-badge); transition:all .15s ease; " + (on
         ? "background:linear-gradient(115deg,#2E8F7C 0%,var(--green-700) 30%,var(--color-primary) 62%,var(--green-900) 100%); color:var(--color-secondary); box-shadow:inset 0 1px 0 rgba(237,224,211,.3), inset 0 -1px 0 rgba(14,70,61,.5), 0 6px 18px rgba(18,87,76,.28);"
         : "background:transparent; color:var(--text-muted);") }, m === "Sur place" ? "Carte sur place" : "Carte à emporter");
-      btn.addEventListener("click", () => { state.mode = m; state.tab = Object.keys(CARTES[m])[0]; renderCarte(); });
+      btn.addEventListener("click", () => { state.mode = m; state.tab = orderedCategoryNames(CARTES[m])[0]; renderCarte(); });
       modeToggle.appendChild(btn);
     });
 

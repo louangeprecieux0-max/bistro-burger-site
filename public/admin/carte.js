@@ -49,6 +49,14 @@
   function currentCategories() {
     return state.data[state.mode] || (state.data[state.mode] = {});
   }
+  // PostgreSQL (jsonb) ne garantit pas l'ordre des clés d'un objet une fois stocké :
+  // l'ordre des catégories est donc mémorisé explicitement dans _order plutôt que
+  // déduit de Object.keys(), qui peut revenir dans un ordre différent après un aller-retour.
+  function orderedCategoryNames(cats) {
+    const order = Array.isArray(cats._order) ? cats._order.filter((n) => Object.prototype.hasOwnProperty.call(cats, n)) : [];
+    const rest = Object.keys(cats).filter((n) => n !== "_order" && !order.includes(n));
+    return order.concat(rest);
+  }
   function currentGroups() {
     return currentCategories()[state.catName] || [];
   }
@@ -90,23 +98,22 @@
     const restorable = state.deletedCategories.filter((d) => d.mode === state.mode);
     restorable.slice().reverse().forEach((d) => { if (!cats[d.catName]) cats[d.catName] = d.groups; });
     state.deletedCategories = state.deletedCategories.filter((d) => d.mode !== state.mode);
+    cats._order = orderedCategoryNames(cats);
     persist("categories");
   }
 
   function moveCategoryTo(fromIndex, toIndex) {
     const cats = currentCategories();
-    const names = Object.keys(cats);
+    const names = orderedCategoryNames(cats);
     const [movedName] = names.splice(fromIndex, 1);
     names.splice(toIndex, 0, movedName);
-    const reordered = {};
-    names.forEach((name) => { reordered[name] = cats[name]; });
-    state.data[state.mode] = reordered;
+    cats._order = names;
     persist("categories");
   }
 
   function renderCategories() {
     const cats = currentCategories();
-    const names = Object.keys(cats);
+    const names = orderedCategoryNames(cats);
     const restorableCatsCount = state.deletedCategories.filter((d) => d.mode === state.mode).length;
     const rows = names
       .map((name, i) => {
@@ -166,6 +173,7 @@
     const cats = currentCategories();
     if (cats[name.trim()]) return;
     cats[name.trim()] = [];
+    cats._order = orderedCategoryNames(cats);
     persist("categories");
   }
 
@@ -246,8 +254,10 @@
       alert("Une catégorie porte déjà ce nom.");
       return;
     }
-    cats[name.trim()] = cats[state.catName];
-    delete cats[state.catName];
+    const oldName = state.catName;
+    cats[name.trim()] = cats[oldName];
+    delete cats[oldName];
+    if (Array.isArray(cats._order)) cats._order = cats._order.map((n) => (n === oldName ? name.trim() : n));
     state.catName = name.trim();
     persist("groups");
   }
@@ -258,6 +268,7 @@
     if (!confirm('Supprimer la catégorie "' + state.catName + '" et ses ' + count + " groupe(s) ?")) return;
     state.deletedCategories.push({ mode: state.mode, catName: state.catName, groups: cats[state.catName] });
     delete cats[state.catName];
+    if (Array.isArray(cats._order)) cats._order = cats._order.filter((n) => n !== state.catName);
     persist("categories");
   }
 
