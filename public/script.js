@@ -362,17 +362,52 @@
   /* ---------------------------------------------------------------- */
   /* Marquee ticker (top strip)                                        */
   /* ---------------------------------------------------------------- */
-  function renderMarqueeInto(trackId) {
-    const track = document.getElementById(trackId);
+  (function renderMarquee() {
+    const track = document.getElementById("marquee-track");
     if (!track) return;
     const items = ANNONCES;
     const span = (text) => `<span style="font-family:var(--font-heading); font-weight:700; font-size:13px; letter-spacing:.16em; text-transform:uppercase; white-space:nowrap;">${esc(text)}</span><span style="color:var(--cream-500); font-size:15px; line-height:1;">✳</span>`;
     let html = "";
     for (let i = 0; i < Math.max(8, items.length * 2); i++) html += span(items[i % items.length]);
     track.innerHTML = html;
-  }
-  renderMarqueeInto("marquee-track");
-  renderMarqueeInto("cart-marquee-track");
+  })();
+
+  /* ---------------------------------------------------------------- */
+  /* Carrousel d'offres dans le panier                                 */
+  /* ---------------------------------------------------------------- */
+  (function renderCartOffersCarousel() {
+    const carousel = document.getElementById("cart-offers-carousel");
+    if (!carousel || !OFFRES.length) return;
+    const badgeEl = document.getElementById("cart-offer-badge");
+    const titleEl = document.getElementById("cart-offer-title");
+    const descEl = document.getElementById("cart-offer-desc");
+    const priceEl = document.getElementById("cart-offer-price");
+    const imgEl = document.getElementById("cart-offer-img");
+    const dotsEl = document.getElementById("cart-offer-dots");
+    let index = 0;
+
+    function show(i) {
+      index = i;
+      const offer = OFFRES[index];
+      badgeEl.textContent = offer.tag || "Offre du moment";
+      titleEl.textContent = offer.title || "";
+      descEl.textContent = offer.description || "";
+      priceEl.textContent = offer.price || "";
+      if (offer.img) { imgEl.src = offer.img; imgEl.alt = offer.title || offer.tag || ""; }
+      dotsEl.querySelectorAll("[data-dot]").forEach((d, di) => {
+        d.style.background = di === index ? "var(--cream-500)" : "rgba(237,224,211,.4)";
+      });
+    }
+
+    dotsEl.innerHTML = OFFRES.map((_, i) =>
+      `<button type="button" data-dot="${i}" aria-label="Offre ${i + 1}" style="width:8px; height:8px; padding:0; border:none; border-radius:50%; cursor:pointer;"></button>`
+    ).join("");
+    dotsEl.querySelectorAll("[data-dot]").forEach((d) => {
+      d.addEventListener("click", () => show(Number(d.dataset.dot)));
+    });
+
+    show(0);
+  })();
 
   /* ---------------------------------------------------------------- */
   /* Burgers carousel                                                   */
