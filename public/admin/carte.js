@@ -93,21 +93,35 @@
     persist("categories");
   }
 
+  function moveCategoryTo(fromIndex, toIndex) {
+    const cats = currentCategories();
+    const names = Object.keys(cats);
+    const [movedName] = names.splice(fromIndex, 1);
+    names.splice(toIndex, 0, movedName);
+    const reordered = {};
+    names.forEach((name) => { reordered[name] = cats[name]; });
+    state.data[state.mode] = reordered;
+    persist("categories");
+  }
+
   function renderCategories() {
     const cats = currentCategories();
     const names = Object.keys(cats);
     const restorableCatsCount = state.deletedCategories.filter((d) => d.mode === state.mode).length;
     const rows = names
-      .map((name) => {
+      .map((name, i) => {
         const count = cats[name].length;
         return (
+          '<div class="list-row-wrap" data-row="' + i + '">' +
+          '<span class="drag-handle" draggable="true" data-drag="' + i + '" aria-label="Glisser pour réorganiser">⠿</span>' +
           '<button type="button" class="list-row" data-cat="' + esc(name) + '">' +
           '<span class="list-row-main">' +
           '<span class="list-row-title">' + esc(name) + "</span>" +
           '<span class="list-row-sub">' + count + " groupe" + (count > 1 ? "s" : "") + "</span>" +
           "</span>" +
           '<span class="list-row-arrow">›</span>' +
-          "</button>"
+          "</button>" +
+          "</div>"
         );
       })
       .join("");
@@ -143,6 +157,7 @@
         render();
       });
     });
+    setupDragAndDrop(moveCategoryTo);
   }
 
   function addCategory() {
@@ -331,10 +346,14 @@
         render();
       });
     });
-    setupDragAndDrop(group.items);
+    setupDragAndDrop((from, to) => {
+      const [moved] = group.items.splice(from, 1);
+      group.items.splice(to, 0, moved);
+      persist("items");
+    });
   }
 
-  function setupDragAndDrop(items) {
+  function setupDragAndDrop(onMove) {
     const rows = container.querySelectorAll(".list-row-wrap");
     let dragFrom = null;
 
@@ -364,9 +383,7 @@
         row.classList.remove("drag-over");
         const to = Number(row.dataset.row);
         if (dragFrom === null || to === dragFrom) return;
-        const [moved] = items.splice(dragFrom, 1);
-        items.splice(to, 0, moved);
-        persist("items");
+        onMove(dragFrom, to);
       });
     });
   }

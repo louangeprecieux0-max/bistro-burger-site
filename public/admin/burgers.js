@@ -68,18 +68,27 @@
     persist("categories");
   }
 
+  function moveCategoryTo(fromIndex, toIndex) {
+    const [moved] = state.data.splice(fromIndex, 1);
+    state.data.splice(toIndex, 0, moved);
+    persist("categories");
+  }
+
   function renderCategories() {
     const rows = state.data
       .map((cat, i) => {
         const count = cat.items.length;
         return (
+          '<div class="list-row-wrap" data-row="' + i + '">' +
+          '<span class="drag-handle" draggable="true" data-drag="' + i + '" aria-label="Glisser pour réorganiser">⠿</span>' +
           '<button type="button" class="list-row" data-cat="' + i + '">' +
           '<span class="list-row-main">' +
           '<span class="list-row-title">' + esc(cat.title) + "</span>" +
           '<span class="list-row-sub">' + count + " burger" + (count > 1 ? "s" : "") + "</span>" +
           "</span>" +
           '<span class="list-row-arrow">›</span>' +
-          "</button>"
+          "</button>" +
+          "</div>"
         );
       })
       .join("");
@@ -109,6 +118,7 @@
         render();
       });
     });
+    setupDragAndDrop(moveCategoryTo);
   }
 
   function restoreItems() {
@@ -183,10 +193,10 @@
         render();
       });
     });
-    setupDragAndDrop();
+    setupDragAndDrop(moveItemTo);
   }
 
-  function setupDragAndDrop() {
+  function setupDragAndDrop(onMove) {
     const rows = container.querySelectorAll(".list-row-wrap");
     let dragFrom = null;
 
@@ -222,7 +232,7 @@
         row.classList.remove("drag-over");
         const to = Number(row.dataset.row);
         if (dragFrom === null || to === dragFrom) return;
-        moveItemTo(dragFrom, to);
+        onMove(dragFrom, to);
       });
     });
   }
