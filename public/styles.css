@@ -232,6 +232,7 @@ a:not(.btn):hover { color: var(--green-700); }
 .dialog-backdrop { position: fixed; inset: 0; background: rgba(44,44,42,0.5); display: flex; align-items: center; justify-content: center; z-index: 100; }
 .dialog-backdrop[hidden] { display: none; }
 .dialog-box { background: var(--color-primary); color: var(--color-secondary); border-radius: var(--radius-card); padding: var(--space-5); max-width: 420px; width: 90%; box-shadow: var(--shadow-popup); font-family: var(--font-body); }
+@media (max-width: 640px) { #promo-close { width: 44px !important; height: 44px !important; } }
 
 .cart-page-backdrop { position: fixed; inset: 0; z-index: 100; background: linear-gradient(180deg,var(--surface-alt),var(--cream-400)); }
 .cart-page-backdrop[hidden] { display: none; }

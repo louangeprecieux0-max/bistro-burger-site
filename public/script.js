@@ -1114,32 +1114,85 @@
   /* ---------------------------------------------------------------- */
   const promoBackdrop = document.getElementById("promo-backdrop");
   if (promoBackdrop && OFFRES.length) {
+    const PROMO_INDEX_KEY = "bb-promo-offer-index";
+    const PROMO_SESSION_KEY = "bb-promo-shown-session";
+    const PROMO_COOLDOWN_KEY = "bb-promo-dismissed-until";
+    const PROMO_COOLDOWN_MS = 7 * 24 * 60 * 60 * 1000;
+
+    const promoImgWrapEl = document.getElementById("promo-img-wrap");
+    const promoImgEl = document.getElementById("promo-img");
     const promoBadgeEl = document.getElementById("promo-badge");
     const promoTitleEl = document.getElementById("promo-title");
     const promoDescEl = document.getElementById("promo-desc");
     const promoPriceEl = document.getElementById("promo-price");
-    const promoNavEl = document.getElementById("promo-nav");
-    const promoCounterEl = document.getElementById("promo-counter");
-    let promoIndex = 0;
-    function renderPromoOffer() {
-      const offer = OFFRES[promoIndex] || {};
+
+    function renderPromoOffer(offer) {
+      if (promoImgEl && offer.img) {
+        promoImgEl.src = offer.img;
+        promoImgEl.alt = offer.title || offer.tag || "";
+        if (promoImgWrapEl) promoImgWrapEl.hidden = false;
+      } else if (promoImgWrapEl) {
+        promoImgWrapEl.hidden = true;
+      }
       if (promoBadgeEl) promoBadgeEl.textContent = offer.tag || "Offre du moment";
       if (promoTitleEl) promoTitleEl.textContent = offer.title || "";
       if (promoDescEl) promoDescEl.textContent = offer.description || "";
       if (promoPriceEl) promoPriceEl.textContent = offer.price || "";
-      if (promoCounterEl) promoCounterEl.textContent = (promoIndex + 1) + " / " + OFFRES.length;
     }
-    renderPromoOffer();
-    if (OFFRES.length > 1 && promoNavEl) {
-      promoNavEl.hidden = false;
-      const promoPrevEl = document.getElementById("promo-prev");
-      const promoNextEl = document.getElementById("promo-next");
-      if (promoPrevEl) promoPrevEl.addEventListener("click", () => { promoIndex = (promoIndex - 1 + OFFRES.length) % OFFRES.length; renderPromoOffer(); });
-      if (promoNextEl) promoNextEl.addEventListener("click", () => { promoIndex = (promoIndex + 1) % OFFRES.length; renderPromoOffer(); });
+
+    function pickOfferIndex() {
+      const now = new Date();
+      const day = now.getDay();
+      const hour = now.getHours();
+      const isTuesdayEvening = day === 2 && hour >= 17;
+      const isWednesdayLunch = day === 3 && hour < 14;
+      if (isTuesdayEvening || isWednesdayLunch) {
+        const childIdx = OFFRES.findIndex((o) => o.tag === "Menu enfant");
+        if (childIdx !== -1) return childIdx;
+      }
+      try {
+        const raw = localStorage.getItem(PROMO_INDEX_KEY);
+        const stored = raw !== null ? parseInt(raw, 10) : -1;
+        const next = Number.isFinite(stored) && stored >= 0 ? (stored + 1) % OFFRES.length : 0;
+        localStorage.setItem(PROMO_INDEX_KEY, String(next));
+        return next;
+      } catch {
+        return Math.floor(Math.random() * OFFRES.length);
+      }
     }
+
+    function canShowPromo() {
+      try {
+        if (sessionStorage.getItem(PROMO_SESSION_KEY)) return false;
+      } catch {}
+      try {
+        const until = localStorage.getItem(PROMO_COOLDOWN_KEY);
+        if (until && Date.now() < parseInt(until, 10)) return false;
+      } catch {}
+      return true;
+    }
+
+    function markShownThisSession() {
+      try { sessionStorage.setItem(PROMO_SESSION_KEY, "1"); } catch {}
+    }
+
+    function markDismissedForCooldown() {
+      try { localStorage.setItem(PROMO_COOLDOWN_KEY, String(Date.now() + PROMO_COOLDOWN_MS)); } catch {}
+    }
+
     let promoDismissed = false;
-    function openPromo() { promoBackdrop.hidden = false; document.getElementById("promo-box").style.animation = "bbPromoIn .55s cubic-bezier(.22,.9,.3,1) both"; }
-    function closePromo() { promoBackdrop.hidden = true; promoDismissed = true; }
+
+    function openPromo() {
+      renderPromoOffer(OFFRES[pickOfferIndex()] || {});
+      promoBackdrop.hidden = false;
+      document.getElementById("promo-box").style.animation = "bbPromoIn .55s cubic-bezier(.22,.9,.3,1) both";
+      markShownThisSession();
+    }
+    function closePromo() {
+      promoBackdrop.hidden = true;
+      promoDismissed = true;
+      markDismissedForCooldown();
+    }
     function reservationInView() {
       const form = document.getElementById("reservation-form");
       if (!form) return false;
@@ -1156,11 +1209,39 @@
       if (reservationInView() || otherModalOpen()) { setTimeout(tryOpenPromo, 2000); return; }
       openPromo();
     }
-    setTimeout(tryOpenPromo, 90000);
-    setInterval(() => { if (promoBackdrop.hidden && !promoDismissed) tryOpenPromo(); }, 120000);
+
+    let promoTriggered = false;
+    function requestPromo() {
+      if (promoTriggered || promoDismissed || !canShowPromo()) return;
+      promoTriggered = true;
+      tryOpenPromo();
+    }
+
+    setTimeout(requestPromo, 25000);
+
+    function onPromoScroll() {
+      const doc = document.documentElement;
+      const scrollable = doc.scrollHeight - doc.clientHeight;
+      const ratio = scrollable > 0 ? (window.scrollY / scrollable) : 1;
+      if (ratio >= 0.5) {
+        window.removeEventListener("scroll", onPromoScroll);
+        requestPromo();
+      }
+    }
+    window.addEventListener("scroll", onPromoScroll, { passive: true });
+
+    const isDesktopPointer = window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    if (isDesktopPointer) {
+      document.addEventListener("mouseleave", (e) => {
+        if (e.clientY <= 0) requestPromo();
+      });
+    }
+
     document.getElementById("promo-close").addEventListener("click", closePromo);
     promoBackdrop.addEventListener("click", (e) => { if (e.target === promoBackdrop) closePromo(); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !promoBackdrop.hidden) closePromo(); });
     document.getElementById("promo-reserve").addEventListener("click", () => { closePromo(); jump("reservation"); });
+    document.getElementById("promo-see-offers").addEventListener("click", () => { closePromo(); jump("offres"); });
   }
 
   /* ---------------------------------------------------------------- */
