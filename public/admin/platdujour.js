@@ -4,6 +4,30 @@
   const container = document.getElementById("platdujour-view");
 
   let state = null;
+  let platDraftTimer = null;
+  let sugDraftTimer = null;
+  const PLAT_DRAFT_KEY = "platdujour-plat";
+  const SUG_DRAFT_KEY = "platdujour-suggestions";
+
+  function schedulePlatDraftSave() {
+    if (platDraftTimer) clearTimeout(platDraftTimer);
+    platDraftTimer = setTimeout(() => {
+      state.data.plat = readPlatFromDom();
+      window.AdminDrafts.save(PLAT_DRAFT_KEY, state.data.plat);
+      const statusEl = document.getElementById("pdj-draft-status");
+      if (statusEl) statusEl.textContent = "Brouillon enregistré automatiquement — à l'instant";
+    }, 800);
+  }
+
+  function scheduleSugDraftSave() {
+    if (sugDraftTimer) clearTimeout(sugDraftTimer);
+    sugDraftTimer = setTimeout(() => {
+      state.data.suggestions = readSuggestionsFromDom();
+      window.AdminDrafts.save(SUG_DRAFT_KEY, state.data.suggestions);
+      const statusEl = document.getElementById("sug-draft-status");
+      if (statusEl) statusEl.textContent = "Brouillon enregistré automatiquement — à l'instant";
+    }, 800);
+  }
 
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({
@@ -205,6 +229,13 @@
       '<p class="dashboard-note">Affiché en haut de la page, mis à jour au fur et à mesure. Le plat du jour et les suggestions s\'enregistrent séparément.</p>' +
       '<form id="pdj-form">' +
       "<h2>Plat du jour</h2>" +
+      (state.pendingPlatDraft
+        ? '<div class="draft-banner">Un brouillon non enregistré existe pour ce formulaire (' + window.AdminDrafts.timeAgo(state.pendingPlatDraft.savedAt) + ').' +
+          '<div class="draft-banner-actions">' +
+          '<button type="button" class="draft-banner-btn" id="pdj-draft-restore">Restaurer le brouillon</button>' +
+          '<button type="button" class="draft-banner-btn draft-banner-btn-ghost" id="pdj-draft-ignore">Ignorer</button>' +
+          "</div></div>"
+        : "") +
       '<label class="field-label">Date</label>' +
       calendarHtml() +
       '<label class="field-label">Horaire</label>' +
@@ -220,10 +251,18 @@
       "</button>" +
       (state.platSaveSuccess ? '<div class="password-success">Enregistré.</div>' : "") +
       (state.platSaveError ? '<div class="login-error">' + esc(state.platSaveError) + "</div>" : "") +
+      '<div id="pdj-draft-status" class="dashboard-note" style="margin-top:10px;"></div>' +
       "</form>" +
       '<hr class="divider">' +
       '<form id="sug-form">' +
       "<h2>Suggestions</h2>" +
+      (state.pendingSugDraft
+        ? '<div class="draft-banner">Un brouillon non enregistré existe pour ce formulaire (' + window.AdminDrafts.timeAgo(state.pendingSugDraft.savedAt) + ').' +
+          '<div class="draft-banner-actions">' +
+          '<button type="button" class="draft-banner-btn" id="sug-draft-restore">Restaurer le brouillon</button>' +
+          '<button type="button" class="draft-banner-btn draft-banner-btn-ghost" id="sug-draft-ignore">Ignorer</button>' +
+          "</div></div>"
+        : "") +
       suggestions.map((sug, i) => suggestionCardHtml(sug, i, suggestions.length > 1, state.removedSuggestions.length > 0)).join("") +
       '<button type="button" class="btn-secondary" id="sug-add" style="margin-bottom:16px;">+ Ajouter une suggestion</button>' +
       '<button type="submit" class="btn-primary" id="sug-save"' + (state.savingSug ? " disabled" : "") + ">" +
@@ -231,6 +270,7 @@
       "</button>" +
       (state.sugSaveSuccess ? '<div class="password-success">Enregistré.</div>' : "") +
       (state.sugSaveError ? '<div class="login-error">' + esc(state.sugSaveError) + "</div>" : "") +
+      '<div id="sug-draft-status" class="dashboard-note" style="margin-top:10px;"></div>' +
       "</form>";
 
     document.getElementById("pdj-back-menu").addEventListener("click", () => window.adminShowDashboard());
@@ -253,6 +293,7 @@
         plat.date = btn.dataset.calDay;
         state.data.plat = plat;
         render();
+        schedulePlatDraftSave();
       });
     });
 
@@ -262,8 +303,27 @@
         plat.horaire = btn.dataset.horaire;
         state.data.plat = plat;
         render();
+        schedulePlatDraftSave();
       });
     });
+
+    if (state.pendingPlatDraft) {
+      document.getElementById("pdj-draft-restore").addEventListener("click", () => {
+        state.data.plat = Object.assign({}, state.data.plat, state.pendingPlatDraft.data);
+        const initial = state.data.plat.date ? new Date(state.data.plat.date + "T00:00:00") : new Date();
+        state.calYear = initial.getFullYear();
+        state.calMonth = initial.getMonth();
+        state.pendingPlatDraft = null;
+        render();
+      });
+      document.getElementById("pdj-draft-ignore").addEventListener("click", () => {
+        window.AdminDrafts.clear(PLAT_DRAFT_KEY);
+        state.pendingPlatDraft = null;
+        render();
+      });
+    }
+
+    document.getElementById("pdj-form").addEventListener("input", schedulePlatDraftSave);
 
     document.getElementById("pdj-form").addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -276,6 +336,7 @@
       render();
       try {
         await apiSave(state.data);
+        window.AdminDrafts.clear(PLAT_DRAFT_KEY);
         state.platSaveSuccess = true;
       } catch (err) {
         state.platSaveError = err.message;
@@ -290,6 +351,7 @@
       state.data.suggestions = readSuggestionsFromDom();
       state.data.suggestions.push({ label: "Suggestion du jour", title: "", description: "", price: "" });
       render();
+      scheduleSugDraftSave();
     });
 
     container.querySelectorAll("[data-remove-sug]").forEach((btn) => {
@@ -300,6 +362,7 @@
         const [removed] = state.data.suggestions.splice(i, 1);
         if (removed) state.removedSuggestions.push(removed);
         render();
+        scheduleSugDraftSave();
       });
     });
 
@@ -309,8 +372,24 @@
         state.data.suggestions = readSuggestionsFromDom().concat(state.removedSuggestions);
         state.removedSuggestions = [];
         render();
+        scheduleSugDraftSave();
       });
     });
+
+    if (state.pendingSugDraft) {
+      document.getElementById("sug-draft-restore").addEventListener("click", () => {
+        state.data.suggestions = state.pendingSugDraft.data;
+        state.pendingSugDraft = null;
+        render();
+      });
+      document.getElementById("sug-draft-ignore").addEventListener("click", () => {
+        window.AdminDrafts.clear(SUG_DRAFT_KEY);
+        state.pendingSugDraft = null;
+        render();
+      });
+    }
+
+    document.getElementById("sug-form").addEventListener("input", scheduleSugDraftSave);
 
     document.getElementById("sug-form").addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -323,6 +402,7 @@
       render();
       try {
         await apiSave(state.data);
+        window.AdminDrafts.clear(SUG_DRAFT_KEY);
         state.removedSuggestions = [];
         state.sugSaveSuccess = true;
       } catch (err) {
@@ -353,6 +433,8 @@
         const initial = state.data.plat.date ? new Date(state.data.plat.date + "T00:00:00") : new Date();
         state.calYear = initial.getFullYear();
         state.calMonth = initial.getMonth();
+        state.pendingPlatDraft = window.AdminDrafts.load(PLAT_DRAFT_KEY);
+        state.pendingSugDraft = window.AdminDrafts.load(SUG_DRAFT_KEY);
         state.screen = "ready";
       } catch (err) {
         state.screen = "error";
