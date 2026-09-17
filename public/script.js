@@ -1217,25 +1217,7 @@
       tryOpenPromo();
     }
 
-    setTimeout(requestPromo, 25000);
-
-    function onPromoScroll() {
-      const doc = document.documentElement;
-      const scrollable = doc.scrollHeight - doc.clientHeight;
-      const ratio = scrollable > 0 ? (window.scrollY / scrollable) : 1;
-      if (ratio >= 0.5) {
-        window.removeEventListener("scroll", onPromoScroll);
-        requestPromo();
-      }
-    }
-    window.addEventListener("scroll", onPromoScroll, { passive: true });
-
-    const isDesktopPointer = window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-    if (isDesktopPointer) {
-      document.addEventListener("mouseleave", (e) => {
-        if (e.clientY <= 0) requestPromo();
-      });
-    }
+    requestPromo();
 
     document.getElementById("promo-close").addEventListener("click", closePromo);
     promoBackdrop.addEventListener("click", (e) => { if (e.target === promoBackdrop) closePromo(); });
