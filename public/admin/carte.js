@@ -201,9 +201,23 @@
     persist("categories");
   }
 
+  function matchesCurrentGroup(d) {
+    return d.mode === state.mode && d.catName === state.catName && d.groupIndex === state.groupIndex;
+  }
+
+  function restoreItems() {
+    const groups = currentGroups();
+    const group = groups[state.groupIndex];
+    const restorable = state.deletedItems.filter(matchesCurrentGroup);
+    restorable.slice().reverse().forEach((d) => { group.items.splice(Math.min(d.index, group.items.length), 0, d.item); });
+    state.deletedItems = state.deletedItems.filter((d) => !matchesCurrentGroup(d));
+    persist("items");
+  }
+
   function renderItems() {
     const groups = currentGroups();
     const group = groups[state.groupIndex];
+    const restorableCount = state.deletedItems.filter(matchesCurrentGroup).length;
     const rows = group.items
       .map((item, i) => {
         return (
@@ -226,6 +240,9 @@
       '<div class="editor-header-row">' +
       "<h1>" + esc(group.title) + "</h1>" +
       '<button type="button" class="icon-btn" id="c-edit-group" aria-label="Modifier le groupe">✎</button>' +
+      (restorableCount > 0
+        ? '<button type="button" class="icon-btn icon-btn-restore" id="c-restore-items" title="Restaurer les plats supprimés" aria-label="Restaurer les plats supprimés">↺</button>'
+        : "") +
       '<button type="button" class="icon-btn icon-btn-danger" id="c-delete-group" aria-label="Supprimer le groupe">🗑</button>' +
       "</div>" +
       (group.note ? '<p class="dashboard-note">' + esc(group.note) + "</p>" : "") +
@@ -241,6 +258,9 @@
       state.screen = "edit-group";
       render();
     });
+    if (restorableCount > 0) {
+      document.getElementById("c-restore-items").addEventListener("click", restoreItems);
+    }
     document.getElementById("c-delete-group").addEventListener("click", () => {
       if (!confirm('Supprimer le groupe "' + group.title + '" et ses ' + group.items.length + " plat(s) ?")) return;
       groups.splice(state.groupIndex, 1);
@@ -392,6 +412,7 @@
     if (!isNew) {
       document.getElementById("ci-delete").addEventListener("click", async () => {
         if (!confirm("Supprimer ce plat ?")) return;
+        state.deletedItems.push({ mode: state.mode, catName: state.catName, groupIndex: state.groupIndex, index: state.itemIndex, item: group.items[state.itemIndex] });
         group.items.splice(state.itemIndex, 1);
         await persist("items");
       });
@@ -431,6 +452,7 @@
         itemIndex: null,
         saving: false,
         saveError: null,
+        deletedItems: [],
       };
       render();
       try {

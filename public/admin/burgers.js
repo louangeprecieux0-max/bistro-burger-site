@@ -97,8 +97,17 @@
     });
   }
 
+  function restoreItems() {
+    const cat = state.data[state.catIndex];
+    const restorable = state.deletedItems.filter((d) => d.catIndex === state.catIndex);
+    restorable.slice().reverse().forEach((d) => { cat.items.splice(Math.min(d.index, cat.items.length), 0, d.item); });
+    state.deletedItems = state.deletedItems.filter((d) => d.catIndex !== state.catIndex);
+    persist("items");
+  }
+
   function renderItems() {
     const cat = state.data[state.catIndex];
+    const restorableCount = state.deletedItems.filter((d) => d.catIndex === state.catIndex).length;
     const rows = cat.items
       .map((item, i) => {
         const meta = [];
@@ -124,6 +133,9 @@
       '<div class="editor-header-row">' +
       "<h1>" + esc(cat.title) + "</h1>" +
       '<button type="button" class="icon-btn" id="b-rename-cat" aria-label="Renommer la catégorie">✎</button>' +
+      (restorableCount > 0
+        ? '<button type="button" class="icon-btn icon-btn-restore" id="b-restore-items" title="Restaurer les burgers supprimés" aria-label="Restaurer les burgers supprimés">↺</button>'
+        : "") +
       '<button type="button" class="icon-btn icon-btn-danger" id="b-delete-cat" aria-label="Supprimer la catégorie">🗑</button>' +
       "</div>" +
       '<div class="list">' + (rows || '<p class="dashboard-note">Aucun burger dans cette catégorie.</p>') + "</div>" +
@@ -136,6 +148,9 @@
     });
     document.getElementById("b-rename-cat").addEventListener("click", renameCategory);
     document.getElementById("b-delete-cat").addEventListener("click", deleteCategory);
+    if (restorableCount > 0) {
+      document.getElementById("b-restore-items").addEventListener("click", restoreItems);
+    }
     document.getElementById("b-add-item").addEventListener("click", () => {
       state.itemIndex = null;
       state.editImgUrl = undefined;
@@ -391,6 +406,7 @@
     if (!isNew) {
       document.getElementById("b-delete-item").addEventListener("click", async () => {
         if (!confirm("Supprimer ce burger ?")) return;
+        state.deletedItems.push({ catIndex: state.catIndex, index: state.itemIndex, item: cat.items[state.itemIndex] });
         cat.items.splice(state.itemIndex, 1);
         window.AdminDrafts.clear(burgerDraftKey());
         stopDraftTicker();
@@ -445,7 +461,7 @@
 
   window.BurgersEditor = {
     async open() {
-      state = { screen: "loading", data: [], catIndex: null, itemIndex: null, saving: false, saveError: null };
+      state = { screen: "loading", data: [], catIndex: null, itemIndex: null, saving: false, saveError: null, deletedItems: [] };
       render();
       try {
         state.data = await apiGet();

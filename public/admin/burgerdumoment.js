@@ -88,6 +88,12 @@
     else renderEdit();
   }
 
+  function restoreItems() {
+    state.deletedItems.slice().reverse().forEach((d) => { state.data.splice(Math.min(d.index, state.data.length), 0, d.item); });
+    state.deletedItems = [];
+    persist();
+  }
+
   function renderList() {
     const rows = state.data
       .map((item, i) => (
@@ -106,7 +112,12 @@
       "<h1>Burger du moment</h1>" +
       '<p class="dashboard-note">Un seul burger peut être actif à la fois : il s\'affiche en avant sur la page publique. Les autres restent enregistrés et peuvent être réactivés plus tard.</p>' +
       '<div class="list">' + (rows || '<p class="dashboard-note">Aucun burger du moment pour l\'instant.</p>') + "</div>" +
+      '<div style="display:flex; gap:10px; align-items:center;">' +
       '<button type="button" class="btn-secondary" id="bdm-add">+ Nouveau burger du moment</button>' +
+      (state.deletedItems.length > 0
+        ? '<button type="button" class="icon-btn icon-btn-restore" id="bdm-restore-items" title="Restaurer les burgers du moment supprimés" aria-label="Restaurer les burgers du moment supprimés">↺</button>'
+        : "") +
+      "</div>" +
       saveStatusHtml();
 
     document.getElementById("bdm-back-menu").addEventListener("click", () => window.adminShowDashboard());
@@ -117,6 +128,9 @@
       state.screen = "edit";
       render();
     });
+    if (state.deletedItems.length > 0) {
+      document.getElementById("bdm-restore-items").addEventListener("click", restoreItems);
+    }
     container.querySelectorAll("[data-item]").forEach((btn) => {
       btn.addEventListener("click", () => {
         state.itemIndex = Number(btn.dataset.item);
@@ -306,6 +320,7 @@
     if (!isNew) {
       document.getElementById("bdm-delete-item").addEventListener("click", async () => {
         if (!confirm("Supprimer définitivement ce burger du moment ?")) return;
+        state.deletedItems.push({ index: state.itemIndex, item: state.data[state.itemIndex] });
         state.data.splice(state.itemIndex, 1);
         window.AdminDrafts.clear(bdmDraftKey());
         stopDraftTicker();
@@ -338,7 +353,7 @@
 
   window.BurgerDuMomentEditor = {
     async open() {
-      state = { screen: "loading", data: [], itemIndex: null, saving: false, saveError: null };
+      state = { screen: "loading", data: [], itemIndex: null, saving: false, saveError: null, deletedItems: [] };
       render();
       try {
         state.data = await apiGet();
