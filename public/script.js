@@ -1115,9 +1115,8 @@
   const promoBackdrop = document.getElementById("promo-backdrop");
   if (promoBackdrop && OFFRES.length) {
     const PROMO_INDEX_KEY = "bb-promo-offer-index";
-    const PROMO_SESSION_KEY = "bb-promo-shown-session";
-    const PROMO_COOLDOWN_KEY = "bb-promo-dismissed-until";
-    const PROMO_COOLDOWN_MS = 7 * 24 * 60 * 60 * 1000;
+    const PROMO_FIRST_DELAY_MS = 10000;
+    const PROMO_REPEAT_MS = 60000;
 
     const promoImgWrapEl = document.getElementById("promo-img-wrap");
     const promoImgEl = document.getElementById("promo-img");
@@ -1161,38 +1160,12 @@
       }
     }
 
-    function canShowPromo() {
-      try {
-        if (sessionStorage.getItem(PROMO_SESSION_KEY)) return false;
-      } catch {}
-      try {
-        const until = localStorage.getItem(PROMO_COOLDOWN_KEY);
-        if (until && Date.now() < parseInt(until, 10)) return false;
-      } catch {}
-      return true;
-    }
-
-    function markShownThisSession() {
-      try { sessionStorage.setItem(PROMO_SESSION_KEY, "1"); } catch {}
-    }
-
-    function markDismissedForCooldown() {
-      try { localStorage.setItem(PROMO_COOLDOWN_KEY, String(Date.now() + PROMO_COOLDOWN_MS)); } catch {}
-    }
-
-    let promoDismissed = false;
-
     function openPromo() {
       renderPromoOffer(OFFRES[pickOfferIndex()] || {});
       promoBackdrop.hidden = false;
       document.getElementById("promo-box").style.animation = "bbPromoIn .55s cubic-bezier(.22,.9,.3,1) both";
-      markShownThisSession();
     }
-    function closePromo() {
-      promoBackdrop.hidden = true;
-      promoDismissed = true;
-      markDismissedForCooldown();
-    }
+    function closePromo() { promoBackdrop.hidden = true; }
     function reservationInView() {
       const form = document.getElementById("reservation-form");
       if (!form) return false;
@@ -1210,14 +1183,26 @@
       openPromo();
     }
 
-    let promoTriggered = false;
-    function requestPromo() {
-      if (promoTriggered || promoDismissed || !canShowPromo()) return;
-      promoTriggered = true;
+    let promoCycleStarted = false;
+    function startPromoCycle() {
+      if (promoCycleStarted) return;
+      promoCycleStarted = true;
       tryOpenPromo();
+      setInterval(tryOpenPromo, PROMO_REPEAT_MS);
     }
 
-    requestPromo();
+    setTimeout(startPromoCycle, PROMO_FIRST_DELAY_MS);
+
+    function onPromoScroll() {
+      const doc = document.documentElement;
+      const scrollable = doc.scrollHeight - doc.clientHeight;
+      const ratio = scrollable > 0 ? (window.scrollY / scrollable) : 1;
+      if (ratio >= 0.5) {
+        window.removeEventListener("scroll", onPromoScroll);
+        startPromoCycle();
+      }
+    }
+    window.addEventListener("scroll", onPromoScroll, { passive: true });
 
     document.getElementById("promo-close").addEventListener("click", closePromo);
     promoBackdrop.addEventListener("click", (e) => { if (e.target === promoBackdrop) closePromo(); });
