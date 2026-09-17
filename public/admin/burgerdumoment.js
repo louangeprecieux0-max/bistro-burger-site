@@ -338,11 +338,11 @@
   async function persist() {
     state.saving = true;
     state.saveError = null;
+    state.itemIndex = null;
+    state.screen = "list";
     render();
     try {
       await apiSave(state.data);
-      state.itemIndex = null;
-      state.screen = "list";
     } catch (err) {
       state.saveError = err.message;
     } finally {

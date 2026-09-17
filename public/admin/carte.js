@@ -428,11 +428,11 @@
   async function persist(nextScreen) {
     state.saving = true;
     state.saveError = null;
+    state.itemIndex = null;
+    state.screen = nextScreen;
     render();
     try {
       await apiSave(state.data);
-      state.itemIndex = null;
-      state.screen = nextScreen;
     } catch (err) {
       state.saveError = err.message;
     } finally {
