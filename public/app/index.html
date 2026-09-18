@@ -61,8 +61,28 @@
     <header class="app-header">
       <img src="../assets/logo-cream-sm.png" alt="Bistro Burger" class="app-header-logo">
       <div class="app-header-title">Réservations</div>
+      <button type="button" class="app-icon-btn" id="invite-toggle-btn" aria-label="Inviter un administrateur">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 14a5 5 0 1 0-5-5 5 5 0 0 0 5 5Z"></path>
+          <path d="M2.5 21a8.5 8.5 0 0 1 13.6-6.8"></path>
+          <path d="M18 8v6M21 11h-6"></path>
+        </svg>
+      </button>
       <button type="button" class="app-logout-btn" id="logout-btn" aria-label="Se déconnecter">Déconnexion</button>
     </header>
+
+    <div class="invite-backdrop" id="invite-backdrop" hidden></div>
+    <div class="invite-popover" id="invite-popover" hidden>
+      <div class="invite-popover-title">Inviter un administrateur</div>
+      <p class="bento-panel-hint">La personne invitée recevra un e-mail pour créer son mot de passe et pourra ensuite se connecter à cette appli et à l'espace admin.</p>
+      <form id="invite-form">
+        <label class="field-label" for="invite-email">E-mail à inviter</label>
+        <input class="field" type="email" id="invite-email" required placeholder="collegue@exemple.com">
+        <button type="submit" class="btn-primary" id="invite-submit">Envoyer l'invitation</button>
+        <div id="invite-success" class="password-success" hidden>Invitation envoyée.</div>
+        <div id="invite-error" class="login-error" hidden></div>
+      </form>
+    </div>
 
     <div class="app-body" id="app-body">
       <div class="bento-greeting">
@@ -94,18 +114,6 @@
       <div class="bento-panel">
         <div class="bento-panel-title">Réservations</div>
         <div id="reservations-root"></div>
-      </div>
-
-      <div class="bento-panel bento-panel-invite">
-        <div class="bento-panel-title">Inviter un administrateur</div>
-        <p class="bento-panel-hint">La personne invitée recevra un e-mail pour créer son mot de passe et pourra ensuite se connecter à cette appli et à l'espace admin.</p>
-        <form id="invite-form">
-          <label class="field-label" for="invite-email">E-mail à inviter</label>
-          <input class="field" type="email" id="invite-email" required placeholder="collegue@exemple.com">
-          <button type="submit" class="btn-primary" id="invite-submit">Envoyer l'invitation</button>
-          <div id="invite-success" class="password-success" hidden>Invitation envoyée.</div>
-          <div id="invite-error" class="login-error" hidden></div>
-        </form>
       </div>
     </div>
   </div>

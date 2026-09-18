@@ -133,10 +133,27 @@
   /* ------------------------------------------------------------------ */
   /* Inviter un administrateur                                           */
   /* ------------------------------------------------------------------ */
+  const inviteToggleBtn = document.getElementById("invite-toggle-btn");
+  const inviteBackdrop = document.getElementById("invite-backdrop");
+  const invitePopover = document.getElementById("invite-popover");
   const inviteForm = document.getElementById("invite-form");
   const inviteSubmit = document.getElementById("invite-submit");
   const inviteSuccess = document.getElementById("invite-success");
   const inviteError = document.getElementById("invite-error");
+
+  function openInvitePopover() {
+    inviteBackdrop.hidden = false;
+    invitePopover.hidden = false;
+  }
+  function closeInvitePopover() {
+    inviteBackdrop.hidden = true;
+    invitePopover.hidden = true;
+  }
+  inviteToggleBtn.addEventListener("click", () => {
+    if (invitePopover.hidden) openInvitePopover();
+    else closeInvitePopover();
+  });
+  inviteBackdrop.addEventListener("click", closeInvitePopover);
 
   inviteForm.addEventListener("submit", async (e) => {
     e.preventDefault();
