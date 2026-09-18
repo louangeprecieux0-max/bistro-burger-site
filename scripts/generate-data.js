@@ -9,8 +9,10 @@ const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
 const RECAPTCHA_SITE_KEY = process.env.RECAPTCHA_SITE_KEY;
+const VAPID_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY;
 const OUT_FILE = path.join(__dirname, "..", "public", "data.generated.js");
 const ADMIN_CONFIG_FILE = path.join(__dirname, "..", "public", "admin", "config.generated.js");
+const APP_CONFIG_FILE = path.join(__dirname, "..", "public", "app", "config.generated.js");
 
 async function main() {
   if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
@@ -62,6 +64,23 @@ async function main() {
     console.log("admin/config.generated.js écrit.");
   } else {
     console.warn("[generate-data] SUPABASE_ANON_KEY absente — /admin ne pourra pas se connecter.");
+  }
+
+  if (SUPABASE_ANON_KEY) {
+    const appConfig =
+      "// Fichier généré automatiquement au build — ne pas modifier ni committer.\n" +
+      "window.SUPABASE_CONFIG = " +
+      JSON.stringify(
+        { url: SUPABASE_URL, anonKey: SUPABASE_ANON_KEY, vapidPublicKey: VAPID_PUBLIC_KEY || null },
+        null,
+        2
+      ) +
+      ";\n";
+    fs.mkdirSync(path.dirname(APP_CONFIG_FILE), { recursive: true });
+    fs.writeFileSync(APP_CONFIG_FILE, appConfig, { encoding: "utf8" });
+    console.log("app/config.generated.js écrit.");
+  } else {
+    console.warn("[generate-data] SUPABASE_ANON_KEY absente — /app ne pourra pas se connecter.");
   }
 }
 

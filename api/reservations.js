@@ -2,6 +2,7 @@
 // pour qu'elle soit consultable depuis l'espace admin.
 const { createClient } = require("@supabase/supabase-js");
 const { notifyAdmins } = require("./_lib/notify");
+const { notifyPush } = require("./_lib/push");
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -127,6 +128,15 @@ module.exports = async (req, res) => {
     message: row.message,
   });
   await sendCustomerConfirmationEmail(row);
+
+  const whenParts = [];
+  if (row.reservation_date) whenParts.push(row.reservation_date);
+  if (row.reservation_time) whenParts.push(row.reservation_time);
+  await notifyPush(supabase, {
+    title: "Nouvelle réservation",
+    body: row.name + (whenParts.length ? " — " + whenParts.join(" à ") : "") + (row.party_size ? " (" + row.party_size + ")" : ""),
+    url: "/app/",
+  });
 
   res.status(200).json({ ok: true });
 };
