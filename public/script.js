@@ -1163,8 +1163,8 @@
   const promoBackdrop = document.getElementById("promo-backdrop");
   if (promoBackdrop && OFFRES.length) {
     const PROMO_INDEX_KEY = "bb-promo-offer-index";
-    const PROMO_FIRST_DELAY_MS = 60000;
-    const PROMO_REPEAT_MS = 60000;
+    const PROMO_FIRST_DELAY_MS = 110000;
+    const PROMO_REPEAT_MS = 110000;
 
     const promoImgWrapEl = document.getElementById("promo-img-wrap");
     const promoImgEl = document.getElementById("promo-img");
