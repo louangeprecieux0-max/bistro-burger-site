@@ -85,6 +85,9 @@ body { margin: 0; }
 }
 .bento-panel-title { font-family: var(--font-heading); font-weight: 700; font-size: 15px; color: var(--ink); margin-bottom: 12px; }
 
+.bento-panel-invite { margin-top: 16px; }
+.bento-panel-hint { font-size: 13px; color: var(--muted); line-height: 1.5; margin: 0 0 14px; }
+
 @media (max-width: 360px) {
   .bento-tile-value { font-size: 22px; }
   .bento-tile-accent .bento-tile-value { font-size: 34px; }

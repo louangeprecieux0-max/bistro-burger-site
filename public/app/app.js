@@ -131,6 +131,43 @@
   });
 
   /* ------------------------------------------------------------------ */
+  /* Inviter un administrateur                                           */
+  /* ------------------------------------------------------------------ */
+  const inviteForm = document.getElementById("invite-form");
+  const inviteSubmit = document.getElementById("invite-submit");
+  const inviteSuccess = document.getElementById("invite-success");
+  const inviteError = document.getElementById("invite-error");
+
+  inviteForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    inviteSuccess.hidden = true;
+    inviteError.hidden = true;
+    inviteSubmit.disabled = true;
+    inviteSubmit.textContent = "Envoi…";
+
+    const email = document.getElementById("invite-email").value.trim();
+
+    try {
+      const headers = await authHeader();
+      const res = await fetch("/api/admin/invite", {
+        method: "POST",
+        headers: Object.assign({ "Content-Type": "application/json" }, headers),
+        body: JSON.stringify({ email }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Échec de l'envoi.");
+      inviteSuccess.hidden = false;
+      inviteForm.reset();
+    } catch (err) {
+      inviteError.hidden = false;
+      inviteError.textContent = err.message;
+    } finally {
+      inviteSubmit.disabled = false;
+      inviteSubmit.textContent = "Envoyer l'invitation";
+    }
+  });
+
+  /* ------------------------------------------------------------------ */
   /* Sonnerie de notification (synthétisée, sans fichier audio)          */
   /* ------------------------------------------------------------------ */
   const Sound = (() => {

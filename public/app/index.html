@@ -95,6 +95,18 @@
         <div class="bento-panel-title">Réservations</div>
         <div id="reservations-root"></div>
       </div>
+
+      <div class="bento-panel bento-panel-invite">
+        <div class="bento-panel-title">Inviter un administrateur</div>
+        <p class="bento-panel-hint">La personne invitée recevra un e-mail pour créer son mot de passe et pourra ensuite se connecter à cette appli et à l'espace admin.</p>
+        <form id="invite-form">
+          <label class="field-label" for="invite-email">E-mail à inviter</label>
+          <input class="field" type="email" id="invite-email" required placeholder="collegue@exemple.com">
+          <button type="submit" class="btn-primary" id="invite-submit">Envoyer l'invitation</button>
+          <div id="invite-success" class="password-success" hidden>Invitation envoyée.</div>
+          <div id="invite-error" class="login-error" hidden></div>
+        </form>
+      </div>
     </div>
   </div>
 
