@@ -31,6 +31,23 @@ body { margin: 0; }
 }
 .app-icon-btn:hover { background: rgba(237,224,211,.22); }
 
+.confirm-backdrop { position: fixed; inset: 0; background: rgba(14,70,61,.35); z-index: 25; }
+.confirm-modal {
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(320px, calc(100vw - 48px));
+  background: #FFFFFF;
+  border-radius: 20px;
+  box-shadow: var(--shadow-card);
+  padding: 20px;
+  z-index: 30;
+}
+.confirm-modal-title { font-family: var(--font-heading); font-weight: 700; font-size: 16.5px; color: var(--ink); margin-bottom: 8px; }
+.confirm-modal-text { font-size: 13.5px; color: var(--muted); line-height: 1.5; margin: 0 0 18px; }
+.confirm-modal-actions { display: flex; gap: 10px; }
+.confirm-modal-actions .rec-btn { flex: 1; min-height: 42px; }
+
 .invite-backdrop { position: fixed; inset: 0; background: rgba(14,70,61,.25); z-index: 15; }
 .invite-popover {
   position: fixed;

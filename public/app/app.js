@@ -225,6 +225,43 @@
   document.addEventListener("click", () => Sound.unlock(), { once: true, capture: true });
 
   /* ------------------------------------------------------------------ */
+  /* Boîte de dialogue de confirmation générique                         */
+  /* ------------------------------------------------------------------ */
+  const Confirm = (() => {
+    const backdrop = document.getElementById("confirm-backdrop");
+    const modal = document.getElementById("confirm-modal");
+    const titleEl = document.getElementById("confirm-modal-title");
+    const textEl = document.getElementById("confirm-modal-text");
+    const cancelBtn = document.getElementById("confirm-modal-cancel");
+    const confirmBtn = document.getElementById("confirm-modal-confirm");
+    let resolvePromise = null;
+
+    function close(result) {
+      backdrop.hidden = true;
+      modal.hidden = true;
+      if (resolvePromise) {
+        resolvePromise(result);
+        resolvePromise = null;
+      }
+    }
+    cancelBtn.addEventListener("click", () => close(false));
+    backdrop.addEventListener("click", () => close(false));
+    confirmBtn.addEventListener("click", () => close(true));
+
+    return {
+      ask(title, text) {
+        titleEl.textContent = title;
+        textEl.textContent = text;
+        backdrop.hidden = false;
+        modal.hidden = false;
+        return new Promise((resolve) => {
+          resolvePromise = resolve;
+        });
+      },
+    };
+  })();
+
+  /* ------------------------------------------------------------------ */
   /* Liste des réservations (confirmer / annuler)                        */
   /* ------------------------------------------------------------------ */
   const Reservations = (() => {
@@ -338,12 +375,21 @@
         btn.addEventListener("click", async () => {
           const id = btn.dataset.setStatus;
           const status = btn.dataset.status;
+          if (status === "annulee") {
+            const r = state.items.find((x) => x.id === id);
+            const ok = await Confirm.ask(
+              "Annuler cette réservation ?",
+              (r ? r.name + " — " : "") + "Cette action peut être annulée en remettant la réservation en attente si besoin."
+            );
+            if (!ok) return;
+          }
           btn.disabled = true;
           try {
             await apiSetStatus(id, status);
             const r = state.items.find((x) => x.id === id);
             if (r) r.status = status;
             render();
+            renderStats();
           } catch (err) {
             btn.disabled = false;
             alert(err.message);
