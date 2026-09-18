@@ -350,6 +350,18 @@
       );
     }
 
+    function ymd(d) {
+      return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+    }
+    function todayStr() {
+      return ymd(new Date());
+    }
+    function tomorrowStr() {
+      const d = new Date();
+      d.setDate(d.getDate() + 1);
+      return ymd(d);
+    }
+
     function render() {
       if (state.screen === "loading") {
         root.innerHTML = '<div class="editor-loading">Chargement…</div>';
@@ -359,18 +371,56 @@
         root.innerHTML = '<div class="login-error">' + esc(state.error) + "</div>";
         return;
       }
-      const filtered = state.filter === "all" ? state.items : state.items.filter((r) => (r.status || "nouveau") === state.filter);
+      const filtered = state.items
+        .filter((r) => state.filter === "all" || (r.status || "nouveau") === state.filter)
+        .filter((r) => !state.dateFilter || r.reservation_date === state.dateFilter);
+
+      const today = todayStr();
+      const tomorrow = tomorrowStr();
+      const emptyMessage = state.dateFilter
+        ? "Aucune réservation à cette date."
+        : "Aucune réservation ici pour l'instant.";
+
       root.innerHTML =
-        '<div class="rec-toolbar"><div class="rec-filter">' +
+        '<div class="rec-toolbar">' +
+        '<div class="rec-filter">' +
         FILTERS.map((f) => '<button type="button" class="rec-filter-btn' + (state.filter === f.key ? " is-active" : "") + '" data-filter="' + f.key + '">' + esc(f.label) + "</button>").join("") +
-        "</div></div>" +
+        "</div>" +
+        '<div class="rec-date-filter">' +
+        '<button type="button" class="rec-filter-btn' + (state.dateFilter === today ? " is-active" : "") + '" data-date-quick="' + today + '">Aujourd\'hui</button>' +
+        '<button type="button" class="rec-filter-btn' + (state.dateFilter === tomorrow ? " is-active" : "") + '" data-date-quick="' + tomorrow + '">Demain</button>' +
+        '<input type="date" class="rec-date-input" id="rec-date-input" value="' + (state.dateFilter || "") + '" aria-label="Choisir une date">' +
+        (state.dateFilter ? '<button type="button" class="rec-date-clear" id="rec-date-clear" aria-label="Effacer le filtre de date">×</button>' : "") +
+        "</div>" +
+        "</div>" +
         (filtered.length
           ? '<div class="rec-list">' + filtered.map(cardHtml).join("") + "</div>"
-          : '<div class="rec-empty">Aucune réservation ici pour l\'instant.</div>');
+          : '<div class="rec-empty">' + esc(emptyMessage) + "</div>");
 
       root.querySelectorAll("[data-filter]").forEach((btn) => {
         btn.addEventListener("click", () => { state.filter = btn.dataset.filter; render(); });
       });
+      root.querySelectorAll("[data-date-quick]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const date = btn.dataset.dateQuick;
+          state.dateFilter = state.dateFilter === date ? null : date;
+          render();
+        });
+      });
+      const dateInput = document.getElementById("rec-date-input");
+      if (dateInput) {
+        dateInput.addEventListener("change", () => {
+          state.dateFilter = dateInput.value || null;
+          render();
+        });
+      }
+      const dateClear = document.getElementById("rec-date-clear");
+      if (dateClear) {
+        dateClear.addEventListener("click", () => {
+          state.dateFilter = null;
+          render();
+        });
+      }
       root.querySelectorAll("[data-set-status]").forEach((btn) => {
         btn.addEventListener("click", async () => {
           const id = btn.dataset.setStatus;
@@ -413,14 +463,13 @@
       if (!pendingEl || !todayEl || !weekEl) return;
 
       const now = new Date();
-      const todayStr = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0") + "-" + String(now.getDate()).padStart(2, "0");
       const monday = startOfWeek(now);
       const sunday = new Date(monday);
       sunday.setDate(monday.getDate() + 6);
       sunday.setHours(23, 59, 59, 999);
 
       const pending = state.items.filter((r) => (r.status || "nouveau") === "nouveau").length;
-      const todayCount = state.items.filter((r) => r.reservation_date === todayStr).length;
+      const todayCount = state.items.filter((r) => r.reservation_date === ymd(now)).length;
       const weekCount = state.items.filter((r) => {
         if (!r.reservation_date) return false;
         const d = new Date(r.reservation_date + "T00:00:00");
@@ -435,7 +484,7 @@
     return {
       pollTimer: null,
       async open() {
-        state = { screen: "loading", items: [], filter: "nouveau", seenIds: new Set() };
+        state = { screen: "loading", items: [], filter: "nouveau", dateFilter: null, seenIds: new Set() };
         render();
         try {
           state.items = await apiList();
