@@ -16,12 +16,18 @@ self.addEventListener("push", (event) => {
     }
   }
   event.waitUntil(
-    self.registration.showNotification(data.title, {
-      body: data.body,
-      icon: "icons/icon-192.png",
-      badge: "icons/icon-192.png",
-      data: { url: data.url || "/app/" },
-    })
+    Promise.all([
+      self.registration.showNotification(data.title, {
+        body: data.body,
+        icon: "icons/icon-192.png",
+        badge: "icons/icon-192.png",
+        vibrate: [200, 100, 200],
+        data: { url: data.url || "/app/" },
+      }),
+      self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) => {
+        clients.forEach((client) => client.postMessage({ type: "new-reservation" }));
+      }),
+    ])
   );
 });
 

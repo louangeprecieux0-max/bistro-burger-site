@@ -65,13 +65,36 @@
     </header>
 
     <div class="app-body" id="app-body">
+      <div class="bento-greeting">
+        <div class="bento-greeting-title">Bonjour<span id="greeting-name"></span></div>
+        <div class="bento-greeting-sub">Suivez les réservations en un coup d'œil.</div>
+      </div>
+
+      <div class="bento-grid">
+        <div class="bento-tile bento-tile-accent">
+          <div class="bento-tile-label">En attente</div>
+          <div class="bento-tile-value" id="stat-pending-value">0</div>
+        </div>
+        <div class="bento-tile">
+          <div class="bento-tile-label">Aujourd'hui</div>
+          <div class="bento-tile-value" id="stat-today-value">0</div>
+        </div>
+        <div class="bento-tile">
+          <div class="bento-tile-label">Cette semaine</div>
+          <div class="bento-tile-value" id="stat-week-value">0</div>
+        </div>
+      </div>
+
       <div id="push-banner" class="push-banner" hidden>
         <span id="push-banner-text">Activez les notifications pour être prévenu dès qu'une réservation arrive.</span>
         <button type="button" class="rec-btn rec-btn-primary" id="push-enable-btn">Activer les notifications</button>
       </div>
       <div id="ios-banner" class="push-banner" hidden>Sur iPhone : ouvrez ce lien dans Safari, appuyez sur Partager → Ajouter à l'écran d'accueil, puis relancez l'appli depuis l'écran d'accueil pour pouvoir activer les notifications.</div>
 
-      <div id="reservations-root"></div>
+      <div class="bento-panel">
+        <div class="bento-panel-title">Réservations</div>
+        <div id="reservations-root"></div>
+      </div>
     </div>
   </div>
 

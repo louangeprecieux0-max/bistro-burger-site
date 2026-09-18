@@ -28,7 +28,7 @@ body { margin: 0; }
 .app-body { max-width: 640px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 18px 16px 60px; }
 
 .push-banner {
-  background: #FFFFFF; border: 1px solid var(--border); border-radius: 14px;
+  background: #FFFFFF; border: 1px solid var(--border); border-radius: 20px;
   padding: 14px 16px; margin-bottom: 16px; font-size: 13.5px; color: var(--ink);
   display: flex; flex-direction: column; gap: 10px; align-items: flex-start;
 }
@@ -36,3 +36,56 @@ body { margin: 0; }
 /* Cibles tactiles confortables sur mobile pour les actions Confirmer/Annuler */
 .app-body .rec-btn { padding: 11px 16px; font-size: 13.5px; min-height: 40px; }
 .app-body .rec-filter-btn { padding: 9px 16px; min-height: 38px; }
+
+/* Tableau de bord "bento" */
+.bento-greeting { margin-bottom: 16px; }
+.bento-greeting-title { font-family: var(--font-heading); font-weight: 800; font-size: 22px; color: var(--ink); }
+.bento-greeting-sub { font-size: 13.5px; color: var(--muted); margin-top: 2px; }
+
+.bento-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  grid-auto-rows: 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.bento-tile {
+  background: #FFFFFF;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 16px 18px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  min-height: 74px;
+}
+.bento-tile-label { font-size: 12px; font-weight: 600; color: var(--muted); letter-spacing: .01em; }
+.bento-tile-value { font-family: var(--font-heading); font-weight: 800; font-size: 26px; color: var(--ink); }
+
+.bento-tile-accent {
+  grid-row: 1 / 3;
+  justify-content: center;
+  align-items: flex-start;
+  border: none;
+  color: var(--cream-500);
+  background: linear-gradient(135deg, var(--green-600) 0%, var(--green-700) 45%, var(--green-900) 100%);
+  box-shadow: inset 0 1px 0 rgba(237,224,211,.25), 0 8px 20px rgba(14,70,61,.3);
+}
+.bento-tile-accent .bento-tile-label { color: rgba(237,224,211,.85); }
+.bento-tile-accent .bento-tile-value { font-size: 40px; }
+
+.bento-panel {
+  background: #FFFFFF;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 16px 16px 18px;
+  box-shadow: var(--shadow-card);
+}
+.bento-panel-title { font-family: var(--font-heading); font-weight: 700; font-size: 15px; color: var(--ink); margin-bottom: 12px; }
+
+@media (max-width: 360px) {
+  .bento-tile-value { font-size: 22px; }
+  .bento-tile-accent .bento-tile-value { font-size: 34px; }
+}

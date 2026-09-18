@@ -22,10 +22,20 @@
   const loginForm = document.getElementById("login-form");
   const loginSubmit = document.getElementById("login-submit");
   const logoutBtn = document.getElementById("logout-btn");
+  const greetingNameEl = document.getElementById("greeting-name");
 
-  function showLoggedIn() {
+  function setGreetingName(session) {
+    if (!greetingNameEl) return;
+    const email = session && session.user && session.user.email;
+    const local = (email || "").split("@")[0];
+    const name = local ? local.charAt(0).toUpperCase() + local.slice(1) : "";
+    greetingNameEl.textContent = name ? ", " + name : "";
+  }
+
+  function showLoggedIn(session) {
     loginScreen.hidden = true;
     appView.hidden = false;
+    setGreetingName(session);
     Reservations.open();
     if (!Reservations.pollTimer) {
       Reservations.pollTimer = setInterval(() => Reservations.reload(), 45000);
@@ -43,15 +53,24 @@
   }
 
   supabase.auth.getSession().then(({ data }) => {
-    if (data.session) showLoggedIn();
+    if (data.session) showLoggedIn(data.session);
   });
   supabase.auth.onAuthStateChange((_event, session) => {
-    if (session) showLoggedIn();
+    if (session) showLoggedIn(session);
     else showLoggedOut();
   });
 
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.addEventListener("message", (event) => {
+      if (event.data && event.data.type === "new-reservation") {
+        Reservations.reload();
+      }
+    });
+  }
+
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
+    Sound.unlock();
     errorBox.hidden = true;
     loginSubmit.disabled = true;
     loginSubmit.textContent = "Connexion…";
@@ -110,6 +129,46 @@
       forgotSuccess.hidden = false;
     }
   });
+
+  /* ------------------------------------------------------------------ */
+  /* Sonnerie de notification (synthétisée, sans fichier audio)          */
+  /* ------------------------------------------------------------------ */
+  const Sound = (() => {
+    let ctx = null;
+    function ensureCtx() {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return null;
+      if (!ctx) ctx = new AudioCtx();
+      if (ctx.state === "suspended") ctx.resume().catch(() => {});
+      return ctx;
+    }
+    function tone(c, freq, startTime, duration, peak) {
+      const osc = c.createOscillator();
+      const gain = c.createGain();
+      osc.type = "sine";
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0, startTime);
+      gain.gain.linearRampToValueAtTime(peak, startTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+      osc.connect(gain).connect(c.destination);
+      osc.start(startTime);
+      osc.stop(startTime + duration + 0.05);
+    }
+    return {
+      unlock() {
+        ensureCtx();
+      },
+      play() {
+        const c = ensureCtx();
+        if (!c) return;
+        const now = c.currentTime;
+        tone(c, 880, now, 0.16, 0.2);
+        tone(c, 1174.66, now + 0.14, 0.24, 0.18);
+      },
+    };
+  })();
+
+  document.addEventListener("click", () => Sound.unlock(), { once: true, capture: true });
 
   /* ------------------------------------------------------------------ */
   /* Liste des réservations (confirmer / annuler)                        */
@@ -239,25 +298,69 @@
       });
     }
 
+    function startOfWeek(d) {
+      const day = (d.getDay() + 6) % 7; // lundi = 0
+      const monday = new Date(d);
+      monday.setDate(d.getDate() - day);
+      monday.setHours(0, 0, 0, 0);
+      return monday;
+    }
+    function renderStats() {
+      if (!state || !state.items) return;
+      const pendingEl = document.getElementById("stat-pending-value");
+      const todayEl = document.getElementById("stat-today-value");
+      const weekEl = document.getElementById("stat-week-value");
+      if (!pendingEl || !todayEl || !weekEl) return;
+
+      const now = new Date();
+      const todayStr = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0") + "-" + String(now.getDate()).padStart(2, "0");
+      const monday = startOfWeek(now);
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+      sunday.setHours(23, 59, 59, 999);
+
+      const pending = state.items.filter((r) => (r.status || "nouveau") === "nouveau").length;
+      const todayCount = state.items.filter((r) => r.reservation_date === todayStr).length;
+      const weekCount = state.items.filter((r) => {
+        if (!r.reservation_date) return false;
+        const d = new Date(r.reservation_date + "T00:00:00");
+        return d >= monday && d <= sunday;
+      }).length;
+
+      pendingEl.textContent = pending;
+      todayEl.textContent = todayCount;
+      weekEl.textContent = weekCount;
+    }
+
     return {
       pollTimer: null,
       async open() {
-        state = { screen: "loading", items: [], filter: "nouveau" };
+        state = { screen: "loading", items: [], filter: "nouveau", seenIds: new Set() };
         render();
         try {
           state.items = await apiList();
+          state.items.forEach((r) => state.seenIds.add(r.id));
           state.screen = "ready";
         } catch (err) {
           state.screen = "error";
           state.error = err.message;
         }
         render();
+        renderStats();
       },
       async reload() {
         if (!state || state.screen !== "ready") return;
         try {
-          state.items = await apiList();
+          const items = await apiList();
+          const newPending = items.filter((r) => !state.seenIds.has(r.id) && (r.status || "nouveau") === "nouveau");
+          items.forEach((r) => state.seenIds.add(r.id));
+          state.items = items;
           render();
+          renderStats();
+          if (newPending.length) {
+            Sound.play();
+            if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+          }
         } catch {}
       },
     };
