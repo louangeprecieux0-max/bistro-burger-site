@@ -226,7 +226,7 @@ a:not(.btn):hover { color: var(--green-700); }
 
 .field-check { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font-body); font-size: 15px; cursor: pointer; }
 .field-check input { display: none; }
-.field-check .box { width: 20px; height: 20px; border-radius: 5px; flex-shrink: 0; border: 1.5px solid var(--border-on-dark); display: flex; align-items: center; justify-content: center; color: var(--color-secondary); font-size: 13px; line-height: 1; }
+.field-check .box { width: 20px; height: 20px; border-radius: 5px; flex-shrink: 0; border: 1.5px solid var(--border-on-dark); display: flex; align-items: center; justify-content: center; color: transparent; font-size: 13px; line-height: 1; }
 .field-check input:checked ~ .box { border: none; background: var(--color-secondary); color: var(--color-primary); }
 
 .dialog-backdrop { position: fixed; inset: 0; background: rgba(44,44,42,0.5); display: flex; align-items: center; justify-content: center; z-index: 100; }
