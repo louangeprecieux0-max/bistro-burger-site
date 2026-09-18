@@ -136,7 +136,7 @@
       <div data-reveal style="position: relative">
         <div class="eyebrow">À propos</div>
         <h2 style="font-family:var(--font-heading); font-weight:700; font-size:42px; line-height:1.15; margin:16px 0 0; color:var(--color-primary);">Une brasserie moderne au cœur de la ZAC Avon</h2>
-        <p style="font-size:16.5px; line-height:1.7; color:var(--text-muted); margin:20px 0 0;">Bistro Burger est une brasserie familiale née à Gardanne d'une idée simple : proposer des burgers et des plats de brasserie qu'on aurait plaisir à manger tous les jours. Ici, tout est cuisiné sur place, à la commande, avec des produits frais sélectionnés auprès de nos fournisseurs.</p>
+        <p style="font-size:16.5px; line-height:1.7; color:var(--text-muted); margin:20px 0 0;">Bistro Burger est une brasserie familiale née à Gardanne d'une idée simple : proposer des plats de brasserie et des burgers qu'on aurait plaisir à manger tous les jours. Ici, tout est cuisiné sur place, à la commande, avec des produits frais sélectionnés auprès de nos fournisseurs.</p>
         <div style="font-size:16.5px; line-height:1.7; color:var(--text-muted); margin:14px 0 0;"><p>Le plat du jour est au cœur de notre carte : chaque midi du lundi au vendredi, nos équipes préparent une recette différente, mijotée comme à la maison, en plus de notre carte brasserie disponible à tout moment et de nos desserts faits maison. Le midi, les actifs de la ZAC Avon viennent pour la formule et le plat du jour ; le soir et le week-end, la salle se remplit de familles et de tablées d'amis autour de nos burgers et grands classiques de brasserie. Le service reste le même : rapide, généreux, avec le sourire.</p></div>
         <div style="font-size:16.5px; line-height:1.7; color:var(--text-muted); margin:14px 0 0;"><p>Bistro Burger, c'est aussi un service traiteur : pour vos repas d'entreprise, événements ou grandes tablées, nous préparons des plats à emporter en quantité, dans le même esprit fait maison. Contactez-nous pour en discuter.</p></div>
         <div style="margin-top:30px;">
@@ -160,8 +160,7 @@
   <!-- 05 · DÉCOUVRIR LA CARTE (Plat du jour + Suggestion) -->
   <section id="plat-du-jour" style="background:var(--surface-alt); padding:80px 24px 96px;">
     <div style="max-width:1240px; margin:0 auto 40px; text-align:center;" data-reveal>
-      <div class="eyebrow">Notre carte</div>
-      <h2 style="font-family:var(--font-heading); font-weight:700; font-size:42px; margin:16px 0 0; color:var(--color-primary);">Plat du jour &amp; suggestion, puis toute la carte</h2>
+      <h2 style="font-family:var(--font-heading); font-weight:700; font-size:42px; margin:16px 0 0; color:var(--color-primary);">Plat du jour &amp; suggestion</h2>
       <p style="font-size:16px; line-height:1.65; color:var(--text-muted); max-width:620px; margin:14px auto 0;">Chaque jour une recette différente et une suggestion du chef, juste avant nos burgers et notre carte complète.</p>
     </div>
     <div data-two-grid style="max-width:1240px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:24px;">
@@ -303,10 +302,11 @@
         <div style="grid-column:1 / -1; color:rgba(237,224,211,.8); font-size:13px; line-height:1.5;">
           <label class="field-check"><input type="checkbox" name="consent" required><span class="box">✓</span>J'accepte que mes coordonnées soient utilisées pour traiter cette réservation.</label>
         </div>
+        <div id="reservation-recaptcha" style="grid-column:1 / -1;" hidden></div>
         <div style="grid-column:1 / -1; margin-top:4px;">
           <button type="submit" class="btn btn-on-green btn-submit" data-shine style="width:100%;">Réserver ma table</button>
         </div>
-        <div id="reservation-sent" hidden style="grid-column:1 / -1; background:rgba(237,224,211,.18); border:1px solid rgba(237,224,211,.4); border-radius:var(--radius-button); padding:14px; font-size:14px; text-align:center;">Merci, votre demande est bien enregistrée. Nous vous rappelons pour confirmer.</div>
+        <div id="reservation-sent" hidden style="grid-column:1 / -1; background:rgba(237,224,211,.18); border:1px solid rgba(237,224,211,.4); border-radius:var(--radius-button); padding:14px; font-size:14px; text-align:center;">Merci, votre demande est bien enregistrée.</div>
         <div id="reservation-error" hidden style="grid-column:1 / -1; background:rgba(181,101,29,.25); border:1px solid rgba(181,101,29,.6); border-radius:var(--radius-button); padding:14px; font-size:14px; text-align:center;">L'envoi a échoué. Réessayez, ou appelez-nous directement au 04 65 84 89 18.</div>
       </form>
     </div>

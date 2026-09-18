@@ -8,6 +8,7 @@ const path = require("path");
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
+const RECAPTCHA_SITE_KEY = process.env.RECAPTCHA_SITE_KEY;
 const OUT_FILE = path.join(__dirname, "..", "public", "data.generated.js");
 const ADMIN_CONFIG_FILE = path.join(__dirname, "..", "public", "admin", "config.generated.js");
 
@@ -32,6 +33,7 @@ async function main() {
   for (const row of data || []) {
     siteData[row.key] = row.value;
   }
+  if (RECAPTCHA_SITE_KEY) siteData.recaptchaSiteKey = RECAPTCHA_SITE_KEY;
 
   const required = ["burgers", "cartes", "plat_du_jour", "offres", "reservation_settings"];
   const missing = required.filter((k) => !(k in siteData));

@@ -1076,6 +1076,24 @@
     const sentBox = document.getElementById("reservation-sent");
     const errorBox = document.getElementById("reservation-error");
     const sendFailedMessage = errorBox.textContent;
+
+    const recaptchaSiteKey = SITE_DATA.recaptchaSiteKey || "";
+    const recaptchaBox = document.getElementById("reservation-recaptcha");
+    let recaptchaWidgetId = null;
+    if (recaptchaSiteKey && recaptchaBox) {
+      recaptchaBox.hidden = false;
+      window.__onRecaptchaLoad = function () {
+        if (window.grecaptcha && recaptchaBox) {
+          recaptchaWidgetId = window.grecaptcha.render(recaptchaBox, { sitekey: recaptchaSiteKey });
+        }
+      };
+      const s = document.createElement("script");
+      s.src = "https://www.google.com/recaptcha/api.js?onload=__onRecaptchaLoad&render=explicit";
+      s.async = true;
+      s.defer = true;
+      document.head.appendChild(s);
+    }
+
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       sentBox.hidden = true;
@@ -1087,6 +1105,16 @@
         const firstInvalid = form.querySelector(":invalid");
         if (firstInvalid) firstInvalid.focus();
         return;
+      }
+      let recaptchaToken = "";
+      if (recaptchaSiteKey && window.grecaptcha) {
+        recaptchaToken = window.grecaptcha.getResponse(recaptchaWidgetId ?? undefined);
+        if (!recaptchaToken) {
+          errorBox.textContent = "Merci de valider le contrôle anti-robot avant d'envoyer votre demande.";
+          errorBox.hidden = false;
+          errorBox.scrollIntoView({ behavior: "smooth", block: "center" });
+          return;
+        }
       }
       errorBox.textContent = sendFailedMessage;
       const submitBtn = form.querySelector("button[type=submit]");
@@ -1105,6 +1133,7 @@
             date: data.get("date"),
             time: data.get("heure"),
             partySize: data.get("couverts"),
+            recaptchaToken: recaptchaToken || undefined,
           }),
         });
         if (!res.ok) throw new Error("request failed");
@@ -1117,6 +1146,7 @@
       } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = originalLabel;
+        if (recaptchaSiteKey && window.grecaptcha) window.grecaptcha.reset(recaptchaWidgetId ?? undefined);
       }
     });
   })();
@@ -1133,7 +1163,7 @@
   const promoBackdrop = document.getElementById("promo-backdrop");
   if (promoBackdrop && OFFRES.length) {
     const PROMO_INDEX_KEY = "bb-promo-offer-index";
-    const PROMO_FIRST_DELAY_MS = 10000;
+    const PROMO_FIRST_DELAY_MS = 60000;
     const PROMO_REPEAT_MS = 60000;
 
     const promoImgWrapEl = document.getElementById("promo-img-wrap");
@@ -1142,7 +1172,18 @@
     const promoTitleEl = document.getElementById("promo-title");
     const promoDescEl = document.getElementById("promo-desc");
     const promoPriceEl = document.getElementById("promo-price");
+    const promoReserveEl = document.getElementById("promo-reserve");
 
+    // Les offres "menu" se réservent (table à venir manger sur place) ; les offres
+    // "carte" (fidélité, cadeau) sont purement informatives, pas de table à réserver.
+    function ctaForOffer(offer) {
+      if (offer.tag === "Carte de fidélité" || offer.tag === "Carte cadeau") {
+        return { label: "Voir toutes nos offres", go: "offres" };
+      }
+      return { label: "Réserver", go: "reservation" };
+    }
+
+    let currentPromoGo = "reservation";
     function renderPromoOffer(offer) {
       if (promoImgEl && offer.img) {
         promoImgEl.src = offer.img;
@@ -1155,6 +1196,9 @@
       if (promoTitleEl) promoTitleEl.textContent = offer.title || "";
       if (promoDescEl) promoDescEl.textContent = offer.description || "";
       if (promoPriceEl) promoPriceEl.textContent = offer.price || "";
+      const cta = ctaForOffer(offer);
+      currentPromoGo = cta.go;
+      if (promoReserveEl) promoReserveEl.textContent = cta.label;
     }
 
     function pickOfferIndex() {
@@ -1225,7 +1269,7 @@
     document.getElementById("promo-close").addEventListener("click", closePromo);
     promoBackdrop.addEventListener("click", (e) => { if (e.target === promoBackdrop) closePromo(); });
     document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !promoBackdrop.hidden) closePromo(); });
-    document.getElementById("promo-reserve").addEventListener("click", () => { closePromo(); jump("reservation"); });
+    promoReserveEl.addEventListener("click", () => { closePromo(); jump(currentPromoGo); });
     document.getElementById("promo-see-offers").addEventListener("click", () => { closePromo(); jump("offres"); });
   }
 
