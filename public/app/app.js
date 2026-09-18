@@ -361,6 +361,52 @@
       d.setDate(d.getDate() + 1);
       return ymd(d);
     }
+    function formatDisplayDate(iso) {
+      try {
+        const s = new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long" }).format(new Date(iso + "T00:00:00"));
+        return s.charAt(0).toUpperCase() + s.slice(1);
+      } catch {
+        return iso;
+      }
+    }
+    function calendarHtml() {
+      const y = state.calYear;
+      const m = state.calMonth;
+      const first = new Date(y, m, 1);
+      const startOffset = (first.getDay() + 6) % 7;
+      const daysInMonth = new Date(y, m + 1, 0).getDate();
+      const today = todayStr();
+      const selected = state.dateFilter || "";
+      const monthLabel = first.toLocaleDateString("fr-FR", { month: "long", year: "numeric" });
+      const monthLabelCap = monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1);
+
+      let cells = "";
+      for (let i = 0; i < startOffset; i++) cells += "<span></span>";
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dateStr = y + "-" + String(m + 1).padStart(2, "0") + "-" + String(d).padStart(2, "0");
+        const cls = ["pdj-cal-day"];
+        if (dateStr === selected) cls.push("is-selected");
+        if (dateStr === today) cls.push("is-today");
+        cells += '<button type="button" class="' + cls.join(" ") + '" data-cal-day="' + dateStr + '">' + d + "</button>";
+      }
+
+      return (
+        '<div class="pdj-cal">' +
+        '<div class="pdj-cal-head">' +
+        '<button type="button" class="pdj-cal-nav" id="rec-cal-prev" aria-label="Mois précédent">‹</button>' +
+        '<span class="pdj-cal-month">' + esc(monthLabelCap) + "</span>" +
+        '<button type="button" class="pdj-cal-nav" id="rec-cal-next" aria-label="Mois suivant">›</button>' +
+        "</div>" +
+        '<div class="pdj-cal-grid">' +
+        ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"].map((d) => '<span class="pdj-cal-dow">' + d + "</span>").join("") +
+        cells +
+        "</div>" +
+        (selected
+          ? '<div class="pdj-cal-selected-box"><span class="pdj-cal-selected-check">✓</span>' + esc(formatDisplayDate(selected)) + "</div>"
+          : '<div class="pdj-cal-selected-box is-empty">Choisissez une date ci-dessous</div>') +
+        "</div>"
+      );
+    }
 
     function render() {
       if (state.screen === "loading") {
@@ -389,10 +435,11 @@
         '<div class="rec-date-filter">' +
         '<button type="button" class="rec-filter-btn' + (state.dateFilter === today ? " is-active" : "") + '" data-date-quick="' + today + '">Aujourd\'hui</button>' +
         '<button type="button" class="rec-filter-btn' + (state.dateFilter === tomorrow ? " is-active" : "") + '" data-date-quick="' + tomorrow + '">Demain</button>' +
-        '<input type="date" class="rec-date-input" id="rec-date-input" value="' + (state.dateFilter || "") + '" aria-label="Choisir une date">' +
+        '<button type="button" class="rec-filter-btn' + (state.showCalendar ? " is-active" : "") + '" id="rec-cal-toggle">Calendrier</button>' +
         (state.dateFilter ? '<button type="button" class="rec-date-clear" id="rec-date-clear" aria-label="Effacer le filtre de date">×</button>' : "") +
         "</div>" +
         "</div>" +
+        (state.showCalendar ? calendarHtml() : "") +
         (filtered.length
           ? '<div class="rec-list">' + filtered.map(cardHtml).join("") + "</div>"
           : '<div class="rec-empty">' + esc(emptyMessage) + "</div>");
@@ -407,13 +454,42 @@
           render();
         });
       });
-      const dateInput = document.getElementById("rec-date-input");
-      if (dateInput) {
-        dateInput.addEventListener("change", () => {
-          state.dateFilter = dateInput.value || null;
+      const calToggle = document.getElementById("rec-cal-toggle");
+      if (calToggle) {
+        calToggle.addEventListener("click", () => {
+          state.showCalendar = !state.showCalendar;
           render();
         });
       }
+      const calPrev = document.getElementById("rec-cal-prev");
+      if (calPrev) {
+        calPrev.addEventListener("click", () => {
+          state.calMonth -= 1;
+          if (state.calMonth < 0) {
+            state.calMonth = 11;
+            state.calYear -= 1;
+          }
+          render();
+        });
+      }
+      const calNext = document.getElementById("rec-cal-next");
+      if (calNext) {
+        calNext.addEventListener("click", () => {
+          state.calMonth += 1;
+          if (state.calMonth > 11) {
+            state.calMonth = 0;
+            state.calYear += 1;
+          }
+          render();
+        });
+      }
+      root.querySelectorAll("[data-cal-day]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          state.dateFilter = btn.dataset.calDay;
+          state.showCalendar = false;
+          render();
+        });
+      });
       const dateClear = document.getElementById("rec-date-clear");
       if (dateClear) {
         dateClear.addEventListener("click", () => {
@@ -484,7 +560,17 @@
     return {
       pollTimer: null,
       async open() {
-        state = { screen: "loading", items: [], filter: "nouveau", dateFilter: null, seenIds: new Set() };
+        const now = new Date();
+        state = {
+          screen: "loading",
+          items: [],
+          filter: "nouveau",
+          dateFilter: null,
+          showCalendar: false,
+          calYear: now.getFullYear(),
+          calMonth: now.getMonth(),
+          seenIds: new Set(),
+        };
         render();
         try {
           state.items = await apiList();

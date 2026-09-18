@@ -167,12 +167,6 @@ body { margin: 0; }
 .bento-panel-hint { font-size: 13px; color: var(--muted); line-height: 1.5; margin: 0 0 14px; }
 
 .rec-date-filter { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.rec-date-input {
-  font-family: var(--font-body); font-size: 13px; font-weight: 600;
-  padding: 7px 12px; border-radius: 999px; border: 1px solid var(--border);
-  background: #FFFFFF; color: var(--ink); cursor: pointer;
-}
-.rec-date-input:focus { border-color: var(--green-700); }
 .rec-date-clear {
   width: 30px; height: 30px; flex: none; display: flex; align-items: center; justify-content: center;
   font-size: 16px; line-height: 1; border-radius: 50%; border: 1px solid var(--border);
