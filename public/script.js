@@ -1270,7 +1270,6 @@
     promoBackdrop.addEventListener("click", (e) => { if (e.target === promoBackdrop) closePromo(); });
     document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !promoBackdrop.hidden) closePromo(); });
     promoReserveEl.addEventListener("click", () => { closePromo(); jump(currentPromoGo); });
-    document.getElementById("promo-see-offers").addEventListener("click", () => { closePromo(); jump("offres"); });
   }
 
   /* ---------------------------------------------------------------- */

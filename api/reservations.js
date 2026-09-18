@@ -6,7 +6,46 @@ const { notifyAdmins } = require("./_lib/notify");
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const RESEND_FROM_EMAIL = process.env.RESEND_FROM_EMAIL;
 const ALERT_EMAIL = "louangeprecieux0@gmail.com";
+
+function escapeHtml(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+  })[c]);
+}
+
+// N'envoie rien tant que RESEND_API_KEY et RESEND_FROM_EMAIL (nécessite un nom
+// de domaine vérifié) ne sont pas configurés — best-effort, ne bloque jamais
+// l'enregistrement de la réservation en base.
+async function sendCustomerConfirmationEmail(row) {
+  if (!RESEND_API_KEY || !RESEND_FROM_EMAIL || !row.email) return;
+  try {
+    const details = [];
+    if (row.reservation_date) details.push("le " + row.reservation_date);
+    if (row.reservation_time) details.push("à " + row.reservation_time);
+    if (row.party_size) details.push("(" + row.party_size + ")");
+    await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + RESEND_API_KEY,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: "Bistro Burger <" + RESEND_FROM_EMAIL + ">",
+        to: row.email,
+        subject: "Votre demande de réservation — Bistro Burger",
+        html:
+          "<p>Bonjour " + escapeHtml(row.name) + ",</p>" +
+          "<p>Nous avons bien reçu votre demande de réservation" +
+          (details.length ? " " + escapeHtml(details.join(" ")) : "") +
+          ". Notre équipe vous recontacte pour confirmer.</p>" +
+          "<p>À bientôt,<br>Bistro Burger — Gardanne</p>",
+      }),
+    });
+  } catch {}
+}
 
 async function verifyRecaptcha(token) {
   if (!RECAPTCHA_SECRET_KEY) return true; // captcha non configuré : ne bloque pas les réservations
@@ -87,6 +126,7 @@ module.exports = async (req, res) => {
     couverts: row.party_size,
     message: row.message,
   });
+  await sendCustomerConfirmationEmail(row);
 
   res.status(200).json({ ok: true });
 };
