@@ -3,7 +3,18 @@
 
 body { margin: 0; }
 
-.app-view { min-height: 100vh; background: var(--page-bg); display: flex; flex-direction: column; }
+.app-view {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--green-900);
+  background-image:
+    linear-gradient(180deg, rgba(14,70,61,.72) 0%, rgba(14,70,61,.86) 55%, rgba(14,70,61,.94) 100%),
+    url('../assets/hero-burger.webp');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
 
 .app-header {
   display: flex;
@@ -91,8 +102,8 @@ body { margin: 0; }
 
 /* Tableau de bord "bento" */
 .bento-greeting { margin-bottom: 16px; }
-.bento-greeting-title { font-family: var(--font-heading); font-weight: 800; font-size: 22px; color: var(--ink); }
-.bento-greeting-sub { font-size: 13.5px; color: var(--muted); margin-top: 2px; }
+.bento-greeting-title { font-family: var(--font-heading); font-weight: 800; font-size: 22px; color: var(--cream-500); }
+.bento-greeting-sub { font-size: 13.5px; color: rgba(237,224,211,.8); margin-top: 2px; }
 
 .bento-grid {
   display: grid;
