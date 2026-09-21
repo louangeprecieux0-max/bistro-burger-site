@@ -926,6 +926,9 @@
     }
   };
 
+  const readMinutes = (post) => Math.max(1, Math.round(String(post.body || "").split(/\s+/).filter(Boolean).length / 200));
+  const blogMeta = (post) => `${esc(blogDate(post.date))} &bull; ${readMinutes(post)} min de lecture`;
+
   function blogCard(post, i) {
     const card = el("a", { class: "blog-post", href: blogBase + post.slug + ".html" });
     if (post.img) {
@@ -933,57 +936,87 @@
     } else {
       card.appendChild(el("div", { class: "blog-post-img ph " + GRADS[i % 3] }, "Photo — " + esc(post.title)));
     }
-    if (post.category) card.appendChild(el("span", { class: "blog-cat" }, esc(post.category)));
+    if (post.category) card.appendChild(el("span", { class: "blog-cat blog-cat-soft" }, esc(post.category)));
     card.appendChild(el("h3", {}, esc(post.title)));
     if (post.excerpt) card.appendChild(el("p", {}, esc(post.excerpt)));
-    card.appendChild(el("div", { class: "blog-meta" },
-      `<span class="blog-avatar"><img src="${esc(blogAssetBase)}assets/logo-cream-sm.png" alt=""></span><span><strong>Bistro Burger</strong> &bull; ${esc(blogDate(post.date))}</span>`));
+    card.appendChild(el("div", { class: "blog-meta" }, blogMeta(post)));
     return card;
   }
 
-  let blogFilter = "all";
+  const ARROW_LEFT = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12H4M10 6l-6 6 6 6"></path></svg>';
+  const ARROW_RIGHT = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M14 6l6 6-6 6"></path></svg>';
 
   function renderBlog() {
-    const grid = document.getElementById("blog-grid");
-    if (!grid) return;
+    const sections = document.getElementById("blog-sections");
+    if (!sections) return;
+    const top = document.getElementById("blog-top");
     const featuredEl = document.getElementById("blog-featured");
-    const filtersEl = document.getElementById("blog-filters");
+    const latestEl = document.getElementById("blog-latest");
+    const latestList = document.getElementById("blog-latest-list");
+    sections.innerHTML = "";
+    featuredEl.innerHTML = "";
+    latestList.innerHTML = "";
 
-    if (filtersEl) {
-      const used = BLOG_CATEGORIES.filter((c) => POSTS.some((p) => p.category === c));
-      filtersEl.innerHTML = "";
-      if (used.length > 1) {
-        ["all"].concat(used).forEach((c) => {
-          const btn = el("button", { type: "button", class: "blog-chip" + (blogFilter === c ? " is-active" : "") }, esc(c === "all" ? "Tous les articles" : c));
-          btn.addEventListener("click", () => { blogFilter = c; renderBlog(); });
-          filtersEl.appendChild(btn);
-        });
-      }
-    }
-
-    const posts = blogFilter === "all" ? POSTS : POSTS.filter((p) => p.category === blogFilter);
-    grid.innerHTML = "";
-    if (featuredEl) featuredEl.innerHTML = "";
-
-    if (!posts.length) {
-      grid.appendChild(el("p", { class: "blog-empty" }, POSTS.length ? "Aucun article dans cette catégorie pour l'instant." : "Les premiers articles arrivent bientôt."));
+    if (!POSTS.length) {
+      top.hidden = true;
+      sections.appendChild(el("p", { class: "blog-empty" }, "Les premiers articles arrivent bientôt."));
       return;
     }
 
-    const [featured, ...others] = posts;
-    if (featuredEl) {
-      featuredEl.innerHTML =
-        `<a class="blog-hero" href="${esc(blogBase + featured.slug)}.html">` +
-        (featured.img ? `<img src="${esc(blogImgUrl(featured.img))}" alt="${esc(featured.title)}">` : "") +
-        `<div class="blog-hero-shade"></div>` +
-        `<div class="blog-hero-content"><span class="blog-hero-label">À la une${featured.category ? " · " + esc(featured.category) : ""}</span>` +
-        `<h2>${esc(featured.title)}</h2>${featured.excerpt ? `<p>${esc(featured.excerpt)}</p>` : ""}</div>` +
-        `<span class="blog-hero-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M14 6l6 6-6 6"></path></svg></span>` +
-        `</a>`;
-    }
-    (featuredEl ? others : posts).forEach((post, i) => grid.appendChild(blogCard(post, i)));
-    const title = document.getElementById("blog-recent-title");
-    if (title) title.hidden = !(featuredEl ? others : posts).length;
+    // À la une (grande carte) + liste des derniers articles à droite
+    const [featured, ...rest] = POSTS;
+    featuredEl.innerHTML =
+      `<a class="blog-hero" href="${esc(blogBase + featured.slug)}.html">` +
+      (featured.img ? `<img src="${esc(blogImgUrl(featured.img))}" alt="${esc(featured.title)}">` : "") +
+      `<div class="blog-hero-shade"></div>` +
+      `<div class="blog-hero-content"><span class="blog-hero-label">${esc(featured.category || "À la une")}</span>` +
+      `<h2>${esc(featured.title)}</h2><div class="blog-hero-meta">${blogMeta(featured)}</div></div></a>`;
+
+    const latest = rest.slice(0, 4);
+    latestEl.hidden = !latest.length;
+    top.classList.toggle("is-solo", !latest.length);
+    latest.forEach((p, i) => {
+      const a = el("a", { class: "blog-latest-item", href: blogBase + p.slug + ".html" });
+      a.appendChild(p.img
+        ? el("div", { class: "blog-latest-thumb" }, `<img src="${esc(blogImgUrl(p.img))}" alt="" loading="lazy">`)
+        : el("div", { class: "blog-latest-thumb ph " + GRADS[i % 3] }, ""));
+      a.appendChild(el("div", { class: "blog-latest-body" }, `<strong>${esc(p.title)}</strong><span>${blogMeta(p)}</span>`));
+      latestList.appendChild(a);
+    });
+
+    // Une section par catégorie, avec flèches de défilement
+    const groups = BLOG_CATEGORIES
+      .filter((c) => POSTS.some((p) => p.category === c))
+      .map((c) => ({ name: c, posts: POSTS.filter((p) => p.category === c) }));
+    const others = POSTS.filter((p) => !p.category || !BLOG_CATEGORIES.includes(p.category));
+    if (others.length) groups.push({ name: "Autres articles", posts: others });
+
+    groups.forEach((g) => {
+      const section = el("div", { class: "blog-cat-section" });
+      section.appendChild(el("div", { class: "blog-cat-head" },
+        `<h2>${esc(g.name)}</h2><div class="blog-arrows" hidden>` +
+        `<button type="button" class="blog-arrow" data-blog-prev aria-label="Précédent">${ARROW_LEFT}</button>` +
+        `<button type="button" class="blog-arrow" data-blog-next aria-label="Suivant">${ARROW_RIGHT}</button></div>`));
+      const row = el("div", { class: "blog-row" });
+      g.posts.forEach((p, i) => row.appendChild(blogCard(p, i)));
+      section.appendChild(row);
+      sections.appendChild(section);
+
+      const arrows = section.querySelector(".blog-arrows");
+      const prev = section.querySelector("[data-blog-prev]");
+      const next = section.querySelector("[data-blog-next]");
+      const update = () => {
+        arrows.hidden = row.scrollWidth <= row.clientWidth + 4;
+        prev.disabled = row.scrollLeft <= 2;
+        next.disabled = row.scrollLeft + row.clientWidth >= row.scrollWidth - 2;
+      };
+      const step = () => (row.firstElementChild ? row.firstElementChild.getBoundingClientRect().width + 28 : 300);
+      prev.addEventListener("click", () => row.scrollBy({ left: -step(), behavior: "smooth" }));
+      next.addEventListener("click", () => row.scrollBy({ left: step(), behavior: "smooth" }));
+      row.addEventListener("scroll", update, { passive: true });
+      window.addEventListener("resize", update);
+      requestAnimationFrame(update);
+    });
   }
   renderBlog();
 

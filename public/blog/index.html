@@ -66,11 +66,15 @@
   <section style="background:var(--surface-alt); padding:36px 24px 100px;">
     <div style="max-width:1240px; margin:0 auto;">
       <h1 style="position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0);">Blog — La vie du restaurant</h1>
-      <div id="blog-filters" class="blog-filters" role="group" aria-label="Filtrer par catégorie"></div>
-      <div id="blog-featured"></div>
+      <div class="blog-top" id="blog-top">
+        <div id="blog-featured"></div>
+        <aside class="blog-latest" id="blog-latest">
+          <h2 class="blog-side-title">Derniers articles</h2>
+          <div id="blog-latest-list"></div>
+        </aside>
+      </div>
 
-      <h2 class="blog-section-title" id="blog-recent-title">Articles récents</h2>
-      <div id="blog-grid" class="blog-grid"></div>
+      <div id="blog-sections"></div>
 
       <div class="blog-cta" data-reveal>
         <h2>Envie d'une bonne table ?</h2>
