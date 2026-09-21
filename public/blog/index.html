@@ -63,14 +63,22 @@
     </div>
   </header>
 
-  <section style="background:linear-gradient(180deg,var(--surface-alt),var(--cream-400)); padding:72px 24px 100px;">
+  <section style="background:var(--surface-alt); padding:36px 24px 100px;">
     <div style="max-width:1240px; margin:0 auto;">
-      <div style="text-align:center;" data-reveal>
-        <div class="eyebrow">Blog</div>
-        <h1 style="font-family:var(--font-heading); font-weight:700; font-size:42px; margin:16px 0 0; color:var(--color-primary);">La vie du restaurant</h1>
-        <p style="font-size:16px; line-height:1.65; color:var(--text-muted); max-width:620px; margin:14px auto 0;">Nouveautés de la carte, coulisses de la cuisine et rendez-vous à ne pas manquer.</p>
+      <h1 style="position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0);">Blog — La vie du restaurant</h1>
+      <div id="blog-featured"></div>
+
+      <h2 class="blog-section-title">Articles récents</h2>
+      <div id="blog-grid" class="blog-grid"></div>
+
+      <div class="blog-cta" data-reveal>
+        <h2>Envie d'une bonne table ?</h2>
+        <p>Burgers faits maison et plats du jour, à Gardanne. Réservez la vôtre en quelques clics.</p>
+        <div class="blog-cta-actions">
+          <a href="../index.html#reservation" class="btn btn-on-green" data-shine>Réserver une table</a>
+          <a href="tel:+33465848918" class="btn btn-outline-on-green">04 65 84 89 18</a>
+        </div>
       </div>
-      <div data-three-grid id="blog-grid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-top:44px;"></div>
     </div>
   </section>
 

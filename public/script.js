@@ -914,19 +914,32 @@
     const assetBaseAttr = document.body.getAttribute("data-asset-base");
     const assetBase = assetBaseAttr !== null ? assetBaseAttr : "";
     grid.innerHTML = "";
-    POSTS.forEach((post, i) => {
-      const card = el("a", { class: "card blog-card", href: blogBase + post.slug + ".html", style: "background:#FFFFFF; overflow:hidden;" });
+    const featuredEl = document.getElementById("blog-featured");
+    const [featured, ...others] = POSTS;
+    if (featuredEl && featured) {
+      featuredEl.innerHTML =
+        `<a class="blog-hero" href="${esc(blogBase + featured.slug)}.html">` +
+        (featured.img ? `<img src="${esc(assetBase + featured.img)}" alt="${esc(featured.title)}">` : "") +
+        `<div class="blog-hero-shade"></div>` +
+        `<div class="blog-hero-content"><span class="blog-hero-label">À la une</span>` +
+        `<h2>${esc(featured.title)}</h2><p>${esc(featured.excerpt)}</p></div>` +
+        `<span class="blog-hero-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M14 6l6 6-6 6"></path></svg></span>` +
+        `</a>`;
+    }
+    (featuredEl ? others : POSTS).forEach((post, i) => {
+      const parts = String(post.date || "").split(" · ");
+      const author = parts.length > 1 ? parts[0] : "Bistro Burger";
+      const when = parts.length > 1 ? parts.slice(1).join(" · ") : parts[0];
+      const card = el("a", { class: "blog-post", href: blogBase + post.slug + ".html" });
       if (post.img) {
-        card.appendChild(el("div", { style: "aspect-ratio:16/10; overflow:hidden;" }, `<img src="${esc(assetBase + post.img)}" alt="${esc(post.title)}" style="width:100%; height:100%; object-fit:cover; display:block;">`));
+        card.appendChild(el("div", { class: "blog-post-img" }, `<img src="${esc(assetBase + post.img)}" alt="${esc(post.title)}">`));
       } else {
-        card.appendChild(el("div", { class: "ph " + GRADS[i % 3], style: "aspect-ratio:16/10;" }, "Photo — " + esc(post.title)));
+        card.appendChild(el("div", { class: "blog-post-img ph " + GRADS[i % 3] }, "Photo — " + esc(post.title)));
       }
-      const body = el("div", { style: "padding:24px;" });
-      body.appendChild(el("div", { style: "font-size:12.5px; color:var(--text-muted);" }, esc(post.date)));
-      body.appendChild(el("h3", { style: "font-family:var(--font-heading); font-weight:600; font-size:19px; margin:8px 0 0; color:var(--text-body);" }, esc(post.title)));
-      body.appendChild(el("p", { style: "font-size:14px; line-height:1.6; color:var(--text-muted); margin:10px 0 0;" }, esc(post.excerpt)));
-      body.appendChild(el("span", { style: "display:inline-block; margin-top:14px; font-family:var(--font-heading); font-weight:600; font-size:13.5px; color:var(--color-primary);" }, "Lire la suite →"));
-      card.appendChild(body);
+      card.appendChild(el("h3", {}, esc(post.title)));
+      card.appendChild(el("p", {}, esc(post.excerpt)));
+      card.appendChild(el("div", { class: "blog-meta" },
+        `<span class="blog-avatar"><img src="${esc(assetBase)}assets/logo-cream-sm.png" alt=""></span><span><strong>${esc(author)}</strong> &bull; ${esc(when)}</span>`));
       grid.appendChild(card);
     });
   }
