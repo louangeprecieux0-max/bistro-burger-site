@@ -101,6 +101,7 @@ window.AdminDrafts = (() => {
     { key: "reservations", title: "Réservations", editor: () => window.ReservationsEditor },
     { key: "popup", title: "Pop-up promo", editor: () => window.PopupEditor },
     { key: "annonces", title: "Annonces", editor: () => window.AnnoncesEditor },
+    { key: "blog", title: "Blog", editor: () => window.BlogEditor },
     { key: "commandes", title: "Commandes", editor: () => window.CommandesEditor },
     { key: "reservations-clients", title: "Réservations reçues", editor: () => window.ReservationsClientsEditor },
   ];

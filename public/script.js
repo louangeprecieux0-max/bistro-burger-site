@@ -228,11 +228,20 @@
     { q: "Y a-t-il un parking ?", a: "Un parking gratuit se trouve directement devant le restaurant, dans la ZAC Avon. Aucun horodateur, aucune limite de durée." }
   ];
 
-  const POSTS = [
-    { slug: "la-terrasse-est-ouverte-tout-lete", img: "assets/blog-terrasse.png", date: "Bistro Burger · 2 août 2026", title: "La terrasse est ouverte tout l'été", excerpt: "Douze couverts supplémentaires à l'ombre, dès 19h et jusqu'à la fermeture.", body: "La terrasse est installée pour toute la saison, côté ombre, à l'écart du passage. Douze couverts de plus chaque soir, ouverts dès 19h et jusqu'à la fermeture. Sur les créneaux du vendredi et du samedi elle part vite : réservez si vous y tenez, en précisant votre préférence au moment de la demande." },
-    { slug: "un-nouveau-pain-livre-chaque-matin", img: "assets/blog-pain.png", date: "Bistro Burger · 24 juillet 2026", title: "Un nouveau pain, livré chaque matin", excerpt: "Nous travaillons désormais avec une boulangerie de Gardanne pour tous nos buns.", body: "Nos buns sont désormais façonnés par une boulangerie de Gardanne et livrés chaque matin. Le pain tient mieux à la cuisson, la mie reste moelleuse jusqu'à la dernière bouchée, et le circuit se raccourcit à quelques rues. Le changement concerne toute la carte, sur place comme à emporter." },
-    { slug: "le-plat-du-jour-sur-instagram", img: "assets/blog-instagram.png", date: "Bistro Burger · 10 juillet 2026", title: "Le plat du jour, maintenant sur Instagram", excerpt: "Retrouvez chaque matin l'ardoise du jour sur @bistroburger_gardanne.", body: "Chaque matin, l'ardoise du jour est publiée sur notre compte Instagram avant le service de midi. Plat, accompagnement et prix : de quoi décider avant de sortir du bureau. Suivez @bistroburger_gardanne pour la recevoir dans votre fil." }
-  ];
+  const DEFAULT_BLOG = {
+    categories: ["Brasserie", "Traiteur", "Annonce"],
+    posts: [
+      { slug: "la-terrasse-est-ouverte-tout-lete", img: "assets/blog-terrasse.png", date: "2026-08-02", category: "Brasserie", published: true, title: "La terrasse est ouverte tout l'été", excerpt: "Douze couverts supplémentaires à l'ombre, dès 19h et jusqu'à la fermeture.", body: "La terrasse est installée pour toute la saison, côté ombre, à l'écart du passage. Douze couverts de plus chaque soir, ouverts dès 19h et jusqu'à la fermeture. Sur les créneaux du vendredi et du samedi elle part vite : réservez si vous y tenez, en précisant votre préférence au moment de la demande." },
+      { slug: "un-nouveau-pain-livre-chaque-matin", img: "assets/blog-pain.png", date: "2026-07-24", category: "Brasserie", published: true, title: "Un nouveau pain, livré chaque matin", excerpt: "Nous travaillons désormais avec une boulangerie de Gardanne pour tous nos buns.", body: "Nos buns sont désormais façonnés par une boulangerie de Gardanne et livrés chaque matin. Le pain tient mieux à la cuisson, la mie reste moelleuse jusqu'à la dernière bouchée, et le circuit se raccourcit à quelques rues. Le changement concerne toute la carte, sur place comme à emporter." },
+      { slug: "le-plat-du-jour-sur-instagram", img: "assets/blog-instagram.png", date: "2026-07-10", category: "Annonce", published: true, title: "Le plat du jour, maintenant sur Instagram", excerpt: "Retrouvez chaque matin l'ardoise du jour sur @bistroburger_gardanne.", body: "Chaque matin, l'ardoise du jour est publiée sur notre compte Instagram avant le service de midi. Plat, accompagnement et prix : de quoi décider avant de sortir du bureau.\n\nSuivez @bistroburger_gardanne pour la recevoir dans votre fil." }
+    ]
+  };
+  const BLOG = SITE_DATA.blog && Array.isArray(SITE_DATA.blog.posts) ? SITE_DATA.blog : DEFAULT_BLOG;
+  const POSTS = BLOG.posts
+    .filter((p) => p && p.published !== false && p.slug)
+    .slice()
+    .sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")));
+  const BLOG_CATEGORIES = Array.isArray(BLOG.categories) && BLOG.categories.length ? BLOG.categories : Array.from(new Set(POSTS.map((p) => p.category).filter(Boolean)));
 
   /* ---------------------------------------------------------------- */
   /* State                                                             */
@@ -906,44 +915,152 @@
   /* ---------------------------------------------------------------- */
   /* Blog                                                               */
   /* ---------------------------------------------------------------- */
+  const blogBase = document.body.getAttribute("data-blog-base") !== null ? document.body.getAttribute("data-blog-base") : "blog/";
+  const blogAssetBase = document.body.getAttribute("data-asset-base") !== null ? document.body.getAttribute("data-asset-base") : "";
+  const blogImgUrl = (img) => (/^https?:\/\//.test(img) ? img : blogAssetBase + img);
+  const blogDate = (iso) => {
+    try {
+      return new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long", year: "numeric" }).format(new Date(iso + "T00:00:00"));
+    } catch (e) {
+      return iso;
+    }
+  };
+
+  function blogCard(post, i) {
+    const card = el("a", { class: "blog-post", href: blogBase + post.slug + ".html" });
+    if (post.img) {
+      card.appendChild(el("div", { class: "blog-post-img" }, `<img src="${esc(blogImgUrl(post.img))}" alt="${esc(post.title)}" loading="lazy">`));
+    } else {
+      card.appendChild(el("div", { class: "blog-post-img ph " + GRADS[i % 3] }, "Photo — " + esc(post.title)));
+    }
+    if (post.category) card.appendChild(el("span", { class: "blog-cat" }, esc(post.category)));
+    card.appendChild(el("h3", {}, esc(post.title)));
+    if (post.excerpt) card.appendChild(el("p", {}, esc(post.excerpt)));
+    card.appendChild(el("div", { class: "blog-meta" },
+      `<span class="blog-avatar"><img src="${esc(blogAssetBase)}assets/logo-cream-sm.png" alt=""></span><span><strong>Bistro Burger</strong> &bull; ${esc(blogDate(post.date))}</span>`));
+    return card;
+  }
+
+  let blogFilter = "all";
+
   function renderBlog() {
     const grid = document.getElementById("blog-grid");
     if (!grid) return;
-    const blogBaseAttr = document.body.getAttribute("data-blog-base");
-    const blogBase = blogBaseAttr !== null ? blogBaseAttr : "blog/";
-    const assetBaseAttr = document.body.getAttribute("data-asset-base");
-    const assetBase = assetBaseAttr !== null ? assetBaseAttr : "";
-    grid.innerHTML = "";
     const featuredEl = document.getElementById("blog-featured");
-    const [featured, ...others] = POSTS;
-    if (featuredEl && featured) {
+    const filtersEl = document.getElementById("blog-filters");
+
+    if (filtersEl) {
+      const used = BLOG_CATEGORIES.filter((c) => POSTS.some((p) => p.category === c));
+      filtersEl.innerHTML = "";
+      if (used.length > 1) {
+        ["all"].concat(used).forEach((c) => {
+          const btn = el("button", { type: "button", class: "blog-chip" + (blogFilter === c ? " is-active" : "") }, esc(c === "all" ? "Tous les articles" : c));
+          btn.addEventListener("click", () => { blogFilter = c; renderBlog(); });
+          filtersEl.appendChild(btn);
+        });
+      }
+    }
+
+    const posts = blogFilter === "all" ? POSTS : POSTS.filter((p) => p.category === blogFilter);
+    grid.innerHTML = "";
+    if (featuredEl) featuredEl.innerHTML = "";
+
+    if (!posts.length) {
+      grid.appendChild(el("p", { class: "blog-empty" }, POSTS.length ? "Aucun article dans cette catégorie pour l'instant." : "Les premiers articles arrivent bientôt."));
+      return;
+    }
+
+    const [featured, ...others] = posts;
+    if (featuredEl) {
       featuredEl.innerHTML =
         `<a class="blog-hero" href="${esc(blogBase + featured.slug)}.html">` +
-        (featured.img ? `<img src="${esc(assetBase + featured.img)}" alt="${esc(featured.title)}">` : "") +
+        (featured.img ? `<img src="${esc(blogImgUrl(featured.img))}" alt="${esc(featured.title)}">` : "") +
         `<div class="blog-hero-shade"></div>` +
-        `<div class="blog-hero-content"><span class="blog-hero-label">À la une</span>` +
-        `<h2>${esc(featured.title)}</h2><p>${esc(featured.excerpt)}</p></div>` +
+        `<div class="blog-hero-content"><span class="blog-hero-label">À la une${featured.category ? " · " + esc(featured.category) : ""}</span>` +
+        `<h2>${esc(featured.title)}</h2>${featured.excerpt ? `<p>${esc(featured.excerpt)}</p>` : ""}</div>` +
         `<span class="blog-hero-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M14 6l6 6-6 6"></path></svg></span>` +
         `</a>`;
     }
-    (featuredEl ? others : POSTS).forEach((post, i) => {
-      const parts = String(post.date || "").split(" · ");
-      const author = parts.length > 1 ? parts[0] : "Bistro Burger";
-      const when = parts.length > 1 ? parts.slice(1).join(" · ") : parts[0];
-      const card = el("a", { class: "blog-post", href: blogBase + post.slug + ".html" });
-      if (post.img) {
-        card.appendChild(el("div", { class: "blog-post-img" }, `<img src="${esc(assetBase + post.img)}" alt="${esc(post.title)}">`));
-      } else {
-        card.appendChild(el("div", { class: "blog-post-img ph " + GRADS[i % 3] }, "Photo — " + esc(post.title)));
-      }
-      card.appendChild(el("h3", {}, esc(post.title)));
-      card.appendChild(el("p", {}, esc(post.excerpt)));
-      card.appendChild(el("div", { class: "blog-meta" },
-        `<span class="blog-avatar"><img src="${esc(assetBase)}assets/logo-cream-sm.png" alt=""></span><span><strong>${esc(author)}</strong> &bull; ${esc(when)}</span>`));
-      grid.appendChild(card);
-    });
+    (featuredEl ? others : posts).forEach((post, i) => grid.appendChild(blogCard(post, i)));
+    const title = document.getElementById("blog-recent-title");
+    if (title) title.hidden = !(featuredEl ? others : posts).length;
   }
   renderBlog();
+
+  /* Page article : contenu piloté par le CMS (?slug=… ou /blog/<slug>.html réécrit par Vercel) */
+  function articleBodyHtml(text) {
+    const inline = (s) => esc(s)
+      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+      .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>')
+      .replace(/(^|[\s(])@bistroburger_gardanne\b/g, '$1<a href="https://www.instagram.com/bistroburger_gardanne/" target="_blank" rel="noopener">@bistroburger_gardanne</a>');
+    return String(text || "").replace(/\r/g, "").split(/\n{2,}/).map((block) => {
+      const b = block.trim();
+      if (!b) return "";
+      if (b.startsWith("## ")) return "<h2>" + inline(b.slice(3)) + "</h2>";
+      return "<p>" + inline(b).replace(/\n/g, "<br>") + "</p>";
+    }).join("");
+  }
+
+  function setMeta(selector, attr, value) {
+    const node = document.querySelector(selector);
+    if (node) node.setAttribute(attr, value);
+  }
+
+  function renderArticle() {
+    const root = document.getElementById("article-root");
+    if (!root) return;
+    let slug = new URLSearchParams(window.location.search).get("slug");
+    if (!slug) {
+      const m = window.location.pathname.match(/\/([^\/]+?)(?:\.html)?$/);
+      slug = m ? decodeURIComponent(m[1]) : "";
+    }
+    const post = POSTS.find((p) => p.slug === slug);
+    if (!post) {
+      document.title = "Article introuvable — Blog Bistro Burger";
+      root.innerHTML =
+        `<a href="index.html" class="footer-link" style="display:block; color:var(--green-700); font-size:14px; font-weight:600;">← Retour au blog</a>` +
+        `<h1 class="article-title">Cet article n'existe plus</h1>` +
+        `<p class="article-body" style="margin-top:20px;">Il a peut-être été déplacé ou retiré. Retrouvez tous nos articles sur la page du blog.</p>`;
+      return;
+    }
+    const origin = "https://bistro-burger-site.vercel.app";
+    const url = origin + "/blog/" + post.slug + ".html";
+    const imgAbs = post.img ? (/^https?:\/\//.test(post.img) ? post.img : origin + "/" + post.img) : origin + "/assets/hero-burger.webp";
+    const desc = post.excerpt || post.title;
+    document.title = post.title + " — Blog Bistro Burger";
+    setMeta('meta[name="description"]', "content", desc);
+    setMeta('link[rel="canonical"]', "href", url);
+    setMeta('meta[property="og:title"]', "content", post.title);
+    setMeta('meta[property="og:description"]', "content", desc);
+    setMeta('meta[property="og:url"]', "content", url);
+    setMeta('meta[property="og:image"]', "content", imgAbs);
+    const ld = document.createElement("script");
+    ld.type = "application/ld+json";
+    ld.textContent = JSON.stringify({
+      "@context": "https://schema.org", "@type": "BlogPosting", headline: post.title, image: imgAbs,
+      datePublished: post.date, author: { "@type": "Organization", name: "Bistro Burger" }, publisher: { "@type": "Organization", name: "Bistro Burger" }
+    });
+    document.head.appendChild(ld);
+
+    root.innerHTML =
+      `<a href="index.html" class="footer-link" style="display:block; color:var(--green-700); font-size:14px; font-weight:600;">← Retour au blog</a>` +
+      `<div class="article-meta">${post.category ? `<span class="blog-cat">${esc(post.category)}</span>` : ""}<span>Bistro Burger &bull; ${esc(blogDate(post.date))}</span></div>` +
+      `<h1 class="article-title">${esc(post.title)}</h1>` +
+      (post.img ? `<div class="article-cover"><img src="${esc(blogImgUrl(post.img))}" alt="${esc(post.title)}"></div>` : "") +
+      `<div class="article-body">${articleBodyHtml(post.body)}</div>` +
+      `<div class="article-actions"><button type="button" class="btn btn-primary btn-gradient" data-shine data-go="reservation">Réserver une table</button><button type="button" class="btn btn-outline" data-go="commander">Commander à emporter</button></div>`;
+
+    const related = POSTS.filter((p) => p.slug !== post.slug)
+      .sort((a, b) => (b.category === post.category) - (a.category === post.category))
+      .slice(0, 3);
+    const relatedEl = document.getElementById("article-related");
+    if (relatedEl && related.length) {
+      relatedEl.hidden = false;
+      const grid = relatedEl.querySelector(".blog-grid");
+      related.forEach((p, i) => grid.appendChild(blogCard(p, i)));
+    }
+  }
+  renderArticle();
 
   /* ---------------------------------------------------------------- */
   /* Band of photos (bottom marquee) — bande-5/6 use placeholders       */

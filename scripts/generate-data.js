@@ -51,6 +51,31 @@ async function main() {
     "window.SITE_DATA = " + JSON.stringify(siteData, null, 2) + ";\n";
 
   fs.writeFileSync(OUT_FILE, contents, { encoding: "utf8" });
+
+  // Sitemap : ajoute les articles du blog (ne doit jamais faire échouer le build).
+  try {
+    const blog = siteData.blog;
+    if (blog && Array.isArray(blog.posts)) {
+      const origin = "https://bistro-burger-site.vercel.app";
+      const urls = [
+        { loc: origin + "/", freq: "weekly", prio: "1.0" },
+        { loc: origin + "/blog/index.html", freq: "weekly", prio: "0.8" },
+      ];
+      blog.posts
+        .filter((p) => p && p.slug && p.published !== false)
+        .forEach((p) => urls.push({ loc: origin + "/blog/" + encodeURIComponent(p.slug) + ".html", freq: "monthly", prio: "0.6", lastmod: p.date }));
+      const xml =
+        '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
+        urls
+          .map((u) => "  <url>\n    <loc>" + u.loc + "</loc>\n" + (u.lastmod ? "    <lastmod>" + u.lastmod + "</lastmod>\n" : "") + "    <changefreq>" + u.freq + "</changefreq>\n    <priority>" + u.prio + "</priority>\n  </url>")
+          .join("\n") +
+        "\n</urlset>\n";
+      fs.writeFileSync(path.join(__dirname, "..", "public", "sitemap.xml"), xml, { encoding: "utf8" });
+      console.log("sitemap.xml régénéré (" + urls.length + " URLs).");
+    }
+  } catch (err) {
+    console.warn("[generate-data] Sitemap non régénéré : " + err.message);
+  }
   console.log("data.generated.js écrit avec les clés : " + Object.keys(siteData).join(", "));
 
   if (SUPABASE_ANON_KEY) {
