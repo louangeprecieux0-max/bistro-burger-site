@@ -932,7 +932,7 @@
   function blogCard(post, i) {
     const card = el("a", { class: "blog-post", href: blogBase + post.slug + ".html" });
     if (post.img) {
-      card.appendChild(el("div", { class: "blog-post-img" }, `<img src="${esc(blogImgUrl(post.img))}" alt="${esc(post.title)}" loading="lazy">`));
+      card.appendChild(el("div", { class: "blog-post-img" }, `<img src="${esc(blogImgUrl(post.img))}" alt="${esc(post.imgAlt || post.title)}" loading="lazy">`));
     } else {
       card.appendChild(el("div", { class: "blog-post-img ph " + GRADS[i % 3] }, "Photo — " + esc(post.title)));
     }
@@ -1021,7 +1021,52 @@
   renderBlog();
 
   /* Page article : contenu piloté par le CMS (?slug=… ou /blog/<slug>.html réécrit par Vercel) */
+  function sanitizeArticleHtml(html) {
+    const ALLOWED = { P: 1, BR: 1, H2: 1, H3: 1, H4: 1, STRONG: 1, B: 1, EM: 1, I: 1, U: 1, A: 1, UL: 1, OL: 1, LI: 1, BLOCKQUOTE: 1, IMG: 1 };
+    const DROP = { SCRIPT: 1, STYLE: 1, IFRAME: 1, OBJECT: 1, EMBED: 1, FORM: 1, INPUT: 1, BUTTON: 1, TEXTAREA: 1, SELECT: 1, LINK: 1, META: 1, SVG: 1 };
+    const normHref = (raw) => {
+      const u = String(raw || "").trim();
+      if (!u) return "";
+      if (/^(https?:|mailto:|tel:)/i.test(u)) return u;
+      if (/^javascript:|^data:|^vbscript:/i.test(u)) return "";
+      if (u.charAt(0) === "/" || u.charAt(0) === "#") return u;
+      if (/^[^\s\/]+\.[^\s\/]{2,}/.test(u)) return "https://" + u;
+      return "";
+    };
+    const doc = new DOMParser().parseFromString("<body>" + String(html || "") + "</body>", "text/html");
+    (function clean(node) {
+      Array.from(node.childNodes).forEach((child) => {
+        if (child.nodeType === 3) return;
+        if (child.nodeType !== 1) { child.remove(); return; }
+        const tag = child.tagName;
+        if (DROP[tag]) { child.remove(); return; }
+        clean(child);
+        if (!ALLOWED[tag]) { while (child.firstChild) node.insertBefore(child.firstChild, child); child.remove(); return; }
+        if (tag === "A") {
+          const href = normHref(child.getAttribute("href"));
+          Array.from(child.attributes).forEach((a) => child.removeAttribute(a.name));
+          if (!href) { while (child.firstChild) node.insertBefore(child.firstChild, child); child.remove(); return; }
+          child.setAttribute("href", href);
+          if (/^https?:/i.test(href)) { child.setAttribute("target", "_blank"); child.setAttribute("rel", "noopener noreferrer"); }
+        } else if (tag === "IMG") {
+          const src = String(child.getAttribute("src") || "").trim();
+          const alt = child.getAttribute("alt") || "";
+          Array.from(child.attributes).forEach((a) => child.removeAttribute(a.name));
+          if (!/^https?:\/\//i.test(src)) { child.remove(); return; }
+          child.setAttribute("src", src);
+          child.setAttribute("alt", alt);
+          child.setAttribute("loading", "lazy");
+        } else {
+          Array.from(child.attributes).forEach((a) => child.removeAttribute(a.name));
+        }
+      });
+    })(doc.body);
+    doc.body.querySelectorAll("p").forEach((p) => { if (!p.textContent.trim() && !p.querySelector("img")) p.remove(); });
+    return doc.body.innerHTML.trim();
+  }
+
   function articleBodyHtml(text) {
+    if (/<(p|h[2-4]|ul|ol|blockquote|img|strong|em|a|br)[\s>\/]/i.test(String(text || ""))) return sanitizeArticleHtml(text);
     const inline = (s) => esc(s)
       .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
       .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>')
@@ -1033,7 +1078,6 @@
       return "<p>" + inline(b).replace(/\n/g, "<br>") + "</p>";
     }).join("");
   }
-
   function setMeta(selector, attr, value) {
     const node = document.querySelector(selector);
     if (node) node.setAttribute(attr, value);
@@ -1059,18 +1103,19 @@
     const origin = "https://bistro-burger-site.vercel.app";
     const url = origin + "/blog/" + post.slug + ".html";
     const imgAbs = post.img ? (/^https?:\/\//.test(post.img) ? post.img : origin + "/" + post.img) : origin + "/assets/hero-burger.webp";
-    const desc = post.excerpt || post.title;
-    document.title = post.title + " — Blog Bistro Burger";
+    const desc = post.seoDesc || post.excerpt || post.title;
+    const pageTitle = post.seoTitle || (post.title + " — Blog Bistro Burger");
+    document.title = pageTitle;
     setMeta('meta[name="description"]', "content", desc);
     setMeta('link[rel="canonical"]', "href", url);
-    setMeta('meta[property="og:title"]', "content", post.title);
+    setMeta('meta[property="og:title"]', "content", pageTitle);
     setMeta('meta[property="og:description"]', "content", desc);
     setMeta('meta[property="og:url"]', "content", url);
     setMeta('meta[property="og:image"]', "content", imgAbs);
     const ld = document.createElement("script");
     ld.type = "application/ld+json";
     ld.textContent = JSON.stringify({
-      "@context": "https://schema.org", "@type": "BlogPosting", headline: post.title, image: imgAbs,
+      "@context": "https://schema.org", "@type": "BlogPosting", headline: post.seoTitle || post.title, description: desc, image: imgAbs,
       datePublished: post.date, author: { "@type": "Organization", name: "Bistro Burger" }, publisher: { "@type": "Organization", name: "Bistro Burger" }
     });
     document.head.appendChild(ld);
@@ -1079,7 +1124,7 @@
       `<a href="index.html" class="footer-link" style="display:block; color:var(--green-700); font-size:14px; font-weight:600;">← Retour au blog</a>` +
       `<div class="article-meta">${post.category ? `<span class="blog-cat">${esc(post.category)}</span>` : ""}<span>Bistro Burger &bull; ${esc(blogDate(post.date))}</span></div>` +
       `<h1 class="article-title">${esc(post.title)}</h1>` +
-      (post.img ? `<div class="article-cover"><img src="${esc(blogImgUrl(post.img))}" alt="${esc(post.title)}"></div>` : "") +
+      (post.img ? `<div class="article-cover"><img src="${esc(blogImgUrl(post.img))}" alt="${esc(post.imgAlt || post.title)}"></div>` : "") +
       `<div class="article-body">${articleBodyHtml(post.body)}</div>` +
       `<div class="article-actions"><button type="button" class="btn btn-primary btn-gradient" data-shine data-go="reservation">Réserver une table</button><button type="button" class="btn btn-outline" data-go="commander">Commander à emporter</button></div>`;
 
