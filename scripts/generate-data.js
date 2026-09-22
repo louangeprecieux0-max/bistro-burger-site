@@ -61,6 +61,8 @@ async function main() {
         { loc: origin + "/", freq: "weekly", prio: "1.0" },
         { loc: origin + "/blog/index.html", freq: "weekly", prio: "0.8" },
         { loc: origin + "/mentions-legales.html", freq: "yearly", prio: "0.2" },
+        { loc: origin + "/confidentialite.html", freq: "yearly", prio: "0.2" },
+        { loc: origin + "/cgv.html", freq: "yearly", prio: "0.2" },
       ];
       blog.posts
         .filter((p) => p && p.slug && p.published !== false)

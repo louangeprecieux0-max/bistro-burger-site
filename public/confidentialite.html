@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mentions légales — Bistro Burger</title>
-<meta name="description" content="Mentions légales du site Bistro Burger : éditeur, hébergeur et informations de l'entreprise.">
-<link rel="canonical" href="https://bistro-burger-site.vercel.app/mentions-legales.html">
+<title>Politique de confidentialité — Bistro Burger</title>
+<meta name="description" content="Comment Bistro Burger collecte, utilise et protège vos données personnelles : réservations, commandes, newsletter.">
+<link rel="canonical" href="https://bistro-burger-site.vercel.app/confidentialite.html">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -16,13 +16,16 @@
   .legal-wrap h1{ font-family:var(--font-heading); font-weight:600; font-size:clamp(28px,4vw,38px); color:var(--text-body); margin:0 0 8px; }
   .legal-updated{ color:var(--text-muted); font-size:14px; margin:0 0 36px; }
   .legal-wrap h2{ font-family:var(--font-heading); font-weight:600; font-size:20px; color:var(--color-primary); margin:38px 0 14px; }
-  .legal-wrap p{ font-size:15.5px; line-height:1.75; color:var(--text-body); margin:0 0 14px; }
-  .legal-card{ background:var(--surface-page); border:1px solid var(--border-default); border-radius:var(--radius-card); padding:24px 26px; box-shadow:var(--shadow-card); }
-  .legal-card dl{ margin:0; display:grid; grid-template-columns:auto 1fr; gap:10px 18px; }
-  .legal-card dt{ font-family:var(--font-heading); font-weight:600; font-size:14px; color:var(--text-muted); white-space:nowrap; }
-  .legal-card dd{ margin:0; font-size:15px; color:var(--text-body); }
+  .legal-wrap h3{ font-family:var(--font-heading); font-weight:600; font-size:16px; color:var(--text-body); margin:22px 0 8px; }
+  .legal-wrap p, .legal-wrap li{ font-size:15.5px; line-height:1.75; color:var(--text-body); margin:0 0 14px; }
+  .legal-wrap ul{ margin:0 0 14px; padding-left:22px; }
+  .legal-card{ background:var(--surface-page); border:1px solid var(--border-default); border-radius:var(--radius-card); box-shadow:var(--shadow-card); overflow:hidden; margin-bottom:14px; }
+  .legal-table{ width:100%; border-collapse:collapse; font-size:14px; }
+  .legal-table th{ text-align:left; font-family:var(--font-heading); font-weight:600; font-size:12.5px; letter-spacing:.03em; text-transform:uppercase; color:var(--text-muted); padding:12px 16px; border-bottom:1px solid var(--border-default); }
+  .legal-table td{ padding:14px 16px; border-bottom:1px solid var(--border-default); vertical-align:top; line-height:1.55; }
+  .legal-table tr:last-child td{ border-bottom:none; }
   .legal-wrap a{ color:var(--color-primary); text-decoration:underline; text-underline-offset:2px; }
-  @media (max-width:560px){ .legal-card dl{ grid-template-columns:1fr; gap:2px 0; } .legal-card dt{ margin-top:10px; } }
+  @media (max-width:640px){ .legal-table{ display:block; } .legal-table thead{ display:none; } .legal-table tr{ display:block; padding:14px 16px; border-bottom:1px solid var(--border-default); } .legal-table td{ display:block; padding:3px 0; border:none; } .legal-table td::before{ content:attr(data-label); display:block; font-family:var(--font-heading); font-weight:600; font-size:11.5px; letter-spacing:.03em; text-transform:uppercase; color:var(--text-muted); margin-top:8px; } }
 </style>
 </head>
 <body data-home="index.html" data-blog-base="blog/" data-asset-base="">
@@ -57,42 +60,66 @@
 
   <section style="background:var(--surface-alt); padding:48px 24px 100px;">
     <div class="legal-wrap">
-      <h1>Mentions légales</h1>
+      <h1>Politique de confidentialité</h1>
       <p class="legal-updated">Dernière mise à jour : 22 septembre 2026</p>
 
+      <p>Cette page explique quelles données personnelles Bistro Burger collecte sur ce site, pourquoi, combien de temps elles sont conservées, et comment vous pouvez exercer vos droits. Elle est rédigée conformément au Règlement général sur la protection des données (RGPD).</p>
+
+      <h2>Qui est responsable de vos données ?</h2>
+      <p>Brasserie Zone Avon (nom commercial Bistro Burger), SARL au capital de 200 €, SIRET 981 082 969 00016, La Plaine Nord, 13120 Gardanne — <a href="mailto:brasserie.zone.avon@gmail.com">brasserie.zone.avon@gmail.com</a>.</p>
+
+      <h2>Ce que nous collectons, et pourquoi</h2>
       <div class="legal-card">
-        <dl>
-          <dt>Raison sociale</dt><dd>Brasserie Zone Avon</dd>
-          <dt>Nom commercial</dt><dd>Bistro Burger</dd>
-          <dt>Forme juridique</dt><dd>SARL au capital de 200 €</dd>
-          <dt>Siège social</dt><dd>La Plaine Nord, 13120 Gardanne, France</dd>
-          <dt>SIRET</dt><dd>981 082 969 00016</dd>
-          <dt>RCS</dt><dd>981 082 969 R.C.S. Aix-en-Provence</dd>
-          <dt>N° TVA intracommunautaire</dt><dd>FR35981082969</dd>
-          <dt>Directeur de publication</dt><dd>Thomas Casella, gérant</dd>
-          <dt>Téléphone</dt><dd><a href="tel:+33465848918">+33 4 65 84 89 18</a></dd>
-          <dt>E-mail</dt><dd><a href="mailto:brasserie.zone.avon@gmail.com">brasserie.zone.avon@gmail.com</a></dd>
-        </dl>
+        <table class="legal-table">
+          <thead><tr><th>Quand</th><th>Données</th><th>Pourquoi</th><th>Conservation</th></tr></thead>
+          <tbody>
+            <tr>
+              <td data-label="Quand">Demande de réservation</td>
+              <td data-label="Données">Nom, téléphone, e-mail (facultatif), date, heure, nombre de couverts, message</td>
+              <td data-label="Pourquoi">Traiter votre demande de table (mesures précontractuelles à votre demande)</td>
+              <td data-label="Conservation">3 ans à compter de la demande</td>
+            </tr>
+            <tr>
+              <td data-label="Quand">Commande à emporter</td>
+              <td data-label="Données">Nom, téléphone, articles commandés, montant</td>
+              <td data-label="Pourquoi">Préparer et vous remettre votre commande (exécution du contrat)</td>
+              <td data-label="Conservation">1 an à compter de la commande</td>
+            </tr>
+            <tr>
+              <td data-label="Quand">Inscription à la newsletter</td>
+              <td data-label="Données">Adresse e-mail</td>
+              <td data-label="Pourquoi">Vous envoyer nos actualités, avec votre consentement</td>
+              <td data-label="Conservation">Jusqu'à votre désabonnement</td>
+            </tr>
+            <tr>
+              <td data-label="Quand">Vérification anti-robot (reCAPTCHA)</td>
+              <td data-label="Données">Interactions avec le formulaire, adresse IP</td>
+              <td data-label="Pourquoi">Empêcher les envois automatisés (intérêt légitime de sécurité)</td>
+              <td data-label="Conservation">Selon la politique de Google (voir ci-dessous)</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
-      <h2>Hébergement</h2>
-      <p>Le site est hébergé par :</p>
-      <div class="legal-card">
-        <dl>
-          <dt>Société</dt><dd>Vercel Inc.</dd>
-          <dt>Adresse</dt><dd>340 S Lemon Ave #4133, Walnut, CA 91789, États-Unis</dd>
-          <dt>Site web</dt><dd><a href="https://vercel.com" target="_blank" rel="noopener">vercel.com</a></dd>
-        </dl>
-      </div>
+      <h2>Les services que nous utilisons</h2>
+      <p>Certaines de vos données transitent par des prestataires qui nous aident à faire fonctionner le site :</p>
+      <ul>
+        <li><strong>Supabase</strong> (hébergement de la base de données) — stocke les réservations, commandes et le contenu du site.</li>
+        <li><strong>Vercel Inc.</strong> (hébergement du site) — États-Unis, encadré par des clauses contractuelles types.</li>
+        <li><strong>Brevo</strong> (envoi de la newsletter) — utilisé uniquement si vous vous inscrivez.</li>
+        <li><strong>Google reCAPTCHA</strong> (anti-spam sur le formulaire de réservation) — Google LLC, États-Unis. En utilisant ce formulaire, certaines données sont transmises à Google selon ses propres règles de confidentialité (<a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a>).</li>
+        <li><strong>Google Maps</strong> (plan d'accès affiché sur la page d'accueil) — le simple affichage de cette carte peut charger des ressources depuis les serveurs de Google.</li>
+      </ul>
+      <p>Aucun outil de mesure d'audience (statistiques de visite) n'est installé sur ce site à ce jour.</p>
 
-      <h2>Propriété intellectuelle</h2>
-      <p>L'ensemble des contenus présents sur ce site (textes, photographies, logo, mise en page) est la propriété de Brasserie Zone Avon, sauf mention contraire, et ne peut être reproduit sans autorisation préalable.</p>
+      <h2>Vos droits</h2>
+      <p>Conformément au RGPD, vous disposez d'un droit d'accès, de rectification, d'effacement, de limitation, d'opposition et de portabilité sur vos données. Pour les exercer, écrivez-nous à <a href="mailto:brasserie.zone.avon@gmail.com">brasserie.zone.avon@gmail.com</a> — nous répondons sous un mois. Si vous estimez que vos droits ne sont pas respectés, vous pouvez adresser une réclamation à la CNIL (<a href="https://www.cnil.fr" target="_blank" rel="noopener">cnil.fr</a>).</p>
 
-      <h2>Crédits</h2>
-      <p>Polices de caractères : Rubik et Geologica, distribuées gratuitement par Google Fonts.</p>
+      <h2>Cookies</h2>
+      <p>Ce site utilise uniquement des données stockées localement dans votre navigateur strictement nécessaires à son fonctionnement (panier de commande), sans finalité publicitaire ni de suivi. Aucune bannière de consentement n'est donc affichée pour ces éléments. Le plan d'accès Google Maps de la page d'accueil peut, lui, charger des ressources tierces au chargement de la page.</p>
 
       <h2>Contact</h2>
-      <p>Pour toute question relative au site ou à ces mentions légales, vous pouvez nous écrire à <a href="mailto:brasserie.zone.avon@gmail.com">brasserie.zone.avon@gmail.com</a> ou nous appeler au <a href="tel:+33465848918">+33 4 65 84 89 18</a>.</p>
+      <p>Pour toute question sur cette politique, écrivez-nous à <a href="mailto:brasserie.zone.avon@gmail.com">brasserie.zone.avon@gmail.com</a> ou appelez le <a href="tel:+33465848918">+33 4 65 84 89 18</a>.</p>
     </div>
   </section>
 
