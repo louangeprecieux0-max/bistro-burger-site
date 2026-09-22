@@ -683,6 +683,9 @@
       '<details class="seo-panel" id="bl-seo" open>' +
       '<summary>Référencement Google (SEO) <span class="seo-score" id="bl-seo-score"></span></summary>' +
       '<div class="seo-body">' +
+      (isNew
+        ? ""
+        : '<button type="button" class="edit-hero-btn" id="bl-seo-open" style="margin-bottom:16px;">Analyser avec l\'outil SEO complet ↗</button>') +
       '<label class="field-label" for="bl-keyword">Mot-clé principal</label>' +
       '<input class="field" id="bl-keyword" placeholder="ex : traiteur Gardanne" value="' + esc(post.keyword) + '">' +
       '<p class="dashboard-note" style="margin-top:6px;">L\'expression que vos clients taperaient dans Google pour trouver cet article.</p>' +
@@ -710,6 +713,18 @@
 
     initEditor(bodyHtml);
     updateSeo();
+
+    const seoOpenBtn = document.getElementById("bl-seo-open");
+    if (seoOpenBtn) {
+      seoOpenBtn.addEventListener("click", () => {
+        const slug = document.getElementById("bl-slug").value.trim() || slugValue;
+        const keyword = document.getElementById("bl-keyword").value.trim();
+        const url = SITE_ORIGIN + "/blog/" + encodeURIComponent(slug) + ".html";
+        let href = "../seo/?page=" + encodeURIComponent(url);
+        if (keyword) href += "&kw=" + encodeURIComponent(keyword);
+        window.open(href, "_blank", "noopener");
+      });
+    }
 
     let slugTouched = !isNew || !!post.slug;
     document.getElementById("bl-slug").addEventListener("input", () => { slugTouched = true; });
