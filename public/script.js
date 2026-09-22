@@ -1359,9 +1359,35 @@
     });
   })();
   if (document.getElementById("newsletter-form")) {
-    document.getElementById("newsletter-form").addEventListener("submit", (e) => {
+    const nlForm = document.getElementById("newsletter-form");
+    const nlSent = document.getElementById("newsletter-sent");
+    const nlError = document.getElementById("newsletter-error");
+    nlForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      document.getElementById("newsletter-sent").hidden = false;
+      nlSent.hidden = true;
+      nlError.hidden = true;
+      const submitBtn = nlForm.querySelector("button[type=submit]");
+      const originalLabel = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Envoi…";
+      try {
+        const email = new FormData(nlForm).get("email");
+        const res = await fetch("/api/newsletter", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(json.error || "Échec de l'inscription.");
+        nlSent.hidden = false;
+        nlForm.reset();
+      } catch (err) {
+        nlError.textContent = err.message || "L'inscription a échoué. Réessayez, ou appelez-nous directement.";
+        nlError.hidden = false;
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalLabel;
+      }
     });
   }
 
