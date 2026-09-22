@@ -1561,8 +1561,8 @@
 
     function getUpsellViande() { return getUpsellGroup("Menus & suppléments", "Suppléments viandes"); }
     function getUpsellFromage() { return getUpsellGroup("Menus & suppléments", "Suppléments fromages"); }
-    function getUpsellBoissons() { return getUpsellGroup("Dessert", "Nos boissons"); }
-    function getUpsellDesserts() { return getUpsellGroup("Dessert", "Nos desserts"); }
+    function getUpsellBoissons() { return getUpsellGroup("Desserts & boissons", "Nos boissons"); }
+    function getUpsellDesserts() { return getUpsellGroup("Desserts & boissons", "Nos desserts"); }
 
     const upsellBox = document.getElementById("upsell-box");
     const stepViande = document.getElementById("upsell-step-viande");

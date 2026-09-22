@@ -18,8 +18,8 @@ const MAX_ITEMS = 60;
 const UPSELL_GROUPS = [
   { prefix: "Supplément : ", category: "Menus & suppléments", title: "Suppléments viandes" },
   { prefix: "Supplément : ", category: "Menus & suppléments", title: "Suppléments fromages" },
-  { prefix: "Boisson : ", category: "Dessert", title: "Nos boissons" },
-  { prefix: "Dessert : ", category: "Dessert", title: "Nos desserts" },
+  { prefix: "Boisson : ", category: "Desserts & boissons", title: "Nos boissons" },
+  { prefix: "Dessert : ", category: "Desserts & boissons", title: "Nos desserts" },
 ];
 
 function isValidPhone(raw) {
