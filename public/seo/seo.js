@@ -7,6 +7,9 @@
   const loginScreen = document.getElementById("login-screen");
   const appEl = document.getElementById("seo-app");
   const loginError = document.getElementById("login-error");
+  const loginChecking = document.getElementById("login-checking");
+  const loginSub = document.getElementById("login-sub");
+  const loginForm = document.getElementById("login-form");
   let started = false;
 
   function authHeaders() {
@@ -18,11 +21,40 @@
     appEl.hidden = false;
     if (!started) { started = true; init(); }
   }
-  function showLoggedOut() {
+  function showPasswordForm() {
+    loginChecking.hidden = true;
+    loginSub.hidden = false;
+    loginForm.hidden = false;
     loginScreen.hidden = false;
     appEl.hidden = true;
   }
-  if (localStorage.getItem(TOKEN_KEY)) showLoggedIn(); else showLoggedOut();
+
+  async function tryAdminSession() {
+    if (!window.supabase || !window.SUPABASE_CONFIG || !window.SUPABASE_CONFIG.url || !window.SUPABASE_CONFIG.anonKey) return false;
+    try {
+      const client = window.supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey);
+      const { data } = await client.auth.getSession();
+      const adminToken = data.session && data.session.access_token;
+      if (!adminToken) return false;
+      const res = await fetch("/api/seo/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: "Bearer " + adminToken },
+        body: JSON.stringify({}),
+      });
+      if (!res.ok) return false;
+      const json = await res.json();
+      localStorage.setItem(TOKEN_KEY, json.token);
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
+
+  if (localStorage.getItem(TOKEN_KEY)) {
+    showLoggedIn();
+  } else {
+    tryAdminSession().then((ok) => { if (ok) showLoggedIn(); else showPasswordForm(); });
+  }
 
   const passwordInput = document.getElementById("password");
   const passwordToggle = document.getElementById("password-toggle");
@@ -63,7 +95,7 @@
   });
   document.getElementById("logout-btn").addEventListener("click", () => {
     localStorage.removeItem(TOKEN_KEY);
-    showLoggedOut();
+    showPasswordForm();
   });
 
   /* ===================================================================== */

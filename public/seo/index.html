@@ -18,8 +18,9 @@
     <section id="login-view" class="login-card">
       <div class="login-logo">Outil interne</div>
       <h1>Analyse SEO</h1>
-      <p class="login-sub">Un mot de passe propre à cet outil, indépendant de l'espace admin du site : vous pouvez l'utiliser pour n'importe quel site web.</p>
-      <form id="login-form" autocomplete="off">
+      <p class="login-sub" id="login-sub" hidden>Déjà connecté à l'espace admin ? Vous y accédez automatiquement. Sinon, un mot de passe propre à cet outil permet de l'utiliser pour n'importe quel site web.</p>
+      <p class="login-sub" id="login-checking">Vérification de votre connexion à l'espace admin…</p>
+      <form id="login-form" autocomplete="off" hidden>
         <label class="field-label" for="password">Mot de passe</label>
         <div class="password-wrap">
           <input class="field" type="password" id="password" name="password" required autocomplete="current-password" placeholder="Mot de passe de l'outil">
@@ -72,6 +73,8 @@
 
   <iframe id="probe" title="Page analysée" aria-hidden="true" tabindex="-1" sandbox="allow-same-origin allow-scripts"></iframe>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="../admin/config.generated.js"></script>
   <script src="seo.js"></script>
 </body>
 </html>
