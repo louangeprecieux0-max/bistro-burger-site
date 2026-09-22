@@ -11,6 +11,15 @@ const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const RESEND_FROM_EMAIL = process.env.RESEND_FROM_EMAIL;
 const ALERT_EMAIL = "louangeprecieux0@gmail.com";
 
+function isValidPhone(raw) {
+  const cleaned = String(raw || "").replace(/[\s.\-()]/g, "");
+  return /^(0[1-9]\d{8}|\+33[1-9]\d{8}|0033[1-9]\d{8})$/.test(cleaned);
+}
+
+function isValidEmail(raw) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(raw || ""));
+}
+
 function escapeHtml(s) {
   return String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
@@ -91,6 +100,15 @@ module.exports = async (req, res) => {
     res.status(400).json({ error: "Nom et téléphone requis." });
     return;
   }
+  if (!isValidPhone(phone)) {
+    res.status(400).json({ error: "Numéro de téléphone invalide." });
+    return;
+  }
+  const email = body.email ? String(body.email).trim() : "";
+  if (email && !isValidEmail(email)) {
+    res.status(400).json({ error: "Adresse e-mail invalide." });
+    return;
+  }
 
   const recaptchaOk = await verifyRecaptcha(body.recaptchaToken);
   if (!recaptchaOk) {
@@ -101,7 +119,7 @@ module.exports = async (req, res) => {
   const row = {
     name,
     phone,
-    email: body.email ? String(body.email).trim() : null,
+    email: email || null,
     reservation_date: body.date || null,
     reservation_time: body.time ? String(body.time).trim() : null,
     party_size: body.partySize ? String(body.partySize).trim() : null,
