@@ -36,7 +36,7 @@
       const { data } = await client.auth.getSession();
       const adminToken = data.session && data.session.access_token;
       if (!adminToken) return false;
-      const res = await fetch("/api/seo/login", {
+      const res = await fetch("/api/seo?action=login", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: "Bearer " + adminToken },
         body: JSON.stringify({}),
@@ -75,7 +75,7 @@
     btn.disabled = true;
     btn.textContent = "Connexion…";
     try {
-      const res = await fetch("/api/seo/login", {
+      const res = await fetch("/api/seo?action=login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password: document.getElementById("password").value }),
@@ -396,7 +396,7 @@
   }
 
   async function fetchViaProxy(url) {
-    const res = await fetch("/api/seo/fetch?url=" + encodeURIComponent(url), { headers: authHeaders() });
+    const res = await fetch("/api/seo?action=fetch&url=" + encodeURIComponent(url), { headers: authHeaders() });
     const json = await res.json().catch(() => ({}));
     if (res.status === 401) { showLoggedOut(); localStorage.removeItem(TOKEN_KEY); throw new Error("Session expirée : reconnectez-vous."); }
     if (!res.ok) throw new Error(json.error || "Impossible de charger cette page.");
