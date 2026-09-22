@@ -27,19 +27,19 @@
     categories: ["Brasserie", "Traiteur", "Annonce"],
     posts: [
       {
-        id: "terrasse", slug: "la-terrasse-est-ouverte-tout-lete", img: "assets/blog-terrasse.png", date: "2026-08-02", category: "Brasserie", published: true,
+        id: "terrasse", slug: "la-terrasse-est-ouverte-tout-lete", img: "assets/blog-terrasse.jpg", date: "2026-08-02", category: "Brasserie", published: true,
         title: "La terrasse est ouverte tout l'été",
         excerpt: "Douze couverts supplémentaires à l'ombre, dès 19h et jusqu'à la fermeture.",
         body: "La terrasse est installée pour toute la saison, côté ombre, à l'écart du passage. Douze couverts de plus chaque soir, ouverts dès 19h et jusqu'à la fermeture. Sur les créneaux du vendredi et du samedi elle part vite : réservez si vous y tenez, en précisant votre préférence au moment de la demande.",
       },
       {
-        id: "pain", slug: "un-nouveau-pain-livre-chaque-matin", img: "assets/blog-pain.png", date: "2026-07-24", category: "Brasserie", published: true,
+        id: "pain", slug: "un-nouveau-pain-livre-chaque-matin", img: "assets/blog-pain.jpg", date: "2026-07-24", category: "Brasserie", published: true,
         title: "Un nouveau pain, livré chaque matin",
         excerpt: "Nous travaillons désormais avec une boulangerie de Gardanne pour tous nos buns.",
         body: "Nos buns sont désormais façonnés par une boulangerie de Gardanne et livrés chaque matin. Le pain tient mieux à la cuisson, la mie reste moelleuse jusqu'à la dernière bouchée, et le circuit se raccourcit à quelques rues. Le changement concerne toute la carte, sur place comme à emporter.",
       },
       {
-        id: "instagram", slug: "le-plat-du-jour-sur-instagram", img: "assets/blog-instagram.png", date: "2026-07-10", category: "Annonce", published: true,
+        id: "instagram", slug: "le-plat-du-jour-sur-instagram", img: "assets/blog-instagram.jpg", date: "2026-07-10", category: "Annonce", published: true,
         title: "Le plat du jour, maintenant sur Instagram",
         excerpt: "Retrouvez chaque matin l'ardoise du jour sur @bistroburger_gardanne.",
         body: "Chaque matin, l'ardoise du jour est publiée sur notre compte Instagram avant le service de midi. Plat, accompagnement et prix : de quoi décider avant de sortir du bureau.\n\nSuivez @bistroburger_gardanne pour la recevoir dans votre fil.",

@@ -26,8 +26,8 @@
     ] },
     { title: "Les signatures BB", items: [
       { name: "Le Poulpe", desc: "Pain roll, tentacule de poulpe, légumes rôtis, persillade, salade, sauce mayo sriracha, cheddar épicé", sur: "21 €", emp: "18 €" },
-      { name: "Le Cam", desc: "Bun's², steak smashé, double cheddar, oignon rouge, galette de camembert pané maison, smashed sauce", sur: "18 €", emp: "15 €", img: "assets/le-cam.png" },
-      { name: "Le Big BB", desc: "Bun's², iceberg, galette de bleu d'Auvergne pané, double steak, double cheddar, tomate, compotée d'oignons maison, sauce enfance", sur: "22 €", emp: "19 €", img: "assets/big-bb.png" }
+      { name: "Le Cam", desc: "Bun's², steak smashé, double cheddar, oignon rouge, galette de camembert pané maison, smashed sauce", sur: "18 €", emp: "15 €", img: "assets/le-cam.jpg" },
+      { name: "Le Big BB", desc: "Bun's², iceberg, galette de bleu d'Auvergne pané, double steak, double cheddar, tomate, compotée d'oignons maison, sauce enfance", sur: "22 €", emp: "19 €", img: "assets/big-bb.jpg" }
     ] }
   ];
 
@@ -188,10 +188,10 @@
   };
 
   const OFFRES = SITE_DATA.offres || [
-    { tag: "Menu étudiant", price: "11,90 €", title: "Burger smash, frites maison, boisson 33 cl", description: "Offre valable uniquement sur présentation de la carte étudiante, un menu par carte.", img: "assets/menu-etudiant.png" },
-    { tag: "Menu enfant", price: "11,90 €", title: "Cheeseburger, tenders de poulet ou steak haché, boisson 33 cl", description: "Le mardi soir et le mercredi midi, le menu enfant est offert pour tout achat d'un menu adulte. Valable également pour tout repas sur place.", img: "assets/menu-enfant.png" },
-    { tag: "Carte de fidélité", price: "", title: "1 case = 15 € d'achat", description: "10 cases complètes = 15 € offerts\n• Offres cumulables\n• Carte nominative\nPassez récupérer votre carte au comptoir.", img: "assets/carte-fidelite.png" },
-    { tag: "Carte cadeau", price: "", title: "Scannez le QR code en salle pour gagner des lots", description: "Tentez votre chance, gagnez, et venez récupérer vos cadeaux sur place.", img: "assets/carte-cadeau.png" },
+    { tag: "Menu étudiant", price: "11,90 €", title: "Burger smash, frites maison, boisson 33 cl", description: "Offre valable uniquement sur présentation de la carte étudiante, un menu par carte.", img: "assets/menu-etudiant.jpg" },
+    { tag: "Menu enfant", price: "11,90 €", title: "Cheeseburger, tenders de poulet ou steak haché, boisson 33 cl", description: "Le mardi soir et le mercredi midi, le menu enfant est offert pour tout achat d'un menu adulte. Valable également pour tout repas sur place.", img: "assets/menu-enfant.jpg" },
+    { tag: "Carte de fidélité", price: "", title: "1 case = 15 € d'achat", description: "10 cases complètes = 15 € offerts\n• Offres cumulables\n• Carte nominative\nPassez récupérer votre carte au comptoir.", img: "assets/carte-fidelite.jpg" },
+    { tag: "Carte cadeau", price: "", title: "Scannez le QR code en salle pour gagner des lots", description: "Tentez votre chance, gagnez, et venez récupérer vos cadeaux sur place.", img: "assets/carte-cadeau.jpg" },
   ];
 
   const ANNONCES = SITE_DATA.annonces && SITE_DATA.annonces.length ? SITE_DATA.annonces : [
@@ -231,9 +231,9 @@
   const DEFAULT_BLOG = {
     categories: ["Brasserie", "Traiteur", "Annonce"],
     posts: [
-      { slug: "la-terrasse-est-ouverte-tout-lete", img: "assets/blog-terrasse.png", date: "2026-08-02", category: "Brasserie", published: true, title: "La terrasse est ouverte tout l'été", excerpt: "Douze couverts supplémentaires à l'ombre, dès 19h et jusqu'à la fermeture.", body: "La terrasse est installée pour toute la saison, côté ombre, à l'écart du passage. Douze couverts de plus chaque soir, ouverts dès 19h et jusqu'à la fermeture. Sur les créneaux du vendredi et du samedi elle part vite : réservez si vous y tenez, en précisant votre préférence au moment de la demande." },
-      { slug: "un-nouveau-pain-livre-chaque-matin", img: "assets/blog-pain.png", date: "2026-07-24", category: "Brasserie", published: true, title: "Un nouveau pain, livré chaque matin", excerpt: "Nous travaillons désormais avec une boulangerie de Gardanne pour tous nos buns.", body: "Nos buns sont désormais façonnés par une boulangerie de Gardanne et livrés chaque matin. Le pain tient mieux à la cuisson, la mie reste moelleuse jusqu'à la dernière bouchée, et le circuit se raccourcit à quelques rues. Le changement concerne toute la carte, sur place comme à emporter." },
-      { slug: "le-plat-du-jour-sur-instagram", img: "assets/blog-instagram.png", date: "2026-07-10", category: "Annonce", published: true, title: "Le plat du jour, maintenant sur Instagram", excerpt: "Retrouvez chaque matin l'ardoise du jour sur @bistroburger_gardanne.", body: "Chaque matin, l'ardoise du jour est publiée sur notre compte Instagram avant le service de midi. Plat, accompagnement et prix : de quoi décider avant de sortir du bureau.\n\nSuivez @bistroburger_gardanne pour la recevoir dans votre fil." }
+      { slug: "la-terrasse-est-ouverte-tout-lete", img: "assets/blog-terrasse.jpg", date: "2026-08-02", category: "Brasserie", published: true, title: "La terrasse est ouverte tout l'été", excerpt: "Douze couverts supplémentaires à l'ombre, dès 19h et jusqu'à la fermeture.", body: "La terrasse est installée pour toute la saison, côté ombre, à l'écart du passage. Douze couverts de plus chaque soir, ouverts dès 19h et jusqu'à la fermeture. Sur les créneaux du vendredi et du samedi elle part vite : réservez si vous y tenez, en précisant votre préférence au moment de la demande." },
+      { slug: "un-nouveau-pain-livre-chaque-matin", img: "assets/blog-pain.jpg", date: "2026-07-24", category: "Brasserie", published: true, title: "Un nouveau pain, livré chaque matin", excerpt: "Nous travaillons désormais avec une boulangerie de Gardanne pour tous nos buns.", body: "Nos buns sont désormais façonnés par une boulangerie de Gardanne et livrés chaque matin. Le pain tient mieux à la cuisson, la mie reste moelleuse jusqu'à la dernière bouchée, et le circuit se raccourcit à quelques rues. Le changement concerne toute la carte, sur place comme à emporter." },
+      { slug: "le-plat-du-jour-sur-instagram", img: "assets/blog-instagram.jpg", date: "2026-07-10", category: "Annonce", published: true, title: "Le plat du jour, maintenant sur Instagram", excerpt: "Retrouvez chaque matin l'ardoise du jour sur @bistroburger_gardanne.", body: "Chaque matin, l'ardoise du jour est publiée sur notre compte Instagram avant le service de midi. Plat, accompagnement et prix : de quoi décider avant de sortir du bureau.\n\nSuivez @bistroburger_gardanne pour la recevoir dans votre fil." }
     ]
   };
   const BLOG = SITE_DATA.blog && Array.isArray(SITE_DATA.blog.posts) ? SITE_DATA.blog : DEFAULT_BLOG;
@@ -1180,9 +1180,9 @@
     const track = document.getElementById("band-track");
     if (!track) return;
     const sequence = [
-      { img: "assets/bande-5.png", alt: "Cheeseburger et frites maison servis sur assiette" },
+      { img: "assets/bande-5.jpg", alt: "Cheeseburger et frites maison servis sur assiette" },
       { img: "assets/bande-1.webp", alt: "Bowl de poulet grillé, poivrons confits et riz" },
-      { img: "assets/bande-6.png", alt: "Poulet mariné en pain pita avec frites maison" },
+      { img: "assets/bande-6.jpg", alt: "Poulet mariné en pain pita avec frites maison" },
       { img: "assets/bande-2.webp", alt: "Penne à la crème de champignons et roquette" },
       { img: "assets/bande-4.webp", alt: "Entrecôte, gratin de pommes de terre et salade" },
       { img: "assets/bande-3.webp", alt: "Café, jus d'orange et viennoiserie en salle le matin" }
