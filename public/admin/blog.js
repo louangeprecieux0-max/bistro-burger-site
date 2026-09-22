@@ -486,6 +486,58 @@
       .join("");
   }
 
+  async function checkPlagiarism() {
+    const btn = document.getElementById("bl-plag-check");
+    const out = document.getElementById("bl-plag-result");
+    if (!btn || !out) return;
+    const text = htmlToDoc(getBodyHtml()).body.textContent.replace(/\s+/g, " ").trim();
+    if (text.split(" ").filter(Boolean).length < 20) {
+      out.innerHTML = '<p class="login-error">Rédigez au moins quelques phrases avant de vérifier.</p>';
+      return;
+    }
+    btn.disabled = true;
+    btn.textContent = "Vérification en cours…";
+    out.innerHTML = "";
+    try {
+      const headers = await window.adminAuth.authHeader();
+      const res = await fetch("/api/admin/plagiarism", {
+        method: "POST",
+        headers: Object.assign({ "Content-Type": "application/json" }, headers),
+        body: JSON.stringify({ text }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(json.error || "Échec de la vérification.");
+      renderPlagiarism(json, out);
+    } catch (err) {
+      out.innerHTML = '<p class="login-error">' + esc(err.message) + "</p>";
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Vérifier le plagiat";
+    }
+  }
+
+  function renderPlagiarism(result, out) {
+    if (!result.total) {
+      out.innerHTML = '<p>Aucune phrase assez longue à vérifier pour l\'instant.</p>';
+      return;
+    }
+    const header = "<p>" + result.checked + " phrase(s) vérifiée(s) sur " + result.total + " (les plus longues, pour un résultat fiable).</p>" +
+      (result.quotaHit ? '<p class="login-error">Quota quotidien de recherches partiellement atteint : certaines phrases n\'ont pas pu être vérifiées.</p>' : "");
+    if (!result.flagged.length) {
+      out.innerHTML = header + '<p style="color:var(--green-700); font-weight:600;">✓ Aucune correspondance trouvée ailleurs sur le web.</p>';
+      return;
+    }
+    out.innerHTML = header +
+      '<p class="login-error" style="margin-bottom:10px;">' + result.flagged.length + " passage(s) retrouvé(s) mot pour mot ailleurs :</p>" +
+      '<ul class="seo-list">' +
+      result.flagged.map((f) =>
+        "<li style=\"margin-bottom:10px;\"><em>« " + esc(truncate(f.sentence, 160)) + " »</em><br>" +
+        f.matches.map((m) => '<a href="' + esc(m.link) + '" target="_blank" rel="noopener">' + esc(m.title) + "</a>").join("<br>") +
+        "</li>"
+      ).join("") +
+      "</ul>";
+  }
+
   async function uploadCover(file) {
     state.restoredFields = readEditFields();
     state.uploadingImg = true;
@@ -704,6 +756,14 @@
       '<ul class="seo-checks" id="bl-seo-checks"></ul>' +
       "</div></details>" +
 
+      '<details class="seo-panel" id="bl-plagiarism">' +
+      '<summary>Vérificateur de plagiat</summary>' +
+      '<div class="seo-body">' +
+      '<p class="dashboard-note">Recherche si des passages de cet article se retrouvent mot pour mot ailleurs sur le web (quelques phrases représentatives, pas le texte entier).</p>' +
+      '<button type="button" class="edit-hero-btn" id="bl-plag-check">Vérifier le plagiat</button>' +
+      '<div id="bl-plag-result" class="dashboard-note" style="margin-top:12px;"></div>' +
+      "</div></details>" +
+
       '<label class="admin-checkbox" style="margin-top:18px;"><input type="checkbox" id="bl-published"' + (post.published ? " checked" : "") + "> Publié (décochez pour garder en brouillon, invisible sur le site)</label>" +
       '<button type="submit" class="btn-primary" id="bl-save"' + (state.saving ? " disabled" : "") + ">" + (state.saving ? "Enregistrement…" : "Enregistrer") + "</button>" +
       (!isNew ? '<button type="button" class="btn-danger" id="bl-delete"' + (state.saving ? " disabled" : "") + ">Supprimer cet article</button>" : "") +
@@ -725,6 +785,8 @@
         window.open(href, "_blank", "noopener");
       });
     }
+
+    document.getElementById("bl-plag-check").addEventListener("click", checkPlagiarism);
 
     let slugTouched = !isNew || !!post.slug;
     document.getElementById("bl-slug").addEventListener("input", () => { slugTouched = true; });
