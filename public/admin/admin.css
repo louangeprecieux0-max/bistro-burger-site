@@ -1470,7 +1470,7 @@ button.section-card:hover .section-card-btn{
 .seo-score{font-family:var(--font-heading); font-weight:700; font-size:12px; padding:5px 12px; border-radius:999px; color:#FFFFFF; background:var(--error)}
 .seo-score.is-ok{background:var(--green-700)}
 .seo-score.is-mid{background:#B58A1D}
-.seo-count{margin-left:8px; font-family:var(--font-body); font-weight:600; font-size:11.5px; letter-spacing:0; text-transform:none; color:var(--muted)}
+.seo-count{display:inline-block; margin-left:8px; vertical-align:1px; font-family:var(--font-body); font-weight:700; font-size:11px; letter-spacing:0; text-transform:none; color:var(--ink); background:#FFFFFF; padding:3px 10px; border-radius:999px; box-shadow:0 1px 4px rgba(44,44,42,.18)}
 .seo-count.is-ok{color:var(--green-700)}
 .seo-count.is-warn{color:var(--error)}
 .seo-preview-title{margin:20px 0 8px; font-family:var(--font-heading); font-weight:700; font-size:12.5px; letter-spacing:.04em; text-transform:uppercase; color:var(--muted)}
@@ -1484,3 +1484,19 @@ button.section-card:hover .section-card-btn{
 .seo-check.is-ok .seo-check-mark{background:var(--green-700)}
 .bl-editor-wrap .ql-editor p{margin:0 0 12px}
 .bl-editor-wrap .ql-editor ul,.bl-editor-wrap .ql-editor ol{margin:0 0 12px}
+.bl-editor-wrap .ql-editor img{cursor:pointer}
+
+.bl-alt-panel{
+  position:absolute; z-index:50; width:320px; max-width:calc(100vw - 24px);
+  background:#FFFFFF; border:1px solid var(--border); border-radius:14px;
+  box-shadow:0 14px 34px rgba(14,70,61,.28); padding:14px;
+}
+.bl-alt-label{display:block; font-family:var(--font-body); font-weight:600; font-size:12.5px; color:var(--muted); margin-bottom:8px; line-height:1.4}
+.bl-alt-row{display:flex; gap:8px; align-items:center}
+.bl-alt-row .field{margin:0; padding:9px 12px; font-size:13.5px}
+.bl-alt-save{
+  flex:none; font-family:var(--font-heading); font-weight:600; font-size:12.5px; color:var(--cream-500);
+  background:linear-gradient(115deg,#2E8F7C 0%,var(--green-700) 30%,var(--green-800) 62%,var(--green-900) 100%);
+  border:none; border-radius:999px; padding:9px 14px; cursor:pointer;
+}
+.bl-alt-save:hover{filter:brightness(1.06)}

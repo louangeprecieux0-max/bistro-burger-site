@@ -436,6 +436,30 @@
   })();
 
   /* ---------------------------------------------------------------- */
+  /* Image en grand (burgers)                                          */
+  /* ---------------------------------------------------------------- */
+  const lightbox = el("div", {
+    role: "dialog", "aria-modal": "true", "aria-label": "Image en grand", tabindex: "-1",
+    style: "position:fixed; inset:0; z-index:300; display:none; align-items:center; justify-content:center; padding:32px; background:rgba(14,70,61,.82); backdrop-filter:blur(4px); cursor:zoom-out;",
+  }, `<img id="lightbox-img" alt="" style="max-width:min(880px,92vw); max-height:88vh; width:auto; height:auto; border-radius:var(--radius-photo); box-shadow:0 30px 70px rgba(0,0,0,.5); cursor:default;">
+      <button type="button" aria-label="Fermer" id="lightbox-close" style="position:absolute; top:18px; right:18px; width:42px; height:42px; border-radius:50%; border:1.5px solid rgba(237,224,211,.55); background:rgba(14,70,61,.5); color:var(--color-secondary); font-size:20px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center;">×</button>`);
+  document.body.appendChild(lightbox);
+  function openLightbox(src, alt) {
+    lightbox.querySelector("#lightbox-img").src = src;
+    lightbox.querySelector("#lightbox-img").alt = alt || "";
+    lightbox.style.display = "flex";
+    document.body.style.overflow = "hidden";
+    lightbox.focus();
+  }
+  function closeLightbox() {
+    lightbox.style.display = "none";
+    document.body.style.overflow = "";
+    lightbox.querySelector("#lightbox-img").src = "";
+  }
+  lightbox.addEventListener("click", (e) => { if (e.target === lightbox || e.target.id === "lightbox-close") closeLightbox(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && lightbox.style.display === "flex") closeLightbox(); });
+
+  /* ---------------------------------------------------------------- */
   /* Burgers carousel                                                   */
   /* ---------------------------------------------------------------- */
   function renderBurgers() {
@@ -448,7 +472,12 @@
       const card = el("div", { "data-burger-card": "", style: "display:flex; flex-direction:column; gap:11px; padding:18px; border-radius:var(--radius-card); background:#FFFFFF; border:1px solid var(--border-default); box-shadow:0 10px 26px rgba(44,44,42,.1);" });
       const photo = el("div", { "data-b-photo": "", style: "position:relative; aspect-ratio:4/3; border-radius:var(--radius-photo); background:linear-gradient(150deg,#FFFFFF,var(--cream-400)); box-shadow:0 8px 20px rgba(44,44,42,.14); display:flex; align-items:center; justify-content:center; font-family:var(--font-heading); font-weight:600; font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:rgba(18,87,76,.45); overflow:hidden;" });
       if (b.img) {
-        photo.innerHTML = `<img src="${esc(b.img)}" alt="${esc(b.name)}" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover;">`;
+        photo.innerHTML = `<img src="${esc(b.img)}" alt="${esc(b.name)}" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; cursor:zoom-in;">
+          <span aria-hidden="true" style="position:absolute; z-index:1; bottom:10px; right:10px; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:rgba(14,70,61,.55); color:#FFFFFF; opacity:0; transition:opacity .2s ease; pointer-events:none;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg></span>`;
+        photo.style.cursor = "zoom-in";
+        photo.addEventListener("mouseenter", () => { photo.querySelector("span").style.opacity = "1"; });
+        photo.addEventListener("mouseleave", () => { photo.querySelector("span").style.opacity = "0"; });
+        photo.addEventListener("click", (e) => { if (e.target.closest("button")) return; openLightbox(b.img, b.name); });
       } else {
         photo.innerHTML = "<span>Photo</span>";
       }

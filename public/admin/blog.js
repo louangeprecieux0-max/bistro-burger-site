@@ -503,6 +503,56 @@
     }
   }
 
+  let altPanelDocClick = null;
+
+  function closeAltPanel() {
+    const panel = document.getElementById("bl-alt-panel");
+    if (panel) panel.remove();
+    if (altPanelDocClick) {
+      document.removeEventListener("click", altPanelDocClick);
+      altPanelDocClick = null;
+    }
+  }
+
+  function showAltPanel(imgEl) {
+    closeAltPanel();
+    const rect = imgEl.getBoundingClientRect();
+    const panel = document.createElement("div");
+    panel.id = "bl-alt-panel";
+    panel.className = "bl-alt-panel";
+    panel.style.top = window.scrollY + rect.bottom + 8 + "px";
+    panel.style.left = Math.max(12, Math.min(window.scrollX + rect.left, window.scrollX + document.documentElement.clientWidth - 340)) + "px";
+    panel.innerHTML =
+      '<label class="bl-alt-label" for="bl-alt-input">Décrivez cette image (pour Google et l\'accessibilité)</label>' +
+      '<div class="bl-alt-row">' +
+      '<input type="text" id="bl-alt-input" class="field" placeholder="ex : Burger maison avec frites sur une planche en bois">' +
+      '<button type="button" class="bl-alt-save" id="bl-alt-save">Valider</button>' +
+      "</div>";
+    document.body.appendChild(panel);
+    const input = panel.querySelector("#bl-alt-input");
+    input.value = imgEl.getAttribute("alt") || "";
+    input.focus();
+
+    function save() {
+      const val = input.value.trim();
+      imgEl.setAttribute("alt", val);
+      closeAltPanel();
+      scheduleDraftSave();
+      scheduleSeo();
+    }
+    panel.querySelector("#bl-alt-save").addEventListener("click", save);
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") { e.preventDefault(); save(); }
+      if (e.key === "Escape") { e.preventDefault(); closeAltPanel(); }
+    });
+    setTimeout(() => {
+      altPanelDocClick = (e) => {
+        if (!panel.contains(e.target) && e.target !== imgEl) closeAltPanel();
+      };
+      document.addEventListener("click", altPanelDocClick);
+    }, 0);
+  }
+
   function insertImageInEditor() {
     if (!state.quill) return;
     const input = document.createElement("input");
@@ -516,17 +566,13 @@
       if (statusEl) statusEl.textContent = "Téléversement de l'image…";
       try {
         const url = await uploadFile(file);
-        const alt = (window.prompt("Décrivez l'image en quelques mots (utile pour Google et l'accessibilité) :", "") || "").trim();
         state.quill.insertEmbed(range.index, "image", url, "user");
         state.quill.setSelection(range.index + 1, 0, "silent");
-        if (alt) {
-          state.quill.root.querySelectorAll("img").forEach((im) => {
-            if (im.getAttribute("src") === url) im.setAttribute("alt", alt);
-          });
-        }
         if (statusEl) statusEl.textContent = "";
         scheduleDraftSave();
         scheduleSeo();
+        const inserted = Array.from(state.quill.root.querySelectorAll("img")).find((im) => im.getAttribute("src") === url);
+        if (inserted) showAltPanel(inserted);
       } catch (err) {
         if (statusEl) statusEl.textContent = "";
         window.alert(err.message);
@@ -566,6 +612,10 @@
     quill.on("text-change", () => {
       scheduleDraftSave();
       scheduleSeo();
+    });
+    quill.root.addEventListener("click", (e) => {
+      const img = e.target.closest("img");
+      if (img) showAltPanel(img);
     });
   }
 
