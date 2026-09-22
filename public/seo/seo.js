@@ -24,6 +24,18 @@
   }
   if (localStorage.getItem(TOKEN_KEY)) showLoggedIn(); else showLoggedOut();
 
+  const passwordInput = document.getElementById("password");
+  const passwordToggle = document.getElementById("password-toggle");
+  passwordToggle.addEventListener("click", () => {
+    const show = passwordInput.type === "password";
+    passwordInput.type = show ? "text" : "password";
+    passwordToggle.setAttribute("aria-pressed", String(show));
+    passwordToggle.setAttribute("aria-label", show ? "Masquer le mot de passe" : "Afficher le mot de passe");
+    passwordToggle.querySelector(".icon-eye").hidden = show;
+    passwordToggle.querySelector(".icon-eye-off").hidden = !show;
+    passwordInput.focus();
+  });
+
   document.getElementById("login-form").addEventListener("submit", async (e) => {
     e.preventDefault();
     const btn = document.getElementById("login-submit");
