@@ -1,6 +1,7 @@
 // API protégée pour l'espace admin : lecture/écriture du contenu du site
 // dans Supabase, puis déclenchement d'un redéploiement Vercel.
 const { createClient } = require("@supabase/supabase-js");
+const siteData = require("../../lib/siteDataStore");
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -82,6 +83,8 @@ module.exports = async (req, res) => {
       return;
     }
 
+    // Le serveur garde les données du site en mémoire : on les reconstruit tout de suite,
+    // sans redéploiement. (Un deploy hook reste utilisable si DEPLOY_HOOK_URL est défini.)
     let deployTriggered = false;
     if (DEPLOY_HOOK_URL) {
       try {
@@ -92,6 +95,13 @@ module.exports = async (req, res) => {
         }
       } catch (err) {
         console.error("[content] Échec de l'appel au deploy hook : " + err.message);
+      }
+    } else {
+      try {
+        await siteData.refresh();
+        deployTriggered = true;
+      } catch (err) {
+        console.error("[content] Échec du rafraîchissement des données du site : " + err.message);
       }
     }
 

@@ -3,11 +3,19 @@
   "private": true,
   "version": "1.0.0",
   "description": "Site web Bistro Burger — Gardanne",
+  "main": "server.js",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
-    "build": "node scripts/generate-data.js"
+    "start": "node server.js",
+    "build": "node -e \"console.log('Rien à construire : les données du site sont générées par le serveur au démarrage.')\"",
+    "generate": "node scripts/generate-data.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",
+    "compression": "^1.7.4",
+    "express": "^4.19.2",
     "web-push": "^3.6.7"
   }
 }
